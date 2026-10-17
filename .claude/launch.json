@@ -4,7 +4,7 @@
     {
       "name": "pop-kyoki",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8000"],
+      "runtimeArgs": [".claude/serve.py"],
       "port": 8000
     }
   ]

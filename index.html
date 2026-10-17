@@ -4,22 +4,1455 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ポップな狂気</title>
+  <!-- Adobe Fonts（VDL ロゴマル Jr / Bungee） -->
+  <script>
+    (function(d) {
+      var config = {
+        kitId: 'kge8hvj',
+        scriptTimeout: 3000,
+        async: true
+      },
+      h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+    })(document);
+  </script>
+  <!-- Google Fonts（Noto Sans JP / Material Symbols） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=chevron_left,chevron_right,laptop_mac,search&display=block">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- 1440x1024 のステージ。画面サイズに合わせて縮小・拡大する -->
   <main class="stage" id="stage">
-    <section class="scene is-active" data-scene="1">
-      <h1>ポップな狂気</h1>
-      <button class="next" type="button">はじめる</button>
+    <!-- 初期画面 -->
+    <section class="scene scene-top is-active" data-scene="1">
+      <h1 class="title" data-text="ポップな狂気">ポップな狂気</h1>
+      <p class="notice">
+        <span class="material-symbols-outlined" aria-hidden="true">laptop_mac</span>
+        パソコンでご覧ください
+      </p>
+      <button class="next btn-start" type="button">START</button>
     </section>
 
-    <section class="scene" data-scene="2">
-      <p>シーン2（仮）</p>
-      <button class="next" type="button">つぎへ</button>
+    <!-- クリエイティブの壁（2）→ 壁の上の人にズームイン（3）→ クリエイティブパーソン（4）→ いーな（5）→ 努力を続けますか？（6） -->
+    <section class="scene scene-wall" data-scene="2 3 4 5 6">
+      <!-- ズームで拡大する範囲 -->
+      <div class="camera">
+      <!-- 空を流れる効果線（JS で生成）。ズームしても線の太さは画面上で一定 -->
+      <div class="speed-lines"></div>
+      <div class="wall">
+        <div class="wall-text"></div>
+        <!-- シーン6で壁を暗くする乗算レイヤー -->
+        <div class="wall-shade"></div>
+        <img class="wall-text-strong" src="assets/svg/wall-text.svg" alt="">
+      </div>
+
+      <!-- ズームのあしらい（同心円）。カメラと一緒に拡大されて画面いっぱいに広がる -->
+      <div class="zoom-fx"></div>
+
+      <div class="skater-wrap">
+        <svg class="skater" viewBox="0 0 2563 929" aria-hidden="true">
+          <defs>
+            <!-- 髪のストライプ（57px x 3色、45度） -->
+            <pattern id="hair-stripe" patternUnits="userSpaceOnUse" width="171" height="171" patternTransform="rotate(45)">
+              <rect width="57" height="171" fill="#FFD7D8"/>
+              <rect x="57" width="57" height="171" fill="#FF2D55"/>
+              <rect x="114" width="57" height="171" fill="#FF9C9E"/>
+            </pattern>
+            <clipPath id="hair-clip"><path id="hair" d="M2029.09 290.94C2158.03 265.26 2181.6 183.368 2256.85 197.117C2332.11 210.867 2311.95 334.676 2301.89 393.501C2289.31 467.031 2196.44 561.125 2051.47 621.337C1898 685.08 1743.66 790.308 1644.71 702.772C1536.06 606.662 1336.43 746.932 1119.5 621.337C782.93 426.483 732.749 682.872 457.794 557.671C182.838 432.469 27.72 171.88 5.66455 18.8442C239.408 213.057 323.678 147.536 559.73 168.188C795.782 188.84 457.794 393.501 1161.36 242.259C1453.42 179.477 1722.15 352.067 2029.09 290.94Z"/></clipPath>
+            <!-- モーフィング用の髪の形 -->
+            <path id="hair-2" d="M1972.01 227.796C2100.96 202.116 2181.59 183.368 2256.85 197.117C2332.10 210.866 2311.94 334.676 2301.88 393.5C2275.25 549.194 1985.26 514.104 1899.70 711.948C1841.53 846.471 1569.18 628.511 1339.72 608.436C950.69 574.4 609.49 704.273 468.68 506.429C327.88 308.585 268.61 321.202 -3.48 393.5C233.88 227.796 339.38 207.144 575.43 227.796C811.49 248.448 1254.70 -18.133 1401.13 227.796C1539.05 459.431 1734.11 275.174 1972.01 227.796Z"/>
+            <path id="hair-3" d="M1972.02 227.799C2100.97 202.119 2181.6 183.371 2256.85 197.121C2332.11 210.87 2311.95 334.679 2301.89 393.504C2275.26 549.197 2026.36 776.704 1876.38 776.704C1606.08 776.704 1568.59 317.698 1339.72 608.439C1096.5 917.42 727.489 348.145 468.691 506.432C209.892 664.72 118.546 369.54 53.8452 55.0901C168.022 301.033 411.6 -56.493 636.148 85.5377C860.696 227.568 1047.18 466.128 1401.14 227.8C1627.19 75.588 1734.12 275.178 1972.02 227.799Z"/>
+            <linearGradient id="paint0_linear_45_6744" x1="2246.75" y1="548.273" x2="2301.63" y2="655.748" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#9B08D9"/>
+        <stop offset="1" stop-color="#CD58FF"/>
+        </linearGradient>
+          </defs>
+          <g id="skater-art">
+          <g clip-path="url(#hair-clip)">
+            <g class="hair-stripe"><rect x="-200" y="-200" width="3000" height="1400" fill="url(#hair-stripe)"/></g>
+          </g>
+        <g id="Group">
+        <path id="Vector 31" d="M2155.94 706.588C2090.81 704.946 2070.1 675.93 2064.73 649.103C2078.04 516.155 2448.04 456.151 2488.63 527.069C2459.68 579.794 2394.81 595.743 2341.33 618.949C2281.3 645.002 2256.96 709.136 2155.94 706.588Z" fill="url(#paint0_linear_45_6744)"/>
+        <path id="Vector 32" d="M2081.1 449.906C2061.74 421.784 2062.45 350.677 2073.62 330.417C2081.91 315.392 2122.38 315.422 2135.42 313.829L2142.01 338.694C2142.01 338.694 2106.56 332.252 2096.74 343.488C2089.66 351.581 2082.92 377.934 2087.96 401.807C2092.76 418.589 2112.89 427.939 2112.89 433.214C2112.89 438.488 2092.66 426.927 2096.74 437.29C2104.58 457.193 2119.27 449.445 2118.89 455.75C2117.7 463.413 2096.74 472.619 2081.1 449.906Z" fill="#FFE2DB"/>
+        <path id="Vector 33" d="M2524.3 311.123C2530.34 321.746 2510.9 303.773 2502.06 291.857C2471.69 301.385 2421.84 328.193 2392.67 327.106C2375.74 326.475 2355.12 324.088 2339.6 322.148L2345.39 293.407C2368.19 296.592 2378.42 299.275 2396.36 300.113C2414.3 300.951 2487.69 276.531 2495.49 273.858C2503.29 271.186 2514.67 271.454 2523.53 276.459C2532.39 281.465 2545.9 301.12 2552.57 316.671C2561.2 336.798 2540.59 311.154 2528.07 300.553C2520.72 294.33 2513.49 292.098 2524.3 311.123Z" fill="#FFE2DB"/>
+        <path id="Vector 34" d="M2064.78 645.728C2067.24 633.854 2073.93 625.843 2077.15 621.423C2098.42 616.176 2132.12 624.185 2143.16 640.204C2115.13 652.147 2098.67 653.517 2100.6 661.071C2114.08 713.741 2112.8 776.857 2120.5 825.37C2113.69 830.305 2109.44 830.646 2103.18 827.563C2091.12 770.76 2062.33 657.601 2064.78 645.728Z" fill="#FFE2DB"/>
+        <path id="Vector 35" d="M2335.36 706.571L2352.02 707.181C2366.78 587.663 2385.35 485.503 2344.88 492.451C2309.82 498.471 2345.63 569.98 2335.36 706.571Z" fill="#FFE2DB"/>
+        <path id="Vector 36" d="M2324.69 346.694C2338.7 337.741 2365.33 342.739 2374.65 346.694C2374.63 329.868 2373.75 310.153 2383.55 295.77C2300.37 287.872 2278.01 287.792 2225.87 291.627C2185.41 294.601 2192 308.55 2123.89 313.717C2132.91 333.793 2135.59 359.174 2135.33 381.012C2151.72 373.104 2190.83 354.584 2194.31 407.144C2199.48 484.949 2051.88 580.972 2062.89 652.992C2068.73 623.626 2096.41 647.577 2128.19 649.159C2205.15 652.992 2266.81 521.869 2349.91 516.847C2386.48 514.637 2406.61 536.611 2424.41 538.862C2446.06 541.6 2466.16 517.913 2488.72 527.006C2449.4 483.445 2441.73 501.66 2419.21 498.008C2391.98 493.593 2374.65 465.008 2341.33 465.008C2336.39 458.406 2328.03 444.822 2317.33 436.49C2304.42 426.429 2289.94 421.04 2284.75 418.445C2312.36 387.427 2306.8 358.124 2324.69 346.694Z" fill="black"/>
+        <path id="Vector 37" d="M2270.12 271.283C2275.12 261.158 2278.33 241.863 2275.12 233.16C2271.91 224.458 2268.59 218.463 2257.52 217.18C2247.44 216.01 2235.44 218.963 2225.99 221.743C2217.95 224.107 2219.44 230.707 2214.98 240.11C2213.5 243.235 2209.66 243.981 2206.2 243.832C2202.64 243.677 2199.3 245.053 2197.88 248.804C2195.69 254.61 2199.54 261.626 2209.9 263.398C2221.15 265.324 2205.88 302.931 2226.89 302.931C2239.79 302.931 2237.22 285.133 2249.22 280.256C2256.75 277.193 2266.89 277.811 2270.12 271.283Z" fill="#FFE2DB"/>
+        <g id="Group 14">
+        <path id="Vector 33_2" d="M2050.68 843.77C2046.26 846.322 2045.71 850.193 2045.99 851.81L2135.76 858.233C2135.91 856.555 2136.11 852.521 2135.67 849.815C2134.09 839.988 2125.12 832.66 2122.71 821.778C2122.05 822.967 2123.18 826.535 2119.13 827.615C2114.06 828.965 2102.71 818.531 2095.36 819.836C2090.28 820.738 2086.25 830.129 2077.41 835.218C2068.57 840.307 2056.19 840.58 2050.68 843.77Z" fill="black" stroke="black" stroke-width="7" stroke-linejoin="round"/>
+        <path id="Vector 29" d="M2086.35 848.517C2077.07 847.733 2056.74 844.583 2048.97 848.764C2036.3 855.591 2070.77 865.086 2086.25 865.814C2101.72 866.541 2113.26 867.24 2119.56 866.497C2125.87 865.755 2136.77 863.931 2135.22 859.295C2133.67 854.659 2124.35 856.914 2115.31 854.393C2106.27 851.871 2100.51 849.715 2086.35 848.517Z" fill="black" stroke="black" stroke-width="8"/>
+        </g>
+        <g id="Group 15">
+        <path id="Vector 37_2" d="M2336.75 693.982C2329.9 693.868 2327.53 698.213 2325.92 698.884C2324.32 699.554 2295.62 701.817 2293.94 719.733L2363.25 732.958C2364.07 716.81 2359.69 710.022 2354.41 696.694C2353.7 697.229 2352.19 699.683 2349.06 699.269C2345.08 698.743 2345.42 694.127 2336.75 693.982Z" fill="black" stroke="black" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path id="Vector 35_2" d="M2329.21 740.045C2339.37 742.665 2347.39 744.731 2359.86 738.999C2375.43 731.849 2348.15 717.465 2339.11 714.498C2326.63 710.402 2307.44 705.454 2296.92 712.282C2284.93 720.067 2297.67 733.87 2304.97 736.592C2312.26 739.314 2321.39 738.031 2329 739.992L2329.21 740.045Z" fill="black" stroke="black" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <g id="Group 16">
+        <path id="Vector 12" d="M2368.6 685.769C2343.31 700.799 2070.37 854.438 2058.75 858.024C2047.12 861.61 1997.35 876.227 1989.66 886.883C1981.96 897.539 1996.53 907.27 2016.11 907.142C2035.7 907.014 2065.48 891.491 2108.14 873.078C2108.14 873.078 2388.85 717.225 2412.24 701.278C2435.63 685.33 2480.59 660.048 2485.04 632.655C2486.89 621.236 2474.44 600.839 2452.06 611.515C2440.15 617.194 2393.89 670.738 2368.6 685.769Z" fill="black"/>
+        <path id="Vector 13" d="M2374.99 691.766C2349.7 706.795 2076.78 860.413 2065.15 863.999C2053.53 867.584 1997.39 886.047 1991.56 894.125C1985.72 902.203 2004.97 908.74 2022.58 907.5C2040.19 906.261 2075.01 899.216 2114.54 879.051C2154.07 858.885 2395.24 723.219 2418.63 707.274C2442.02 691.328 2480.66 663.163 2485.1 635.773C2486.96 624.355 2480.82 606.848 2458.44 617.522C2446.54 623.201 2400.28 676.737 2374.99 691.766Z" fill="#6155F5"/>
+        <g id="Group 10">
+        <g id="Group 2">
+        <path id="Ellipse 4" d="M2438.21 737.354C2433.5 745.631 2424.61 748.175 2418.73 744.777C2412.85 741.378 2410.53 732.351 2415.24 724.074C2419.95 715.797 2428.85 713.252 2434.72 716.651C2440.6 720.05 2442.92 729.077 2438.21 737.354Z" fill="black" stroke="black" stroke-width="9"/>
+        <rect id="Rectangle 1" x="4.29124" y="-1.22036" width="34.8762" height="6.3355" transform="matrix(0.500712 -0.877288 0.853952 0.492042 2409.86 746.332)" fill="black" stroke="black" stroke-width="6.3355"/>
+        <path id="Ellipse 3" d="M2428.57 731.81C2423.86 740.087 2414.97 742.631 2409.09 739.233C2403.21 735.834 2400.89 726.807 2405.6 718.53C2410.31 710.253 2419.21 707.708 2425.09 711.107C2430.96 714.506 2433.28 723.533 2428.57 731.81Z" fill="white" stroke="black" stroke-width="9"/>
+        <path id="Vector 34_2" d="M2408.76 732.207C2413.31 733.918 2418.25 731.39 2419.79 726.559C2421.32 721.729 2418.87 716.426 2414.31 714.715L2411.54 723.461L2408.76 732.207ZM2371.92 698.793C2367.37 697.082 2362.43 699.61 2360.9 704.441C2359.36 709.271 2361.81 714.574 2366.37 716.286L2369.15 707.54L2371.92 698.793ZM2411.54 723.461L2414.31 714.715L2371.92 698.793L2369.15 707.54L2366.37 716.286L2408.76 732.207L2411.54 723.461Z" fill="black"/>
+        </g>
+        <g id="Group 3">
+        <path id="Ellipse 4_2" d="M2389.08 719.578C2384.36 727.861 2375.46 730.406 2369.59 727.012C2363.72 723.617 2361.41 714.592 2366.12 706.309C2370.83 698.026 2379.73 695.481 2385.6 698.875C2391.47 702.269 2393.79 711.295 2389.08 719.578Z" fill="black" stroke="black" stroke-width="9"/>
+        <rect id="Rectangle 1_2" x="4.28871" y="-1.21963" width="34.8856" height="6.33059" transform="matrix(0.500845 -0.877297 0.854071 0.491984 2360.73 728.564)" fill="black" stroke="black" stroke-width="6.33059"/>
+        <path id="Ellipse 3_2" d="M2379.44 714.034C2374.72 722.317 2365.83 724.862 2359.95 721.468C2354.08 718.073 2351.77 709.048 2356.48 700.765C2361.19 692.482 2370.09 689.937 2375.96 693.331C2381.84 696.725 2384.15 705.751 2379.44 714.034Z" fill="white" stroke="black" stroke-width="9"/>
+        </g>
+        </g>
+        <g id="Group 11">
+        <g id="Group 2_2">
+        <path id="Ellipse 4_3" d="M2152.18 902.387C2147.47 910.664 2138.57 913.209 2132.69 909.81C2126.81 906.411 2124.5 897.384 2129.21 889.107C2133.91 880.83 2142.81 878.285 2148.69 881.684C2154.57 885.083 2156.88 894.111 2152.18 902.387Z" fill="black" stroke="black" stroke-width="9"/>
+        <rect id="Rectangle 1_3" x="4.29124" y="-1.22036" width="34.8762" height="6.3355" transform="matrix(0.500712 -0.877288 0.853952 0.492042 2123.82 911.365)" fill="black" stroke="black" stroke-width="6.3355"/>
+        <path id="Ellipse 3_3" d="M2142.54 896.844C2137.83 905.12 2128.93 907.665 2123.05 904.266C2117.18 900.867 2114.86 891.84 2119.57 883.563C2124.28 875.286 2133.17 872.741 2139.05 876.14C2144.93 879.539 2147.25 888.567 2142.54 896.844Z" fill="white" stroke="black" stroke-width="9"/>
+        <path id="Vector 34_3" d="M2122.73 897.24C2127.28 898.951 2132.22 896.423 2133.75 891.593C2135.29 886.762 2132.84 881.459 2128.28 879.748L2125.5 888.494L2122.73 897.24ZM2085.89 863.827C2081.33 862.115 2076.4 864.644 2074.86 869.474C2073.33 874.304 2075.78 879.608 2080.34 881.319L2083.11 872.573L2085.89 863.827ZM2125.5 888.494L2128.28 879.748L2085.89 863.827L2083.11 872.573L2080.34 881.319L2122.73 897.24L2125.5 888.494Z" fill="black"/>
+        </g>
+        <g id="Group 3_2">
+        <path id="Ellipse 4_4" d="M2103.04 884.611C2098.33 892.894 2089.43 895.439 2083.56 892.045C2077.69 888.651 2075.37 879.625 2080.08 871.342C2084.8 863.059 2093.7 860.514 2099.57 863.908C2105.44 867.303 2107.76 876.328 2103.04 884.611Z" fill="black" stroke="black" stroke-width="9"/>
+        <rect id="Rectangle 1_4" x="4.28871" y="-1.21963" width="34.8856" height="6.33059" transform="matrix(0.500845 -0.877297 0.854071 0.491984 2074.69 893.597)" fill="black" stroke="black" stroke-width="6.33059"/>
+        <path id="Ellipse 3_4" d="M2093.4 879.067C2088.69 887.35 2079.79 889.895 2073.92 886.501C2068.05 883.107 2065.73 874.081 2070.45 865.798C2075.16 857.515 2084.06 854.97 2089.93 858.364C2095.8 861.759 2098.12 870.784 2093.4 879.067Z" fill="white" stroke="black" stroke-width="9"/>
+        </g>
+        </g>
+        </g>
+        <g id="Group 13">
+        <path id="Vector 2" d="M2229.98 232.398C2230.91 227.039 2237.76 225.949 2245.67 227.953C2253.58 229.956 2255.78 235.31 2254.35 240.922C2252.92 246.534 2248.08 248.82 2239.44 246.905C2230.81 244.991 2229.04 237.758 2229.98 232.398Z" fill="black"/>
+        <path id="Vector 3" d="M2285.36 241.561C2285.96 236.075 2280.43 233.126 2273.19 232.901C2265.95 232.675 2262.69 237.29 2262.44 243.158C2262.19 249.026 2265.72 252.592 2273.55 253.104C2281.38 253.616 2284.76 247.047 2285.36 241.561Z" fill="black"/>
+        <path id="Vector 4" d="M2248.98 237.926L2249 239.925C2251.41 239.861 2254.93 240.156 2258.44 240.781C2261.98 241.411 2265.28 242.338 2267.34 243.438L2268.3 241.671L2269.26 239.903C2266.65 238.508 2262.86 237.494 2259.19 236.842C2255.5 236.184 2251.69 235.853 2248.95 235.926L2248.98 237.926Z" fill="black"/>
+        </g>
+        </g>
+          </g>
+        </svg>
+      </div>
+
+      <!-- カラー版（上の絵をそのまま参照。ズーム時にフェードインして色を戻す） -->
+      <div class="skater-wrap skater-color">
+        <svg class="skater" viewBox="0 0 2563 929" aria-hidden="true"><use href="#skater-art"/></svg>
+      </div>
+
+      <p class="tategaki tategaki-left">高い壁</p>
+      <p class="tategaki tategaki-right">超えられない</p>
+
+      <img class="me" src="assets/svg/person.svg" alt="">
+
+      <span class="bubble-dot dot-l1"></span>
+      <span class="bubble-dot dot-l2"></span>
+      <p class="bubble bubble-l">壁の上に</p>
+      <span class="bubble-dot dot-r1"></span>
+      <p class="bubble bubble-r">誰かいる</p>
+
+      <button class="next zoom" type="button" aria-label="壁の上の人を見る">
+        <span class="ripple"></span>
+        <span class="ripple"></span>
+        <span class="ripple"></span>
+        <span class="material-symbols-outlined">search</span>
+      </button>
+      </div>
+
+      <button class="next btn-white btn-are" type="button">
+        あれは…<span class="material-symbols-outlined">chevron_right</span>
+      </button>
+
+      <!-- クリエイティブパーソン -->
+      <div class="person-band">
+        <p class="person-title">クリエイティブパーソン</p>
+        <button class="next btn-white" type="button">
+          もっとよく見る<span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+
+      <!-- いーな（5）：シーン4の上にオーバーレイを重ね、モーダル風に要素を出す -->
+      <div class="s5 s5-overlay"></div>
+      <div class="s5-layer">
+        <div class="s5 s5-navy"></div>
+        <p class="s5 iina-bubble" style="--x:-720;--y:-498;--w:313;--h:210;--f:54"><span>いーな</span></p>
+        <p class="s5 iina-bubble" style="--x:-780;--y:-303;--w:217;--h:126;--f:36"><span>いーな</span></p>
+        <p class="s5 iina-bubble" style="--x:-920;--y:-179;--w:575;--h:412;--f:108"><span>いーな</span></p>
+        <p class="s5 iina-bubble" style="--x:-662;--y:278;--w:313;--h:210;--f:54"><span>いーな</span></p>
+        <p class="s5 iina-bubble" style="--x:36;--y:-602;--w:612;--h:330;--f:108"><span>いーな</span></p>
+        <p class="s5 iina-bubble" style="--x:216;--y:-318;--w:700;--h:410;--f:108"><span>いーな</span></p>
+        <p class="s5 iina-bubble" style="--x:378;--y:129;--w:313;--h:210;--f:54"><span>いーな</span></p>
+        <p class="s5 iina-bubble" style="--x:245;--y:338;--w:198;--h:131;--f:38"><span>いーな</span></p>
+        <div class="s5 s5-panel"></div>
+
+        <!-- 目（開いた目 → 伏し目）。座標は eye1 に合わせ、eye2/3 の部品は (30.857, 76.435) ずらして重ねる -->
+        <svg class="s5 s5-eye" viewBox="0 0 961 652" aria-hidden="true">
+          <defs>
+            <clipPath id="eye-white-clip"><path d="M480.409 76.4351C686.162 76.4352 860.794 219.611 922.737 384.492C860.794 549.373 686.162 651.942 480.409 651.942C274.655 651.942 100.021 549.374 38.0789 384.492C100.022 219.611 274.655 76.4351 480.409 76.4351Z"/></clipPath>
+            <clipPath id="pupil-clip"><circle cx="480.408" cy="368.249" r="236.772"/></clipPath>
+            <linearGradient id="pupil-wall" x1="0" y1="547" x2="0" y2="610" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#EDF3FF"/>
+              <stop offset="1" stop-color="#C9D2FF"/>
+            </linearGradient>
+            <linearGradient id="eye-iris" x1="449.359" y1="55.042" x2="449.359" y2="528.586" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#171717"/>
+              <stop offset="1" stop-color="#9A9A9A"/>
+            </linearGradient>
+            <linearGradient id="eye-lid" x1="449.359" y1="0" x2="449.359" y2="408.057" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FFE2DB"/>
+              <stop offset="1" stop-color="#FFBAA9"/>
+            </linearGradient>
+            <!-- 伏し目の最終形のまぶた（モーフィング用） -->
+            <path id="lid-3" d="M449.359 0.000244141C655.112 0.000377719 829.744 143.176 891.687 308.057C891.687 308.057 655.113 408.057 449.359 408.057C243.605 408.057 7.0293 308.057 7.0293 308.057C68.972 143.176 243.605 0.000244141 449.359 0.000244141Z"/>
+          </defs>
+          <g class="lashes-up">
+            <path d="M861.41 337.963L854.482 333.963L946.575 249.44L953.504 253.44L960.432 257.44L868.338 341.963L861.41 337.963Z" fill="black"/>
+            <path d="M685.427 165.441L677.909 162.705L736.014 63.2264L743.532 65.9626L751.049 68.6987L692.945 168.177L685.427 165.441Z" fill="black"/>
+            <path d="M480.216 111.403L480.216 3.18047e-06" stroke="black" stroke-width="16" stroke-linejoin="round"/>
+            <path d="M275.389 165.441L267.871 168.177L209.766 68.6987L217.284 65.9626L224.802 63.2264L282.906 162.705L275.389 165.441Z" fill="black"/>
+            <path d="M99.0217 337.963L92.0935 341.963L-6.32685e-05 257.44L6.92814 253.44L13.8563 249.44L105.95 333.963L99.0217 337.963Z" fill="black"/>
+          </g>
+          <path d="M480.409 76.4351C686.162 76.4352 860.794 219.611 922.737 384.492C860.794 549.373 686.162 651.942 480.409 651.942C274.655 651.942 100.021 549.374 38.0789 384.492C100.022 219.611 274.655 76.4351 480.409 76.4351Z" fill="white"/>
+          <circle cx="480.408" cy="368.249" r="276.267" fill="black"/>
+          <!-- 瞳に映るシーン4（スケーターの絵をそのまま参照） -->
+          <g clip-path="url(#pupil-clip)">
+            <rect x="243" y="131" width="475" height="475" fill="#37D3F0"/>
+            <use href="#skater-art" transform="translate(-692.4 75.4) scale(0.527)"/>
+            <rect x="243" y="547" width="475" height="63" fill="url(#pupil-wall)"/>
+          </g>
+          <g transform="translate(30.857 76.435)">
+            <circle class="eye-iris" cx="449.359" cy="291.814" r="236.772" fill="url(#eye-iris)" opacity="0"/>
+            <g class="lashes-down" opacity="0">
+            <path d="M812.206 295.217L804.79 298.217L884.272 394.695L891.688 391.694L899.104 388.694L819.622 292.216L812.206 295.217Z" fill="black"/>
+            <path class="lash-mid" d="M630.178 289.652L622.316 291.128L663.459 398.735L671.321 397.259L679.184 395.783L638.041 288.175L630.178 289.652Z" fill="black"/>
+            <path class="lash-center" d="M449.552 287.754L449.552 399.157" stroke="black" stroke-width="16" stroke-linejoin="round"/>
+            <path class="lash-mid" d="M268.926 289.652L261.064 288.175L219.921 395.783L227.783 397.259L235.646 398.735L276.789 291.128L268.926 289.652Z" fill="black"/>
+            <path d="M86.8984 295.217L79.4825 292.216L0.000136691 388.694L7.4161 391.694L14.8321 394.695L94.3144 298.217L86.8984 295.217Z" fill="black"/>
+            </g>
+          </g>
+          <!-- まぶた：白目の形で切り抜き、上から下りてくる -->
+          <g clip-path="url(#eye-white-clip)">
+            <g transform="translate(30.857 76.435)">
+              <path class="eye-lid" d="M449.36 0.000244141C655.113 0.000377719 829.745 143.176 891.688 308.057C891.688 308.057 655.114 308.057 449.36 308.057C243.606 308.057 7.03027 308.057 7.03027 308.057C68.9729 143.176 243.606 0.000244141 449.36 0.000244141Z" fill="url(#eye-lid)"/>
+            </g>
+          </g>
+        </svg>
+
+        <p class="s5 s5-text s5-right">ポップな狂気を漂わせ</p>
+        <p class="s5 s5-text s5-left">クリエイティブの壁を駆け回る</p>
+        <p class="s5 s5-text s5-top">クリエイティブ</p>
+        <p class="s5 s5-text s5-bottom">パーソン</p>
+        <p class="s5 s5-iina">（いーな）</p>
+      </div>
+
+      <!-- 努力を続けますか？（6）：コマ → 2つのパネルと質問 -->
+      <div class="s6-layer">
+        <div class="koma-row">
+          <figure class="koma koma-1">
+            <div class="koma-frame">
+              <svg class="koma-art" viewBox="0 0 424 323" fill="none" aria-hidden="true">
+              <g>
+              <rect width="423.333" height="323" fill="white"/>
+              <rect width="423.333" height="323" fill="#21005D" fill-opacity="0.3"/>
+              <circle cx="211.667" cy="161.5" r="119.6" fill="white" stroke="#6155F5" stroke-width="12"/>
+              <path class="clock-hour" d="M211.667 161.5V93.6216" stroke="#6155F5" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+              <path class="clock-minute" d="M211.667 161.5L270.451 195.439" stroke="#6155F5" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              </svg>
+            </div>
+            <figcaption>頑張って</figcaption>
+          </figure>
+          <figure class="koma koma-2">
+            <div class="koma-frame"><img class="koma-art" src="assets/svg/koma2.svg" alt=""></div>
+            <figcaption>努力して</figcaption>
+          </figure>
+          <figure class="koma koma-3">
+            <div class="koma-frame">
+              <svg class="koma-art" viewBox="0 0 424 323" fill="none" aria-hidden="true">
+              <g>
+              <rect width="423.333" height="323" fill="white"/>
+              <rect width="423.333" height="323" fill="#21005D" fill-opacity="0.3"/>
+              <g>
+              <g>
+              <path d="M353.929 165.976L351.343 164.483L385.713 132.939L388.298 134.431L390.884 135.924L356.514 167.468L353.929 165.976Z" fill="black"/>
+              <path d="M288.252 101.59L285.446 100.569L307.131 63.4434L309.936 64.4645L312.742 65.4856L291.057 102.611L288.252 101.59Z" fill="black"/>
+              <path d="M211.667 81.4233L211.667 39.8476" stroke="black" stroke-width="5.97122" stroke-linejoin="round"/>
+              <path d="M135.225 101.59L132.419 102.611L110.735 65.4856L113.54 64.4645L116.346 63.4434L138.031 100.569L135.225 101.59Z" fill="black"/>
+              <path d="M69.4045 165.976L66.8189 167.468L32.4495 135.924L35.0351 134.431L37.6207 132.939L71.9902 164.483L69.4045 165.976Z" fill="black"/>
+              </g>
+              <circle cx="211.738" cy="177.278" r="83.7714" fill="#7E7E7E"/>
+              <path d="M211.739 68.373C288.526 68.3731 353.699 121.806 376.816 183.34C353.699 244.874 288.526 283.153 211.739 283.153C134.951 283.153 69.7777 244.874 46.6606 183.34C69.7777 121.806 134.951 68.373 211.739 68.373Z" fill="url(#paint0_linear_56_6825)"/>
+              <g>
+              <mask id="mask0_56_6825" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="46" y="68" width="331" height="216">
+              <path d="M211.739 68.373C288.526 68.3731 353.699 121.806 376.816 183.34C353.699 244.874 288.526 283.153 211.739 283.153C134.951 283.153 69.7777 244.874 46.6606 183.34C69.7777 121.806 134.951 68.373 211.739 68.373Z" fill="white"/>
+              </mask>
+              <g mask="url(#mask0_56_6825)">
+              <path opacity="0.7" d="M195.138 288.023C202.139 282.099 215.816 267.022 214.524 254.098M214.524 254.098C213.231 241.174 206.447 222.865 203.216 215.326M214.524 254.098C218.95 245.147 232.542 224.13 251.5 211.665" stroke="#FF3B30" stroke-width="9.11341" stroke-linecap="round" stroke-linejoin="round"/>
+              <path opacity="0.7" d="M162.091 60.3462C174.709 63.9418 201.429 75.5354 207.363 93.1459M207.363 93.1459C213.296 110.756 214.781 140.795 202.082 163.088M207.363 93.1459C223.529 93.1459 251.748 90.5643 278.275 134.586" stroke="#FF3B30" stroke-width="9.11341" stroke-linecap="round" stroke-linejoin="round"/>
+              <path opacity="0.7" d="M41.3383 134.431C49.0044 145.079 68.9815 166.275 87.5605 165.877M87.5605 165.877C106.14 165.479 133.014 157.848 144.128 154.083M87.5605 165.877C99.8325 173.191 128.291 194.929 143.952 223.364" stroke="#FF3B30" stroke-width="9.11341" stroke-linecap="round" stroke-linejoin="round"/>
+              <path opacity="0.7" d="M334.058 178.502C338.239 184.876 343.146 191.546 347.862 196.215C357.092 205.354 377.417 204.215 386.426 202.503M347.862 196.215C334.058 192.958 309.064 196.215 286.05 209.798M294.47 157.596C310.187 159.56 328.649 170.256 334.058 178.502M334.058 178.502C343.585 164.612 344.186 150.032 337.41 133.459" stroke="#FF3B30" stroke-width="9.11341" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              </g>
+              <g>
+              <mask id="mask1_56_6825" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="46" y="68" width="331" height="216">
+              <path d="M211.739 68.373C288.526 68.3731 353.699 121.806 376.816 183.34C353.699 244.874 288.526 283.153 211.739 283.153C134.951 283.153 69.7777 244.874 46.6606 183.34C69.7777 121.806 134.951 68.373 211.739 68.373Z" fill="url(#paint1_linear_56_6825)"/>
+              </mask>
+              <g mask="url(#mask1_56_6825)">
+              <g class="bloody-iris">
+              <circle cx="85.7318" cy="184.526" r="103.103" fill="black"/>
+              <circle cx="85.7317" cy="183.011" r="44.6302" fill="#808080" fill-opacity="0.55"/>
+              </g>
+              </g>
+              </g>
+              </g>
+              </g>
+              <defs>
+              <linearGradient id="paint0_linear_56_6825" x1="211.738" y1="68.373" x2="211.738" y2="355.435" gradientUnits="userSpaceOnUse">
+              <stop offset="0.110733" stop-color="white"/>
+              <stop offset="1" stop-color="#FFDBDB"/>
+              </linearGradient>
+              <linearGradient id="paint1_linear_56_6825" x1="211.738" y1="68.373" x2="211.738" y2="283.153" gradientUnits="userSpaceOnUse">
+              <stop stop-color="white"/>
+              <stop offset="1" stop-color="#999999"/>
+              </linearGradient>
+              </defs>
+              </svg>
+            </div>
+            <figcaption>壁を登らなきゃ</figcaption>
+          </figure>
+        </div>
+
+        <p class="s6-quote">「君はどうやって、そこに辿り着いたの？」</p>
+        <!-- 左：カラーのスケーターのアップ -->
+        <div class="q-panel q-panel-l">
+          <svg class="q-skater" viewBox="0 0 655 466" aria-hidden="true">
+            <use href="#skater-art" transform="translate(-954 -54.7) scale(0.582)"/>
+          </svg>
+        </div>
+        <!-- 右：シーン2の構図（壁の手前の自分と、壁の上のスケーター） -->
+        <div class="q-panel q-panel-r">
+          <svg class="q-mini-skater" viewBox="0 0 2563 929" aria-hidden="true"><use href="#skater-art"/></svg>
+          <div class="q-wall"><div class="q-wall-text"></div></div>
+          <img class="q-me" src="assets/svg/person.svg" alt="">
+        </div>
+        <p class="s6-question">努力を続けますか？</p>
+        <div class="s6-answers">
+          <button class="btn-white btn-blue-shadow btn-yes" type="button"><span class="material-symbols-outlined">chevron_left</span>はい</button>
+          <button class="next btn-white btn-blue-shadow" type="button">いいえ<span class="material-symbols-outlined">chevron_right</span></button>
+        </div>
+      </div>
+
+      <button class="back" type="button">
+        <span class="material-symbols-outlined">chevron_left</span>BACK
+      </button>
+      <button class="s5 next btn-black btn-next" type="button">
+        NEXT<span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </section>
+    <!-- GIVE UP → パチン（7） -->
+    <section class="scene scene-snap" data-scene="7" data-cut-in>
+      <!-- 爆発の形（黄色 → 青に色を変える） -->
+      <svg class="s7-burst" viewBox="0 0 1440 1024" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs>
+          <linearGradient id="burst-yellow" x1="216.836" y1="50.9724" x2="1324.4" y2="1254.41" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FFE8A3"/>
+            <stop offset="1" stop-color="#E6A000"/>
+          </linearGradient>
+        </defs>
+        <g class="s7-burst-shape">
+          <path class="s7-burst-yellow" d="M1471.06 511.894C1364.03 618.115 1332.03 717.633 1383.27 859.261C1220.24 888.613 1140.45 960.076 1126.83 1135.49C949.632 1060.24 838.6 1088.95 720 1254.41C601.454 1088.95 490.368 1060.24 313.171 1135.49C299.549 960.076 219.815 888.613 56.7267 859.261C108.026 717.633 75.9708 618.115 -31.061 511.894C75.9708 405.673 107.972 306.155 56.7267 164.527C219.761 135.174 299.549 63.7112 313.171 -111.702C490.368 -36.4555 601.4 -65.1595 720 -230.626C838.546 -65.1595 949.632 -36.4555 1126.83 -111.702C1140.45 63.7112 1220.18 135.174 1383.27 164.527C1331.97 306.155 1364.03 405.673 1471.06 511.894Z" fill="url(#burst-yellow)"/>
+          <path class="s7-burst-blue" d="M1471.06 511.894C1364.03 618.115 1332.03 717.633 1383.27 859.261C1220.24 888.613 1140.45 960.076 1126.83 1135.49C949.632 1060.24 838.6 1088.95 720 1254.41C601.454 1088.95 490.368 1060.24 313.171 1135.49C299.549 960.076 219.815 888.613 56.7267 859.261C108.026 717.633 75.9708 618.115 -31.061 511.894C75.9708 405.673 107.972 306.155 56.7267 164.527C219.761 135.174 299.549 63.7112 313.171 -111.702C490.368 -36.4555 601.4 -65.1595 720 -230.626C838.546 -65.1595 949.632 -36.4555 1126.83 -111.702C1140.45 63.7112 1220.18 135.174 1383.27 164.527C1331.97 306.155 1364.03 405.673 1471.06 511.894Z" fill="#8CE6F5"/>
+        </g>
+      </svg>
+
+      <!-- ほぼ閉じていく目（eye3 → eye4）と GIVE UP -->
+      <svg class="s7-eye-closed" viewBox="0 0 900 607" aria-hidden="true">
+        <defs>
+          <linearGradient id="s7-iris" x1="449.358" y1="55.042" x2="449.358" y2="528.586" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#171717"/>
+            <stop offset="1" stop-color="#9A9A9A"/>
+          </linearGradient>
+          <linearGradient id="s7-lid" x1="449.358" y1="0" x2="449.358" y2="508.057" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FFE2DB"/>
+            <stop offset="1" stop-color="#FFBAA9"/>
+          </linearGradient>
+          <!-- eye4 の形（モーフィング用） -->
+          <path id="s7-lid-4" d="M449.359 0C655.112 0.000133578 829.744 143.176 891.687 308.057C891.687 308.057 813.225 508.057 449.359 508.057C85.4919 508.057 7.02893 308.057 7.02893 308.057C68.9716 143.176 243.605 0 449.359 0Z"/>
+          <path id="s7-lash-4-0" d="M812.205 362.181L804.789 365.181L884.272 461.659L891.688 458.659L899.104 455.658L819.621 359.18L812.205 362.181Z"/>
+          <path id="s7-lash-4-1" d="M654.858 462.616L646.995 464.093L688.138 571.7L696.001 570.223L703.863 568.747L662.72 461.14L654.858 462.616Z"/>
+          <path id="s7-lash-4-2" d="M449.551 494.718L449.551 606.121"/>
+          <path id="s7-lash-4-3" d="M243.858 462.616L235.995 461.14L194.852 568.747L202.715 570.223L210.577 571.7L251.72 464.093L243.858 462.616Z"/>
+          <path id="s7-lash-4-4" d="M86.8983 362.181L79.4823 359.18L1.46209e-05 455.658L7.41598 458.659L14.8319 461.659L94.3143 365.181L86.8983 362.181Z"/>
+        </defs>
+        <path d="M449.551 0C655.305 0.000133578 829.937 143.176 891.88 308.057C829.937 472.938 655.305 575.507 449.551 575.507C243.798 575.507 69.1642 472.939 7.22168 308.057C69.1643 143.176 243.798 0 449.551 0Z" fill="white"/>
+        <circle cx="449.551" cy="291.814" r="276.267" fill="black"/>
+        <circle cx="449.358" cy="291.814" r="236.772" fill="url(#s7-iris)"/>
+        <g>
+          <path class="s7-lash" d="M812.206 294.954L804.79 297.955L884.272 394.433L891.688 391.432L899.104 388.431L819.622 291.954L812.206 294.954Z" fill="black"/>
+          <path class="s7-lash" d="M630.178 359.389L622.315 360.866L663.458 468.473L671.321 466.997L679.183 465.52L638.04 357.913L630.178 359.389Z" fill="black"/>
+          <path class="s7-lash" d="M449.551 377.491L449.551 488.895" stroke="black" stroke-width="16" stroke-linejoin="round"/>
+          <path class="s7-lash" d="M268.925 359.389L261.063 357.913L219.92 465.52L227.782 466.997L235.645 468.473L276.788 360.866L268.925 359.389Z" fill="black"/>
+          <path class="s7-lash" d="M86.8984 294.954L79.4825 291.954L0.000136691 388.431L7.4161 391.432L14.8321 394.433L94.3144 297.955L86.8984 294.954Z" fill="black"/>
+        </g>
+        <path class="s7-lid" d="M449.359 0.000244141C655.112 0.000377719 829.744 143.176 891.687 308.057C891.687 308.057 655.113 408.057 449.359 408.057C243.605 408.057 7.0293 308.057 7.0293 308.057C68.972 143.176 243.605 0.000244141 449.359 0.000244141Z" fill="url(#s7-lid)"/>
+      </svg>
+      <p class="s7-giveup">GIVE UP......</p>
+
+      <!-- 開いた目（瞳の中に手が入る） -->
+      <svg class="s7-eye-open" viewBox="0 0 961 652" aria-hidden="true">
+        <defs>
+          <clipPath id="s7-pupil-clip"><circle cx="480.408" cy="368.249" r="236.772"/></clipPath>
+        </defs>
+        <!-- 目の枠（まつ毛・白目・黒い輪・瞳の色）。ズームアウトしながらフェードインする -->
+        <g class="s7-eye-frame">
+          <g>
+          <path d="M861.41 337.963L854.482 333.963L946.575 249.44L953.504 253.44L960.432 257.44L868.338 341.963L861.41 337.963Z" fill="black"/>
+            <path d="M685.427 165.441L677.909 162.705L736.014 63.2264L743.532 65.9626L751.049 68.6987L692.945 168.177L685.427 165.441Z" fill="black"/>
+            <path d="M480.216 111.403L480.216 3.18047e-06" stroke="black" stroke-width="16" stroke-linejoin="round"/>
+            <path d="M275.389 165.441L267.871 168.177L209.766 68.6987L217.284 65.9626L224.802 63.2264L282.906 162.705L275.389 165.441Z" fill="black"/>
+            <path d="M99.0217 337.963L92.0935 341.963L-6.32685e-05 257.44L6.92814 253.44L13.8563 249.44L105.95 333.963L99.0217 337.963Z" fill="black"/>
+        </g>
+          <path d="M480.409 76.4351C686.162 76.4352 860.794 219.611 922.737 384.492C860.794 549.373 686.162 651.942 480.409 651.942C274.655 651.942 100.021 549.374 38.0789 384.492C100.022 219.611 274.655 76.4351 480.409 76.4351Z" fill="white"/>
+          <circle cx="480.408" cy="368.249" r="276.267" fill="black"/>
+          <circle cx="480.408" cy="368.249" r="236.772" fill="#37D3F0"/>
+        </g>
+        <!-- 瞳の中の手（パチンの手をそのまま参照し、瞳の円で切り抜く） -->
+        <g clip-path="url(#s7-pupil-clip)">
+          <use href="#s7-hand-art" transform="translate(363.4 172.2) scale(0.432)"/>
+        </g>
+      </svg>
+
+      <!-- 指を鳴らした手。最後は瞳の円で切り抜く -->
+      <div class="s7-hand-wrap">
+        <svg class="s7-hand" viewBox="0 0 537 969" fill="none" aria-hidden="true">
+          <g id="s7-hand-art" fill="none">
+          <path d="M411.297 370.643C397.2 399.958 399.55 461.63 402.487 488.802L512.619 479.264C500.912 410.843 534.645 330.074 494.998 313.062C455.35 296.049 428.918 334.001 411.297 370.643Z" fill="url(#hand-g0)"/>
+          <path d="M402.487 488.802C399.55 461.63 397.2 399.958 411.297 370.643C428.918 334.001 455.35 296.049 494.998 313.062C534.646 330.074 499.402 399.957 517.264 516.203" stroke="#FE5227" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M204.138 183.385C187.514 96.1108 139.135 -21.7571 67.8585 17.921C59.4311 22.6124 164.693 242.838 67.8585 510.051H187.591C187.591 510.051 232.317 331.329 204.138 183.385Z" fill="url(#hand-g1)" stroke="#FE5227" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M262.883 483.916C325.716 462.812 393.133 461.232 414.723 484.456L512.874 474.917C572.86 868.29 429.179 789.962 421.154 987.918C418.013 1065.39 419.845 1182.48 421.154 1231.33H57.4543C78.3931 1178.55 119.224 1055.97 115.036 987.918C108.048 874.368 -56.3723 564.142 40.4462 474.917C107.189 413.409 178.876 406.281 261.29 363.741C351.122 317.371 475.407 227.381 486.898 248.065C539.649 343.019 304.84 469.085 262.883 483.916Z" fill="url(#hand-g2)"/>
+          <path d="M414.723 484.458C392.95 461.039 324.573 462.843 261.29 484.459C298.444 472.5 578.031 312.636 483.067 244.235C455.993 224.734 366.32 314.419 240.634 372.125C156.348 410.823 89.824 429.415 40.4462 474.92C-56.3723 564.145 108.048 874.371 115.036 987.922C119.224 1055.97 78.3931 1178.55 57.4543 1231.34H427.343C426.035 1182.48 411.582 1095.66 414.723 1018.18C422.748 820.228 572.86 868.293 512.874 474.92" stroke="#FE5227" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M308.534 902.58C344.281 841.659 372.901 734.908 284.745 695.152C317.214 690.621 347.378 686.264 367.142 664.705" stroke="#FE5227" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M203.135 620.036C262.836 593.214 407.07 529.873 428.874 573.482C450.677 617.09 402.917 711.052 351.869 713.648C317.234 715.409 296.857 698.207 296.857 698.207" stroke="#FE5227" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M123.571 540.882C148.123 529.737 204.418 503.883 261.29 484.457C324.573 462.841 392.95 461.037 414.723 484.457C439.068 510.643 426.426 546.952 422.178 565.463" stroke="#FE5227" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <defs>
+          <linearGradient id="hand-g0" x1="457.608" y1="308.874" x2="457.608" y2="488.802" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#FFE2DB"/>
+          <stop offset="1" stop-color="#FFD8CE"/>
+          </linearGradient>
+          <linearGradient id="hand-g1" x1="140.414" y1="10.0005" x2="140.414" y2="510.051" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#FFE2DB"/>
+          <stop offset="1" stop-color="#FFBAA9"/>
+          </linearGradient>
+          <linearGradient id="hand-g2" x1="268.739" y1="245.025" x2="268.739" y2="1231.33" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#FFE2DB"/>
+          <stop offset="1" stop-color="#FFBAA9"/>
+          </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <!-- パチン！の効果線 -->
+      <svg class="s7-snap-lines" viewBox="-100 -100 200 200" aria-hidden="true">
+        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(-90)"/>
+        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(-60)"/>
+        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(-30)"/>
+        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(0)"/>
+        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(30)"/>
+        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(60)"/>
+        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(90)"/>
+      </svg>
+
+      <div class="s7-flash"></div>
+
+      <button class="next btn-white s7-btn" type="button">え!?<span class="material-symbols-outlined">chevron_right</span></button>
+      <button class="back" type="button">
+        <span class="material-symbols-outlined">chevron_left</span>BACK
+      </button>
+    </section>
+    <!-- 私とスケーター（8）：パネルを左右にスライドする -->
+    <section class="scene scene-slides" data-scene="8">
+      <div class="s8-track">
+        <div class="s8-slide">
+          <div class="s8-panel">
+            <svg class="s8-me" viewBox="0 0 571 786" fill="none" aria-hidden="true">
+            <g clip-path="url(#clip0_35_5553)">
+            <g>
+            <g>
+            <path d="M106.196 813.59L50.1024 818.498C43.666 744.93 51.2126 643.415 94.7327 559.946L130.033 588.295C112.174 658.935 98.0578 720.565 106.196 813.59Z" fill="#FEC0B1"/>
+            <path d="M466.529 813.59L522.623 818.498C529.06 744.93 521.513 643.415 477.993 559.946L442.693 588.295C460.551 658.935 474.668 720.565 466.529 813.59Z" fill="#FEC0B1"/>
+            <path d="M27.9927 617.713C118.628 424.36 229.099 403.135 285.92 401.373C342.74 403.135 453.212 424.36 543.847 617.713L452.853 672.309C444.993 617.713 428.815 577.272 428.815 577.272C408.571 653.647 417.356 746.451 428.815 809.809H143.025C154.484 746.451 164.026 660.932 143.025 577.272C143.025 577.272 124.706 630.825 118.986 672.309L27.9927 617.713Z" fill="white"/>
+            </g>
+            <path d="M432.882 111.155C391.679 85.4034 390.027 35.1132 284.55 24.2018C188.25 14.2397 66.8537 89.2891 51.8241 187.878C12.8364 443.623 253.346 384.6 369.873 384.6C494.261 384.6 533.659 308.219 524.949 221.125C519.024 161.873 472.697 136.039 432.882 111.155Z" fill="black"/>
+            <g>
+            <path d="M170.211 350.82C141.561 329.394 132.009 217.451 159.518 192.999C225.189 154.131 340.152 147.312 415.319 192.999C446.771 212.115 433.275 329.394 404.625 350.82C375.69 372.46 331.028 379.084 316.56 399.842C309.032 410.643 316.56 463.229 287.418 463.229C258.277 463.229 265.804 410.643 258.277 399.842C243.809 379.084 199.147 372.46 170.211 350.82Z" fill="url(#paint0_linear_35_5553)"/>
+            <g>
+            <g>
+            <path d="M247.812 246.167L246.482 245.399L255.256 237.347L256.586 238.114L257.915 238.882L249.141 246.935L247.812 246.167Z" fill="black"/>
+            <path d="M231.045 229.729L229.602 229.204L235.138 219.727L236.581 220.252L238.024 220.777L232.488 230.255L231.045 229.729Z" fill="black"/>
+            <path d="M211.494 224.582L211.494 213.968" stroke="black" stroke-width="3.07088" stroke-linejoin="round"/>
+            <path d="M191.979 229.729L190.537 230.255L185.001 220.777L186.444 220.252L187.887 219.727L193.422 229.204L191.979 229.729Z" fill="black"/>
+            <path d="M175.177 246.167L173.847 246.935L165.073 238.882L166.403 238.114L167.732 237.347L176.506 245.399L175.177 246.167Z" fill="black"/>
+            </g>
+            <g>
+            <g>
+            <circle cx="211.513" cy="249.053" r="21.3856" fill="#7E7E7E"/>
+            <path d="M211.513 221.251C231.115 221.251 247.753 234.892 253.654 250.6C247.753 266.309 231.115 276.081 211.513 276.081C191.91 276.081 175.272 266.309 169.371 250.6C175.272 234.892 191.91 221.251 211.513 221.251Z" fill="white"/>
+            <circle cx="211.513" cy="249.053" r="26.3207" fill="black"/>
+            <circle cx="211.513" cy="249.053" r="11.9532" fill="#C6C6C6"/>
+            </g>
+            </g>
+            </g>
+            <g>
+            <g>
+            <path d="M396.919 246.167L395.589 245.399L404.363 237.347L405.693 238.114L407.023 238.882L398.249 246.935L396.919 246.167Z" fill="black"/>
+            <path d="M380.152 229.729L378.71 229.204L384.245 219.727L385.688 220.252L387.131 220.777L381.595 230.255L380.152 229.729Z" fill="black"/>
+            <path d="M360.602 224.582L360.602 213.968" stroke="black" stroke-width="3.07088" stroke-linejoin="round"/>
+            <path d="M341.087 229.729L339.644 230.255L334.108 220.777L335.551 220.252L336.994 219.727L342.53 229.204L341.087 229.729Z" fill="black"/>
+            <path d="M324.284 246.167L322.954 246.935L314.18 238.882L315.51 238.114L316.84 237.347L325.614 245.399L324.284 246.167Z" fill="black"/>
+            </g>
+            <g>
+            <g>
+            <circle cx="360.62" cy="249.053" r="21.3856" fill="#7E7E7E"/>
+            <path d="M360.62 221.251C380.223 221.251 396.86 234.892 402.762 250.6C396.86 266.309 380.223 276.081 360.62 276.081C341.017 276.081 324.379 266.309 318.478 250.6C324.379 234.892 341.017 221.251 360.62 221.251Z" fill="white"/>
+            <circle cx="360.62" cy="249.053" r="26.3207" fill="black"/>
+            <circle cx="360.62" cy="249.053" r="11.9532" fill="#C6C6C6"/>
+            </g>
+            </g>
+            </g>
+            <ellipse cx="286.852" cy="318.316" rx="13.9654" ry="11.6707" fill="url(#paint1_linear_35_5553)"/>
+            </g>
+            </g>
+            </g>
+            <defs>
+            <linearGradient id="paint0_linear_35_5553" x1="288.264" y1="161.239" x2="288.264" y2="484.985" gradientUnits="userSpaceOnUse">
+            <stop offset="0.41644" stop-color="#FFE2DB"/>
+            <stop offset="1" stop-color="#FF957A"/>
+            </linearGradient>
+            <linearGradient id="paint1_linear_35_5553" x1="286.852" y1="306.646" x2="286.852" y2="329.987" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FE5227"/>
+            <stop offset="1" stop-color="#FF0000"/>
+            </linearGradient>
+            <clipPath id="clip0_35_5553">
+            <rect width="571" height="786" fill="white"/>
+            </clipPath>
+            </defs>
+            </svg>
+          </div>
+          <button class="s8-arrow s8-arrow-next" type="button" aria-label="次の絵へ"><span class="material-symbols-outlined">chevron_right</span></button>
+        </div>
+        <div class="s8-slide">
+          <div class="s8-panel">
+            <svg class="s8-skater" viewBox="0 0 1315 786" fill="none" aria-hidden="true">
+            <g clip-path="url(#clip0_35_5591)">
+            <g>
+            <path d="M878.357 175.02C908.647 88.692 961.656 41.7374 1035.87 41.7373C1110.08 41.7372 1168.22 116.348 1156.22 256.739C1142.56 416.541 1333.92 371.613 1297.14 527.212C1264.07 667.135 1149.41 896.538 1098.53 896.538H596.082C387.258 890.177 -55.831 862.829 -157.593 804.316C-284.796 731.174 -154.413 724.814 -30.3905 721.634C93.632 718.454 399.959 524.032 644.824 527.212C889.689 530.392 610.381 422.171 778.925 368.11C947.468 314.049 842.543 277.088 878.357 175.02Z" fill="#FFD7D8"/>
+            <!-- 髪のストライプ（右から左へ流す） -->
+            <g clip-path="url(#s8-hair-clip)"><g class="s8-hair-stripe"><rect x="0" y="-300" width="1500" height="1300" fill="url(#s8-stripe)"/></g></g>
+            <g filter="url(#filter0_d_35_5591)">
+            <path d="M1118.33 383.624L1141.88 334.707C1201.49 392.719 1250.59 428.595 1250.59 486.213C1250.59 522.089 1190.8 569.923 1158.18 589.491L1136.52 562.232C1170.14 536.221 1206.62 502.336 1207.1 486.213C1208.38 443.381 1150.79 400.009 1118.33 383.624Z" fill="#FFE2DB"/>
+            </g>
+            <g filter="url(#filter1_d_35_5591)">
+            <path d="M973.272 408.64C963.019 437.692 874.153 544.502 845.1 525.704C827.347 514.216 840.372 447.154 855.384 392.384L908.685 389.069L876.386 475.619C893.11 460.462 928.128 425.006 934.4 404.434C942.239 378.72 924.773 364.779 924.391 356.378C924.009 347.978 935.083 341.485 938.52 338.048C941.956 334.611 942.057 320.049 940.811 305.208C939.464 289.173 930.119 280.387 930.501 276.568C930.882 272.749 934.62 271.117 939.593 273.39C954.443 280.18 958.377 305.847 958.377 320.101C969.027 316.229 972.997 328.021 975.561 336.14C981.289 327.357 990.562 317.084 997.669 312.346C1004.11 308.049 1010.31 310.554 1009.93 314.755C1009.55 318.955 993.878 330.825 984.876 358.781C978.11 379.789 983.977 378.31 973.272 408.64Z" fill="#FFE2DB"/>
+            </g>
+            <path d="M909.623 481.217C889.173 452.976 856.98 427.258 825.038 412.456C909.623 324.852 906.11 255.085 1027.54 255.085C1148.96 255.085 1140.18 319.742 1229.47 379.756C1195.8 412.456 1172.38 437.107 1172.38 471.973C1133.73 440.599 1090.53 430.243 1090.53 481.217C1179.27 581.752 1292.05 726.339 1315 899.71L722.164 899.71C778.544 743.966 834.253 624.203 965.991 481.217C973.31 435.379 930.742 449.868 909.623 481.217Z" fill="black"/>
+            <g filter="url(#filter2_d_35_5591)">
+            <path d="M947.759 162.488C953.642 156.607 945.819 148.176 957.158 132.3C963.502 123.419 981.9 121.365 1000.22 116.363C1018.26 111.436 1023.7 95.3926 1046.07 95.3926C1068.44 95.3926 1080.66 114.241 1083.54 132.3C1086.61 151.566 1098.3 160.26 1104.48 162.488C1110.29 164.586 1131.21 162.488 1131.21 177.951C1131.21 193.414 1101.04 190.907 1098.37 199.118L1098.3 199.31C1096.01 206.362 1092.56 216.947 1076.47 225.008C1050.46 238.039 1045.89 229.87 1039.85 270.319C1037.28 287.536 1014.89 287.068 1012.39 270.319C1006.35 229.87 1001.78 238.039 975.77 225.008C959.683 216.947 956.234 206.362 953.936 199.31L953.873 199.118C951.196 190.907 921.026 193.414 921.026 177.951C921.027 162.488 943.389 166.858 947.759 162.488Z" fill="#FFE2DB"/>
+            </g>
+            <g>
+            <path d="M962.328 171.202C963.559 160.101 977.445 156.994 993.906 160.089C1010.37 163.184 1015.57 173.872 1013.36 185.553C1011.15 197.235 1001.5 202.537 983.57 199.717C965.636 196.898 961.096 182.303 962.328 171.202Z" fill="black"/>
+            <path d="M1089.91 171.2C1088.68 160.099 1074.8 156.993 1058.33 160.087C1041.87 163.182 1036.67 173.87 1038.88 185.551C1041.09 197.233 1050.74 202.535 1068.67 199.715C1086.6 196.896 1091.14 182.301 1089.91 171.2Z" fill="black"/>
+            <path d="M1006.16 178.013H1046.42" stroke="black" stroke-width="8.9967"/>
+            </g>
+            <path d="M973.273 408.64C963.019 437.692 874.153 544.502 845.101 525.703L876.386 475.619C893.111 460.462 928.128 425.006 934.4 404.434C942.24 378.72 924.773 364.779 924.391 356.378C924.009 347.978 935.083 341.485 938.52 338.048C941.957 334.611 942.057 320.049 940.811 305.208C939.465 289.173 930.119 280.387 930.501 276.568C930.883 272.749 934.621 271.117 939.593 273.39C954.443 280.18 958.377 305.847 958.377 320.101C969.027 316.229 972.997 328.021 975.561 336.14C981.289 327.357 990.562 317.084 997.669 312.346C1004.11 308.049 1010.31 310.554 1009.93 314.755C1009.55 318.955 993.879 330.825 984.876 358.781C978.111 379.789 983.977 378.309 973.273 408.64Z" fill="#FFE2DB"/>
+            </g>
+            </g>
+            <defs>
+            <clipPath id="s8-hair-clip"><path d="M878.357 175.02C908.647 88.692 961.656 41.7374 1035.87 41.7373C1110.08 41.7372 1168.22 116.348 1156.22 256.739C1142.56 416.541 1333.92 371.613 1297.14 527.212C1264.07 667.135 1149.41 896.538 1098.53 896.538H596.082C387.258 890.177 -55.831 862.829 -157.593 804.316C-284.796 731.174 -154.413 724.814 -30.3905 721.634C93.632 718.454 399.959 524.032 644.824 527.212C889.689 530.392 610.381 422.171 778.925 368.11C947.468 314.049 842.543 277.088 878.357 175.02Z"/></clipPath>
+            <pattern id="s8-stripe" patternUnits="userSpaceOnUse" width="33" height="33" patternTransform="rotate(45)">
+            <rect width="11" height="33" fill="#FFD7D8"/>
+            <rect x="11" width="11" height="33" fill="#FF2D55"/>
+            <rect x="22" width="11" height="33" fill="#FF9C9E"/>
+            </pattern>
+            <filter id="filter0_d_35_5591" x="1112.04" y="334.706" width="144.833" height="267.36" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feOffset dy="6.28753"/>
+            <feGaussianBlur stdDeviation="3.14376"/>
+            <feComposite in2="hardAlpha" operator="out"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0.142785 0 0 0 0 0.118088 0 0 0 0 0.118088 0 0 0 0.5 0"/>
+            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_35_5591"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_35_5591" result="shape"/>
+            </filter>
+            <filter id="filter1_d_35_5591" x="830.246" y="272.351" width="185.987" height="268.132" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feOffset dy="6.28753"/>
+            <feGaussianBlur stdDeviation="3.14376"/>
+            <feComposite in2="hardAlpha" operator="out"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0.142785 0 0 0 0 0.118088 0 0 0 0 0.118088 0 0 0 0.5 0"/>
+            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_35_5591"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_35_5591" result="shape"/>
+            </filter>
+            <filter id="filter2_d_35_5591" x="914.739" y="95.3926" width="222.761" height="201.811" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feOffset dy="7.85941"/>
+            <feGaussianBlur stdDeviation="3.14376"/>
+            <feComposite in2="hardAlpha" operator="out"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0.142785 0 0 0 0 0.118088 0 0 0 0 0.118088 0 0 0 0.4 0"/>
+            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_35_5591"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_35_5591" result="shape"/>
+            </filter>
+            <clipPath id="clip0_35_5591">
+            <rect width="1315" height="786" fill="white"/>
+            </clipPath>
+            </defs>
+            </svg>
+          </div>
+          <button class="s8-arrow s8-arrow-prev" type="button" aria-label="前の絵へ"><span class="material-symbols-outlined">chevron_left</span></button>
+          <div class="s8-bubble">
+            <p>見なよ</p>
+            <button class="next btn-indigo" type="button">見る<span class="material-symbols-outlined">chevron_right</span></button>
+          </div>
+        </div>
+      </div>
+      <button class="back" type="button">
+        <span class="material-symbols-outlined">chevron_left</span>BACK
+      </button>
+    </section>
+    <!-- 鏡（9）：私と、鏡に映る私 -->
+    <section class="scene scene-mirror" data-scene="9">
+      <svg class="s9-me" viewBox="0 0 518 1077" fill="none" aria-hidden="true">
+        <g>
+        <path d="M154.139 852.515L117.14 894.939C12.7597 801.299 23.7085 586.357 55.9996 491.79L92.2689 520.713C82.8357 599.536 54.6153 774.068 154.139 852.515Z" fill="#FEC0B1"/>
+        <path d="M363.701 852.515L400.7 894.939C505.08 801.299 494.131 586.357 461.84 491.79L425.571 520.713C435.004 599.536 463.225 774.068 363.701 852.515Z" fill="#FEC0B1"/>
+        <path d="M148.579 705.235H380.741C406.122 804.742 416.205 988.426 416.205 1076.96H292.199C292.199 1031.67 296.686 864.129 262.052 864.129C227.418 864.129 231.196 1034.06 231.196 1076.96H105.287C105.287 979.628 105.287 794.844 148.579 705.235Z" fill="url(#me2-paint0-s9)"/>
+        <path d="M0 561.938C90.635 368.585 201.107 367.203 257.927 365.596C314.748 367.203 425.219 368.585 515.854 561.938L424.861 616.534C417 561.938 400.822 521.497 400.822 521.497C380.579 597.872 409.364 770.676 420.822 834.034C308.382 860.473 189.409 859.105 95.0325 834.034C106.491 770.676 136.033 605.156 115.032 521.497C115.032 521.497 96.7136 575.05 90.9936 616.534L0 561.938Z" fill="white"/>
+        <path d="M394.113 81.3593C355.951 57.5083 354.421 10.929 256.728 0.822781C167.533 -8.40419 55.0951 61.1072 41.1745 152.421C5.06369 389.294 227.826 334.627 335.754 334.627C450.963 334.627 487.454 263.882 479.387 183.214C473.9 128.335 430.991 104.407 394.113 81.3593Z" fill="black"/>
+        <g>
+        <path d="M150.826 303.34C124.29 283.494 115.442 179.812 140.921 157.164C201.747 121.164 308.226 114.848 377.846 157.164C406.977 174.87 394.478 283.494 367.942 303.34C341.141 323.383 299.775 329.518 286.375 348.744C279.403 358.748 286.375 407.453 259.384 407.453C232.392 407.453 239.365 358.748 232.392 348.744C218.992 329.518 177.626 323.383 150.826 303.34Z" fill="url(#me2-paint1-s9)"/>
+        <g>
+        <g>
+        <path d="M222.7 206.408L221.469 205.697L229.595 198.239L230.827 198.95L232.058 199.661L223.932 207.119L222.7 206.408Z" fill="black"/>
+        <path d="M207.171 191.184L205.835 190.697L210.962 181.919L212.298 182.405L213.635 182.892L208.507 191.67L207.171 191.184Z" fill="black"/>
+        <path d="M189.062 186.416L189.063 176.586" stroke="black" stroke-width="2.84428" stroke-linejoin="round"/>
+        <path d="M170.988 191.184L169.651 191.67L164.524 182.892L165.86 182.405L167.197 181.919L172.324 190.697L170.988 191.184Z" fill="black"/>
+        <path d="M155.425 206.408L154.194 207.119L146.067 199.661L147.299 198.95L148.53 198.239L156.657 205.697L155.425 206.408Z" fill="black"/>
+        </g>
+        <g>
+        <g>
+        <circle cx="189.079" cy="209.082" r="19.8075" fill="#7E7E7E"/>
+        <path d="M189.08 183.331C207.236 183.331 222.646 195.965 228.112 210.515C222.646 225.064 207.236 234.115 189.08 234.115C170.923 234.115 155.513 225.064 150.047 210.515C155.513 195.965 170.923 183.331 189.08 183.331Z" fill="white"/>
+        <circle cx="189.08" cy="209.082" r="24.3784" fill="black"/>
+        <circle cx="189.08" cy="209.082" r="11.0711" fill="#C6C6C6"/>
+        </g>
+        </g>
+        </g>
+        <g>
+        <g>
+        <path d="M360.804 206.408L359.572 205.697L367.699 198.239L368.93 198.95L370.162 199.661L362.035 207.119L360.804 206.408Z" fill="black"/>
+        <path d="M345.274 191.184L343.938 190.697L349.065 181.919L350.402 182.405L351.738 182.892L346.611 191.67L345.274 191.184Z" fill="black"/>
+        <path d="M327.167 186.416L327.167 176.586" stroke="black" stroke-width="2.84428" stroke-linejoin="round"/>
+        <path d="M309.092 191.184L307.755 191.67L302.628 182.892L303.965 182.405L305.301 181.919L310.428 190.697L309.092 191.184Z" fill="black"/>
+        <path d="M293.529 206.408L292.297 207.119L284.171 199.661L285.402 198.95L286.634 198.239L294.76 205.697L293.529 206.408Z" fill="black"/>
+        </g>
+        <g>
+        <g>
+        <circle cx="327.184" cy="209.082" r="19.8075" fill="#7E7E7E"/>
+        <path d="M327.184 183.331C345.34 183.331 360.75 195.965 366.216 210.515C360.75 225.064 345.34 234.115 327.184 234.115C309.027 234.115 293.617 225.064 288.151 210.515C293.617 195.965 309.027 183.331 327.184 183.331Z" fill="white"/>
+        <circle cx="327.184" cy="209.082" r="24.3784" fill="black"/>
+        <circle cx="327.183" cy="209.082" r="11.0711" fill="#C6C6C6"/>
+        </g>
+        </g>
+        </g>
+        <ellipse cx="258.859" cy="273.234" rx="12.9348" ry="10.8095" fill="url(#me2-paint2-s9)"/>
+        </g>
+        </g>
+        <defs>
+        <linearGradient id="me2-paint0-s9" x1="260.272" y1="705.235" x2="260.272" y2="966.957" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#5856D6"/>
+        <stop offset="1" stop-color="#17017A"/>
+        </linearGradient>
+        <linearGradient id="me2-paint1-s9" x1="260.167" y1="127.748" x2="260.167" y2="427.604" gradientUnits="userSpaceOnUse">
+        <stop offset="0.41644" stop-color="#FFE2DB"/>
+        <stop offset="1" stop-color="#FF957A"/>
+        </linearGradient>
+        <linearGradient id="me2-paint2-s9" x1="258.859" y1="262.425" x2="258.859" y2="284.044" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#FE5227"/>
+        <stop offset="1" stop-color="#FF0000"/>
+        </linearGradient>
+        </defs>
+      </svg>
+
+      <!-- 鏡（上から降りてくる）。鏡に映る私はガラスの形で切り抜き、鏡の動きを打ち消して本物の私に合わせる -->
+      <svg class="s9-mirror" viewBox="0 0 1332 1526" fill="none" aria-hidden="true">
+        <defs>
+          <clipPath id="s9-glass-clip"><path d="M331.361 955.572C331.361 770.676 481.248 620.788 666.144 620.788V620.788C851.04 620.788 1000.93 770.676 1000.93 955.571V1156.22C1000.93 1341.11 851.04 1491 666.144 1491V1491C481.248 1491 331.361 1341.11 331.361 1156.22V955.572Z"/></clipPath>
+          <clipPath id="s9-hair-clip"><path d="M394.113 81.3593C355.951 57.5083 354.421 10.929 256.728 0.822781C167.533 -8.40419 55.0951 61.1072 41.1745 152.421C5.06369 389.294 227.826 334.627 335.754 334.627C450.963 334.627 487.454 263.882 479.387 183.214C473.9 128.335 430.991 104.407 394.113 81.3593Z"/></clipPath>
+          <!-- 1本40px に見えるよう、私の拡大率（1.0797倍）で割った幅 -->
+          <pattern id="s9-stripe" patternUnits="userSpaceOnUse" width="111" height="111" patternTransform="rotate(45)">
+            <rect width="37" height="111" fill="#79D997"/>
+            <rect x="37" width="37" height="111" fill="#007AFF"/>
+            <rect x="74" width="37" height="111" fill="#FFE8A3"/>
+          </pattern>
+        </defs>
+        <path d="M983.23 993.37C957.755 1023.93 990.303 944.107 1016.52 903.551C1014.8 754.205 988.68 481.355 988.68 352.728L1102.46 352.729C1093.92 439.815 1075.98 795.765 1075.92 822.605C1075.86 849.444 1093.14 918.647 1088.02 951.381C1082.9 984.115 1038.43 1047.77 998.662 1085.89C947.186 1135.23 1001.77 1043.06 1019.77 992.775C1030.33 963.259 1028.85 938.648 983.23 993.37Z" fill="#FFE2DB"/>
+        <path d="M349.079 993.37C374.553 1023.93 342.005 944.107 315.789 903.551C317.51 754.205 343.629 481.355 343.629 352.728L229.848 352.729C238.391 439.815 256.324 795.765 256.385 822.605C256.447 849.444 239.17 918.647 244.291 951.381C249.413 984.115 293.875 1047.77 333.647 1085.89C385.123 1135.23 330.535 1043.06 312.542 992.775C301.982 963.259 303.455 938.648 349.079 993.37Z" fill="#FFE2DB"/>
+        <path d="M331.361 955.572C331.361 770.676 481.248 620.788 666.144 620.788V620.788C851.04 620.788 1000.93 770.676 1000.93 955.571V1156.22C1000.93 1341.11 851.04 1491 666.144 1491V1491C481.248 1491 331.361 1341.11 331.361 1156.22V955.572Z" fill="#87E5F6"/>
+        <g clip-path="url(#s9-glass-clip)">
+          <g class="s9-reflection">
+            <!-- 本物の私を左右反転した位置（鏡の座標） -->
+            <g transform="translate(383.4 789.3) scale(1.0797) translate(518 0) scale(-1 1)">
+              <g>
+              <path d="M154.139 852.515L117.14 894.939C12.7597 801.299 23.7085 586.357 55.9996 491.79L92.2689 520.713C82.8357 599.536 54.6153 774.068 154.139 852.515Z" fill="#FEC0B1"/>
+              <path d="M363.701 852.515L400.7 894.939C505.08 801.299 494.131 586.357 461.84 491.79L425.571 520.713C435.004 599.536 463.225 774.068 363.701 852.515Z" fill="#FEC0B1"/>
+              <path d="M148.579 705.235H380.741C406.122 804.742 416.205 988.426 416.205 1076.96H292.199C292.199 1031.67 296.686 864.129 262.052 864.129C227.418 864.129 231.196 1034.06 231.196 1076.96H105.287C105.287 979.628 105.287 794.844 148.579 705.235Z" fill="url(#me2-paint0-s9r)"/>
+              <path d="M0 561.938C90.635 368.585 201.107 367.203 257.927 365.596C314.748 367.203 425.219 368.585 515.854 561.938L424.861 616.534C417 561.938 400.822 521.497 400.822 521.497C380.579 597.872 409.364 770.676 420.822 834.034C308.382 860.473 189.409 859.105 95.0325 834.034C106.491 770.676 136.033 605.156 115.032 521.497C115.032 521.497 96.7136 575.05 90.9936 616.534L0 561.938Z" fill="white"/>
+              <path d="M394.113 81.3593C355.951 57.5083 354.421 10.929 256.728 0.822781C167.533 -8.40419 55.0951 61.1072 41.1745 152.421C5.06369 389.294 227.826 334.627 335.754 334.627C450.963 334.627 487.454 263.882 479.387 183.214C473.9 128.335 430.991 104.407 394.113 81.3593Z" fill="#79D997"/>
+              <!-- 髪のストライプ（流す） -->
+              <g clip-path="url(#s9-hair-clip)"><g class="s9-hair-stripe"><rect x="-100" y="-100" width="800" height="700" fill="url(#s9-stripe)"/></g></g>
+              <g>
+              <path d="M150.826 303.34C124.29 283.494 115.442 179.812 140.921 157.164C201.747 121.164 308.226 114.848 377.846 157.164C406.977 174.87 394.478 283.494 367.942 303.34C341.141 323.383 299.775 329.518 286.375 348.744C279.403 358.748 286.375 407.453 259.384 407.453C232.392 407.453 239.365 358.748 232.392 348.744C218.992 329.518 177.626 323.383 150.826 303.34Z" fill="url(#me2-paint1-s9r)"/>
+              <g>
+              <g>
+              <path d="M222.7 206.408L221.469 205.697L229.595 198.239L230.827 198.95L232.058 199.661L223.932 207.119L222.7 206.408Z" fill="black"/>
+              <path d="M207.171 191.184L205.835 190.697L210.962 181.919L212.298 182.405L213.635 182.892L208.507 191.67L207.171 191.184Z" fill="black"/>
+              <path d="M189.062 186.416L189.063 176.586" stroke="black" stroke-width="2.84428" stroke-linejoin="round"/>
+              <path d="M170.988 191.184L169.651 191.67L164.524 182.892L165.86 182.405L167.197 181.919L172.324 190.697L170.988 191.184Z" fill="black"/>
+              <path d="M155.425 206.408L154.194 207.119L146.067 199.661L147.299 198.95L148.53 198.239L156.657 205.697L155.425 206.408Z" fill="black"/>
+              </g>
+              <g>
+              <g>
+              <circle cx="189.079" cy="209.082" r="19.8075" fill="#7E7E7E"/>
+              <path d="M189.08 183.331C207.236 183.331 222.646 195.965 228.112 210.515C222.646 225.064 207.236 234.115 189.08 234.115C170.923 234.115 155.513 225.064 150.047 210.515C155.513 195.965 170.923 183.331 189.08 183.331Z" fill="white"/>
+              <circle cx="189.08" cy="209.082" r="24.3784" fill="black"/>
+              <circle cx="189.08" cy="209.082" r="11.0711" fill="#FFE8A3"/>
+              </g>
+              </g>
+              </g>
+              <g>
+              <g>
+              <path d="M360.804 206.408L359.572 205.697L367.699 198.239L368.93 198.95L370.162 199.661L362.035 207.119L360.804 206.408Z" fill="black"/>
+              <path d="M345.274 191.184L343.938 190.697L349.065 181.919L350.402 182.405L351.738 182.892L346.611 191.67L345.274 191.184Z" fill="black"/>
+              <path d="M327.167 186.416L327.167 176.586" stroke="black" stroke-width="2.84428" stroke-linejoin="round"/>
+              <path d="M309.092 191.184L307.755 191.67L302.628 182.892L303.965 182.405L305.301 181.919L310.428 190.697L309.092 191.184Z" fill="black"/>
+              <path d="M293.529 206.408L292.297 207.119L284.171 199.661L285.402 198.95L286.634 198.239L294.76 205.697L293.529 206.408Z" fill="black"/>
+              </g>
+              <g>
+              <g>
+              <circle cx="327.184" cy="209.082" r="19.8075" fill="#7E7E7E"/>
+              <path d="M327.184 183.331C345.34 183.331 360.75 195.965 366.216 210.515C360.75 225.064 345.34 234.115 327.184 234.115C309.027 234.115 293.617 225.064 288.151 210.515C293.617 195.965 309.027 183.331 327.184 183.331Z" fill="white"/>
+              <circle cx="327.184" cy="209.082" r="24.3784" fill="black"/>
+              <circle cx="327.183" cy="209.082" r="11.0711" fill="#FFE8A3"/>
+              </g>
+              </g>
+              </g>
+              <ellipse cx="258.859" cy="273.234" rx="12.9348" ry="10.8095" fill="url(#me2-paint2-s9r)"/>
+              </g>
+              </g>
+              <defs>
+              <linearGradient id="me2-paint0-s9r" x1="260.272" y1="705.235" x2="260.272" y2="966.957" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#5856D6"/>
+              <stop offset="1" stop-color="#17017A"/>
+              </linearGradient>
+              <linearGradient id="me2-paint1-s9r" x1="260.167" y1="127.748" x2="260.167" y2="427.604" gradientUnits="userSpaceOnUse">
+              <stop offset="0.41644" stop-color="#FFE2DB"/>
+              <stop offset="1" stop-color="#FF957A"/>
+              </linearGradient>
+              <linearGradient id="me2-paint2-s9r" x1="258.859" y1="262.425" x2="258.859" y2="284.044" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FE5227"/>
+              <stop offset="1" stop-color="#FF0000"/>
+              </linearGradient>
+              </defs>
+            </g>
+          </g>
+        </g>
+        <path d="M1000.93 955.571C1000.93 771.398 852.208 621.96 668.309 620.795L666.144 620.788C481.249 620.788 331.361 770.676 331.361 955.571V1156.22C331.361 1340.39 480.08 1489.83 663.979 1490.99L666.144 1491C850.317 1491 999.756 1342.28 1000.92 1158.38L1000.93 1156.22V955.571ZM1024.93 1156.22C1024.93 1354.37 864.294 1515 666.144 1515C467.994 1515 307.361 1354.37 307.361 1156.22V955.571C307.361 757.421 467.994 596.788 666.144 596.788C864.294 596.788 1024.93 757.421 1024.93 955.571V1156.22Z" fill="#1DB3D8"/>
+        <path d="M1020.37 867.611C980.993 908.021 957.755 1023.93 983.23 993.371C1019.94 949.344 1024.1 931.63 1026.6 960.028L1028.57 989.172C1027.72 976.547 1027.21 966.927 1026.6 960.028L1020.37 867.611Z" fill="#FFE2DB"/>
+        <path d="M311.941 867.611C351.315 908.021 374.553 1023.93 349.078 993.371C312.372 949.344 308.204 931.63 305.707 960.028L303.741 989.172C304.593 976.547 305.101 966.927 305.707 960.028L311.941 867.611Z" fill="#FFE2DB"/>
+      </svg>
+
+      <div class="s9-overlay"></div>
+      <p class="s9-line s9-line-1">君にもあるよ</p>
+      <p class="s9-line s9-line-2">ポップな狂気の気配が</p>
+      <button class="next btn-white s9-btn" type="button">さあ、おいで<span class="material-symbols-outlined">chevron_right</span></button>
+      <button class="back" type="button">
+        <span class="material-symbols-outlined">chevron_left</span>BACK
+      </button>
+    </section>
+    <!-- ハシゴを登る（10） -->
+    <section class="scene scene-ladder" data-scene="10">
+      <!-- 壁・空・ハシゴをまとめて動かす（下にずらすと登っているように見える）。原点は壁のてっぺん -->
+      <div class="s10-world">
+        <div class="s10-sky"></div>
+        <div class="s10-wall"></div>
+        <div class="s10-ladder"></div>
+      </div>
+
+      <!-- バロメーター（下から1目盛りずつ塗る） -->
+      <div class="s10-meter">
+        <span class="s10-seg"><span class="s10-fill"></span></span>
+        <span class="s10-seg"><span class="s10-fill"></span></span>
+        <span class="s10-seg"><span class="s10-fill"></span></span>
+        <span class="s10-seg"><span class="s10-fill"></span></span>
+        <span class="s10-seg"><span class="s10-fill"></span></span>
+      </div>
+
+      <button class="btn-white s10-climb" type="button">登る<span class="material-symbols-outlined">chevron_right</span></button>
+      <button class="next btn-white s10-go" type="button">さあ！<span class="material-symbols-outlined">chevron_right</span></button>
+      <button class="back" type="button">
+        <span class="material-symbols-outlined">chevron_left</span>BACK
+      </button>
+    </section>
+    <!-- 解放しなよ（11） -->
+    <section class="scene scene-free" data-scene="11">
+      <div class="s11-intro">
+        <p class="s11-line">解放しなよ</p>
+        <p class="s11-line">君のその、ポップな狂気を</p>
+      </div>
+
+      <!-- 左：スケーター（ずっと ON） -->
+      <div class="s11-half s11-left">
+        <svg class="s11-face s11-face-skater" viewBox="0 0 483 345" fill="none" aria-hidden="true">
+          <g>
+          <g>
+          <g>
+          <path d="M2.27721 54.5687C7.39863 8.39921 65.1496 -4.52017 133.613 8.35053C202.075 21.2212 223.706 65.6713 214.512 114.256C205.318 162.84 165.21 184.891 90.6238 173.164C16.038 161.437 -2.84422 100.738 2.27721 54.5687Z" fill="black"/>
+          <path d="M480.384 54.5687C475.262 8.39921 417.511 -4.52017 349.048 8.35053C280.586 21.2212 258.955 65.6713 268.149 114.256C277.343 162.84 317.451 184.891 392.037 173.164C466.623 161.437 485.505 100.738 480.384 54.5687Z" fill="black"/>
+          <path d="M184.581 82.8936H351.997" stroke="black" stroke-width="34.1529"/>
+          </g>
+          <g>
+          <path d="M440.814 179.756C424.22 273.267 341.222 344.354 241.33 344.354C141.439 344.353 58.4413 273.267 41.8467 179.756C86.6517 229.516 159.312 261.867 241.33 261.867C323.348 261.867 396.009 229.516 440.814 179.756Z" fill="white"/>
+          <g>
+          <mask id="mask0_64_7153-s11" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="41" y="179" width="400" height="166">
+          <path d="M440.814 179.756C424.22 273.267 341.222 344.354 241.33 344.354C141.439 344.353 58.4413 273.267 41.8467 179.756C86.6517 229.516 159.312 261.867 241.33 261.867C323.348 261.867 396.009 229.516 440.814 179.756Z" fill="white"/>
+          </mask>
+          <g mask="url(#mask0_64_7153-s11)">
+          <path d="M236.98 263.251C238.425 263.277 239.875 263.29 241.331 263.29V373.29L239.594 373.285C238.06 373.278 236.529 373.259 235.002 373.231L236.98 263.251ZM247.658 373.231C245.555 373.269 243.446 373.29 241.331 373.29V263.29C242.787 263.29 244.237 263.277 245.682 263.251L247.658 373.231ZM174.75 253.528C177.354 254.332 180.003 255.092 182.692 255.807L154.44 362.115C150.353 361.029 146.31 359.869 142.313 358.636L174.75 253.528ZM340.347 358.636C336.351 359.869 332.307 361.029 328.22 362.115L299.97 255.807C302.659 255.092 305.307 254.332 307.911 253.528L340.347 358.636ZM424.426 317.233C421.041 319.687 417.575 322.072 414.031 324.389L353.853 232.312C355.929 230.954 357.933 229.573 359.865 228.173L424.426 317.233ZM122.796 228.173C124.728 229.573 126.732 230.954 128.809 232.312L68.6289 324.388C65.0853 322.072 61.6194 319.686 58.2354 317.233L122.796 228.173ZM91.0449 194.188C91.8973 195.699 92.8281 197.23 93.8408 198.777L1.80371 259.018C-0.509421 255.484 -2.69727 251.892 -4.75488 248.245L91.0449 194.188ZM487.415 248.245C485.357 251.892 483.17 255.484 480.857 259.018L388.82 198.777C389.833 197.23 390.764 195.699 391.616 194.188L487.415 248.245Z" fill="black"/>
+          </g>
+          </g>
+          </g>
+          </g>
+          </g>
+        </svg>
+        <button class="s11-toggle s11-toggle-skater" type="button" aria-label="スケーターのスイッチ">
+          <svg class="s11-switch " viewBox="0 0 380 120" aria-hidden="true">
+          <path class="sw-off" d="M27.16 66.44C27.16 71.32 24.76 74.6 14.76 74.6C4.76 74.6 2.32 71.32 2.32 66.44V52.8C2.32 47.92 4.76 44.6 14.76 44.6C24.76 44.6 27.16 47.92 27.16 52.8V66.44ZM11.4 65C11.4 66.08 11.88 66.88 14.76 66.88C17.68 66.88 18.12 66.08 18.12 65V54.24C18.12 53.2 17.68 52.4 14.76 52.4C11.88 52.4 11.4 53.2 11.4 54.24V65ZM39.8922 74H33.6922C32.6922 74 32.2522 73.56 32.2522 72.56V46.64C32.2522 45.64 32.6922 45.2 33.6922 45.2H51.5322C52.5322 45.2 52.9722 45.64 52.9722 46.64V51.4C52.9722 52.4 52.5322 52.84 51.5322 52.84H41.3322V57H48.2922C49.2922 57 49.7322 57.44 49.7322 58.44V63.24C49.7322 64.24 49.2922 64.68 48.2922 64.68H41.3322V72.56C41.3322 73.56 40.8922 74 39.8922 74ZM64.6188 74H58.4188C57.4188 74 56.9788 73.56 56.9788 72.56V46.64C56.9788 45.64 57.4188 45.2 58.4188 45.2H76.2587C77.2588 45.2 77.6988 45.64 77.6988 46.64V51.4C77.6988 52.4 77.2588 52.84 76.2587 52.84H66.0588V57H73.0188C74.0188 57 74.4588 57.44 74.4588 58.44V63.24C74.4588 64.24 74.0188 64.68 73.0188 64.68H66.0588V72.56C66.0588 73.56 65.6188 74 64.6188 74Z" fill="#fff" opacity="0.6"/>
+          <rect class="sw-track" x="88.543" width="220" height="120" rx="60" fill="#FFE3E4"/>
+          <circle class="sw-knob" cx="248.543" cy="60" r="50" fill="#FF2D55"/>
+          <path class="sw-on" d="M346.187 66.44C346.187 71.32 343.787 74.6 333.787 74.6C323.787 74.6 321.347 71.32 321.347 66.44V52.8C321.347 47.92 323.787 44.6 333.787 44.6C343.787 44.6 346.187 47.92 346.187 52.8V66.44ZM330.427 65C330.427 66.08 330.907 66.88 333.787 66.88C336.707 66.88 337.147 66.08 337.147 65V54.24C337.147 53.2 336.707 52.4 333.787 52.4C330.907 52.4 330.427 53.2 330.427 54.24V65ZM358.719 74H352.719C351.719 74 351.279 73.56 351.279 72.56V46.64C351.279 45.64 351.719 45.2 352.719 45.2H356.879C357.919 45.2 358.559 45.48 359.239 46.28L366.999 55.16V46.64C366.999 45.64 367.439 45.2 368.439 45.2H374.439C375.439 45.2 375.879 45.64 375.879 46.64V72.56C375.879 73.56 375.439 74 374.439 74H368.439C367.439 74 366.999 73.56 366.999 72.56V67.64L360.159 59.36V72.56C360.159 73.56 359.719 74 358.719 74Z" fill="#FF3B30"/>
+        </svg>
+        </button>
+        <div class="s11-bar"><span class="s11-bar-fill s11-bar-red"></span></div>
+      </div>
+
+      <!-- 右：私（OFF → ON） -->
+      <div class="s11-half s11-right">
+        <div class="s11-right-bg"></div>
+        <div class="s11-right-bg s11-right-bg-on"></div>
+        <svg class="s11-face s11-face-me" viewBox="0 0 539 267" fill="none" aria-hidden="true">
+          <defs><linearGradient id="paint0_linear-me" x1="114.833" y1="13.7822" x2="114.833" y2="132.349" gradientUnits="userSpaceOnUse">
+<stop stop-color="#171717"/>
+<stop offset="1" stop-color="#9A9A9A"/>
+</linearGradient>
+<linearGradient id="paint1_linear-me" x1="114.833" y1="0" x2="114.833" y2="77.1322" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFE2DB"/>
+<stop offset="1" stop-color="#FFBAA9"/>
+</linearGradient>
+<linearGradient id="paint2_linear-me" x1="423.328" y1="13.7822" x2="423.328" y2="132.349" gradientUnits="userSpaceOnUse">
+<stop stop-color="#171717"/>
+<stop offset="1" stop-color="#9A9A9A"/>
+</linearGradient>
+<linearGradient id="paint3_linear-me" x1="423.328" y1="0" x2="423.328" y2="77.1322" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFE2DB"/>
+<stop offset="1" stop-color="#FFBAA9"/>
+</linearGradient></defs>
+          <defs><clipPath id="me-white-1"><path d="M114.881 0.000976562C166.398 0.00101001 210.123 35.8498 225.632 77.1331C210.123 118.417 166.398 144.098 114.881 144.098C63.3639 144.098 19.6387 118.417 4.12939 77.1331C19.6388 35.8497 63.3639 0.000976562 114.881 0.000976562Z"/></clipPath></defs>
+          <g class="me-eye">
+            <g class="me-lashes-up" transform="translate(-7.286 -20.774)">
+<path d="M217.339 86.2739L213.445 84.0258L236.449 62.9123L240.343 65.1605L244.237 67.4086L221.233 88.5221L217.339 86.2739Z" fill="black"/>
+<path d="M173.38 43.1792L169.155 41.6414L183.669 16.7923L187.894 18.3301L192.119 19.868L177.605 44.717L173.38 43.1792Z" fill="black"/>
+<path d="M122.119 29.6816L122.119 1.85379" stroke="black" stroke-width="8.99259" stroke-linejoin="round"/>
+<path d="M70.9539 43.1792L66.7287 44.717L52.2145 19.868L56.4397 18.3301L60.6648 16.7923L75.179 41.6414L70.9539 43.1792Z" fill="black"/>
+<path d="M26.8983 86.2739L23.0044 88.5221L-4.28584e-05 67.4086L3.89386 65.1605L7.78777 62.9123L30.7922 84.0258L26.8983 86.2739Z" fill="black"/>
+</g>
+            <path d="M114.881 0.000976562C166.398 0.00101001 210.123 35.8498 225.632 77.1331C210.123 118.417 166.398 144.098 114.881 144.098C63.3639 144.098 19.6387 118.417 4.12939 77.1331C19.6388 35.8497 63.3639 0.000976562 114.881 0.000976562Z" fill="white"/>
+            <circle cx="114.881" cy="73.066" r="69.1724" fill="black"/>
+            <circle class="me-iris-gray" cx="114.833" cy="73.0658" r="59.2836" fill="url(#paint0_linear-me)"/>
+            <circle class="me-iris-yellow" cx="114.880" cy="73.064" r="59.1443" fill="#FFE8A3" opacity="0"/>
+            <g class="me-lashes-down">
+<path d="M205.684 73.917L201.506 75.6074L221.407 99.7638L225.585 98.0734L229.763 96.383L209.862 72.2266L205.684 73.917Z" fill="black"/>
+<path d="M160.107 72.5234L155.677 73.3552L165.979 100.298L170.408 99.4664L174.838 98.6346L164.536 71.6917L160.107 72.5234Z" fill="black"/>
+<path d="M114.881 72.0488L114.881 99.9422" stroke="black" stroke-width="9.01378" stroke-linejoin="round"/>
+<path d="M69.6562 72.5234L65.2268 71.6917L54.9253 98.6346L59.3547 99.4664L63.7842 100.298L74.0857 73.3552L69.6562 72.5234Z" fill="black"/>
+<path d="M24.0791 73.917L19.9012 72.2266L0.000229782 96.383L4.1781 98.0734L8.35597 99.7638L28.257 75.6074L24.0791 73.917Z" fill="black"/>
+</g>
+            <!-- まぶた（白目の形で切り抜く） -->
+            <g clip-path="url(#me-white-1)"><path class="me-lid" d="M114.833 0C166.35 3.34458e-05 210.075 35.8488 225.585 77.1322C225.585 77.1322 166.35 77.1321 114.833 77.1322C63.3161 77.1322 4.08154 77.1322 4.08154 77.1322C19.5909 35.8487 63.3161 0 114.833 0Z" fill="url(#paint1_linear-me)"/></g>
+          </g>
+          <defs><clipPath id="me-white-2"><path d="M423.376 0.000976562C474.893 0.00101001 518.618 35.8498 534.128 77.1331C518.618 118.417 474.893 144.098 423.376 144.098C371.859 144.098 328.134 118.417 312.625 77.1331C328.134 35.8497 371.859 0.000976562 423.376 0.000976562Z"/></clipPath></defs>
+          <g class="me-eye">
+            <g class="me-lashes-up" transform="translate(-7.286 -20.774)">
+<path d="M525.179 86.2749L521.285 84.0268L544.289 62.9133L548.183 65.1615L552.077 67.4096L529.073 88.5231L525.179 86.2749Z" fill="black"/>
+<path d="M481.22 43.1802L476.995 41.6424L491.509 16.7933L495.734 18.3311L499.959 19.8689L485.445 44.718L481.22 43.1802Z" fill="black"/>
+<path d="M429.959 29.6826L429.959 1.85477" stroke="black" stroke-width="8.99259" stroke-linejoin="round"/>
+<path d="M378.794 43.1802L374.569 44.718L360.055 19.8689L364.28 18.3311L368.505 16.7933L383.019 41.6424L378.794 43.1802Z" fill="black"/>
+<path d="M334.738 86.2749L330.845 88.5231L307.84 67.4096L311.734 65.1615L315.628 62.9133L338.632 84.0268L334.738 86.2749Z" fill="black"/>
+</g>
+            <path d="M423.376 0.000976562C474.893 0.00101001 518.618 35.8498 534.128 77.1331C518.618 118.417 474.893 144.098 423.376 144.098C371.859 144.098 328.134 118.417 312.625 77.1331C328.134 35.8497 371.859 0.000976562 423.376 0.000976562Z" fill="white"/>
+            <circle cx="423.377" cy="73.066" r="69.1724" fill="black"/>
+            <circle class="me-iris-gray" cx="423.328" cy="73.0658" r="59.2836" fill="url(#paint2_linear-me)"/>
+            <circle class="me-iris-yellow" cx="422.720" cy="73.065" r="59.1443" fill="#FFE8A3" opacity="0"/>
+            <g class="me-lashes-down">
+<path d="M514.179 73.917L510.001 75.6074L529.902 99.7638L534.08 98.0734L538.258 96.383L518.357 72.2266L514.179 73.917Z" fill="black"/>
+<path d="M468.602 72.5234L464.173 73.3552L474.474 100.298L478.904 99.4664L483.333 98.6346L473.032 71.6917L468.602 72.5234Z" fill="black"/>
+<path d="M423.376 72.0488L423.376 99.9422" stroke="black" stroke-width="9.01378" stroke-linejoin="round"/>
+<path d="M378.151 72.5234L373.722 71.6917L363.42 98.6346L367.85 99.4664L372.279 100.298L382.581 73.3552L378.151 72.5234Z" fill="black"/>
+<path d="M332.574 73.917L328.396 72.2266L308.495 96.383L312.673 98.0734L316.851 99.7638L336.752 75.6074L332.574 73.917Z" fill="black"/>
+</g>
+            <!-- まぶた（白目の形で切り抜く） -->
+            <g clip-path="url(#me-white-2)"><path class="me-lid" d="M423.328 0C474.845 3.34458e-05 518.57 35.8488 534.08 77.1322C534.08 77.1322 474.846 77.1321 423.328 77.1322C371.811 77.1322 312.577 77.1322 312.577 77.1322C328.086 35.8487 371.811 0 423.328 0Z" fill="url(#paint3_linear-me)"/></g>
+          </g>
+          <path class="me-mouth-line" d="M151.364 259.642H386.893" stroke="black" stroke-width="14"/>
+          <!-- 笑った口（一文字の口の位置から上下に開く） -->
+          <g class="me-grin" transform="translate(-7.286 -20.774)">
+<path d="M474.218 188.572C457.623 282.083 374.625 353.17 274.733 353.17C174.842 353.17 91.8445 282.083 75.2499 188.572C120.055 238.333 192.715 270.683 274.733 270.684C356.752 270.684 429.413 238.333 474.218 188.572Z" fill="white"/>
+<g>
+<mask id="me-grin-mask" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="75" y="188" width="400" height="166">
+<path d="M474.218 188.572C457.623 282.083 374.625 353.17 274.733 353.17C174.842 353.17 91.8445 282.083 75.2499 188.572C120.055 238.333 192.715 270.683 274.733 270.684C356.752 270.684 429.413 238.333 474.218 188.572Z" fill="white"/>
+</mask>
+<g mask="url(#me-grin-mask)">
+<path d="M270.384 272.067C271.828 272.093 273.278 272.106 274.734 272.106V382.106L272.997 382.102C271.463 382.094 269.933 382.075 268.405 382.048L270.384 272.067ZM281.061 382.048C278.958 382.086 276.849 382.106 274.734 382.106V272.106C276.19 272.106 277.641 272.093 279.085 272.067L281.061 382.048ZM208.153 262.345C210.757 263.148 213.406 263.908 216.096 264.623L187.844 370.932C183.756 369.845 179.713 368.685 175.717 367.452L208.153 262.345ZM373.75 367.452C369.754 368.685 365.71 369.845 361.623 370.932L333.373 264.623C336.063 263.908 338.711 263.148 341.314 262.345L373.75 367.452ZM457.829 326.05C454.445 328.503 450.978 330.889 447.434 333.205L387.256 241.128C389.332 239.771 391.336 238.39 393.268 236.989L457.829 326.05ZM156.199 236.989C158.131 238.39 160.135 239.771 162.212 241.128L102.032 333.204C98.4885 330.888 95.0226 328.503 91.6385 326.05L156.199 236.989ZM124.448 203.005C125.3 204.515 126.231 206.046 127.244 207.594L35.2069 267.834C32.8938 264.3 30.7059 260.708 28.6483 257.062L124.448 203.005ZM520.818 257.062C518.761 260.708 516.574 264.3 514.261 267.834L422.224 207.594C423.236 206.046 424.167 204.515 425.019 203.005L520.818 257.062Z" fill="black"/>
+</g>
+</g>
+</g>
+        </svg>
+        <button class="s11-toggle s11-toggle-me" type="button" aria-label="私のスイッチ">
+          <span class="s11-ripple"></span>
+          <span class="s11-ripple"></span>
+          <svg class="s11-switch " viewBox="0 0 380 120" aria-hidden="true">
+          <path class="sw-off" d="M27.16 66.44C27.16 71.32 24.76 74.6 14.76 74.6C4.76 74.6 2.32 71.32 2.32 66.44V52.8C2.32 47.92 4.76 44.6 14.76 44.6C24.76 44.6 27.16 47.92 27.16 52.8V66.44ZM11.4 65C11.4 66.08 11.88 66.88 14.76 66.88C17.68 66.88 18.12 66.08 18.12 65V54.24C18.12 53.2 17.68 52.4 14.76 52.4C11.88 52.4 11.4 53.2 11.4 54.24V65ZM39.8922 74H33.6922C32.6922 74 32.2522 73.56 32.2522 72.56V46.64C32.2522 45.64 32.6922 45.2 33.6922 45.2H51.5322C52.5322 45.2 52.9722 45.64 52.9722 46.64V51.4C52.9722 52.4 52.5322 52.84 51.5322 52.84H41.3322V57H48.2922C49.2922 57 49.7322 57.44 49.7322 58.44V63.24C49.7322 64.24 49.2922 64.68 48.2922 64.68H41.3322V72.56C41.3322 73.56 40.8922 74 39.8922 74ZM64.6188 74H58.4188C57.4188 74 56.9788 73.56 56.9788 72.56V46.64C56.9788 45.64 57.4188 45.2 58.4188 45.2H76.2587C77.2588 45.2 77.6988 45.64 77.6988 46.64V51.4C77.6988 52.4 77.2588 52.84 76.2587 52.84H66.0588V57H73.0188C74.0188 57 74.4588 57.44 74.4588 58.44V63.24C74.4588 64.24 74.0188 64.68 73.0188 64.68H66.0588V72.56C66.0588 73.56 65.6188 74 64.6188 74Z" fill="#fff" opacity="0.7"/>
+          <rect class="sw-track" x="88.543" width="220" height="120" rx="60" fill="#251C98"/>
+          <circle class="sw-knob" cx="148.543" cy="60" r="50" fill="#8B83F0"/>
+          <path class="sw-on" d="M346.187 66.44C346.187 71.32 343.787 74.6 333.787 74.6C323.787 74.6 321.347 71.32 321.347 66.44V52.8C321.347 47.92 323.787 44.6 333.787 44.6C343.787 44.6 346.187 47.92 346.187 52.8V66.44ZM330.427 65C330.427 66.08 330.907 66.88 333.787 66.88C336.707 66.88 337.147 66.08 337.147 65V54.24C337.147 53.2 336.707 52.4 333.787 52.4C330.907 52.4 330.427 53.2 330.427 54.24V65ZM358.719 74H352.719C351.719 74 351.279 73.56 351.279 72.56V46.64C351.279 45.64 351.719 45.2 352.719 45.2H356.879C357.919 45.2 358.559 45.48 359.239 46.28L366.999 55.16V46.64C366.999 45.64 367.439 45.2 368.439 45.2H374.439C375.439 45.2 375.879 45.64 375.879 46.64V72.56C375.879 73.56 375.439 74 374.439 74H368.439C367.439 74 366.999 73.56 366.999 72.56V67.64L360.159 59.36V72.56C360.159 73.56 359.719 74 358.719 74Z" fill="#251C98"/>
+        </svg>
+        </button>
+        <div class="s11-bar s11-bar-off"><span class="s11-bar-fill s11-bar-blue"></span></div>
+      </div>
+
+      <!-- OFF にできません -->
+      <div class="s11-modal">
+        <div class="s11-modal-card">
+          <p>OFFにできません</p>
+          <button class="btn-black s11-close" type="button">閉じる</button>
+        </div>
+      </div>
+
+      <button class="back" type="button">
+        <span class="material-symbols-outlined">chevron_left</span>BACK
+      </button>
+      <button class="next btn-black btn-next s11-next" type="button">
+        NEXT<span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </section>
+    <!-- スケボーがやってくる（12） -->
+    <section class="scene scene-board" data-scene="12">
+      <svg class="s12-foot" viewBox="0 0 818 789" fill="none" aria-hidden="true">
+        <g clip-path="url(#clip0_31_4812-s12)">
+        <g>
+        <g>
+        <g>
+        <g>
+        <path d="M314.11 25.2584C274.53 30.8333 258.792 73.526 261.323 113.202C264.152 157.545 298.596 296.407 345.48 284.577C392.403 272.738 381.454 157.669 372.501 92.8421C369.542 71.4184 361.46 18.5889 314.11 25.2584Z" fill="black"/>
+        </g>
+        <g>
+        <path d="M356.449 136.572C334.9 125.655 301.965 127.304 289.607 129.239" stroke="#6155F5" stroke-width="8" stroke-linecap="round"/>
+        <path d="M291.227 141.732C310.791 127.562 343.576 124.011 356.085 123.978" stroke="white" stroke-width="8" stroke-linecap="round"/>
+        </g>
+        <g>
+        <path d="M358.621 164.019C337.072 153.102 304.137 154.751 291.779 156.686" stroke="#6155F5" stroke-width="8" stroke-linecap="round"/>
+        <path d="M293.399 169.18C312.963 155.009 345.748 151.458 358.257 151.426" stroke="white" stroke-width="8" stroke-linecap="round"/>
+        </g>
+        <g>
+        <path d="M360.792 191.467C339.243 180.55 306.308 182.199 293.95 184.134" stroke="#6155F5" stroke-width="8" stroke-linecap="round"/>
+        <path d="M295.571 196.628C315.135 182.458 347.92 178.906 360.428 178.874" stroke="white" stroke-width="8" stroke-linecap="round"/>
+        </g>
+        <path d="M360.677 106.178C349.871 104.887 338.403 104.632 326.581 105.568C310.856 106.812 296.082 110.036 282.915 114.771" stroke="white" stroke-width="8" stroke-linecap="round"/>
+        <g>
+        <mask id="mask0_31_4812-s12" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="261" y="24" width="120" height="262">
+        <path d="M314.11 25.2584C274.53 30.8333 258.792 73.526 261.323 113.202C264.152 157.545 298.596 296.407 345.48 284.577C392.403 272.738 381.454 157.669 372.501 92.8421C369.542 71.4184 361.46 18.5889 314.11 25.2584Z" fill="black"/>
+        </mask>
+        <g mask="url(#mask0_31_4812-s12)">
+        <g>
+        <path d="M324.167 251.842L286.185 93.6534C283.625 82.9894 274.276 74.0473 263.711 71.1059C239.51 64.3686 217.468 88.9434 224.517 113.055L269.355 266.425C273.751 281.462 289.505 290.089 304.543 285.693C319.065 281.447 327.699 266.553 324.167 251.842Z" fill="black"/>
+        <path d="M348.482 246.007L347.218 87.5555C347.129 76.3411 354.002 65.2316 363.544 59.3382C385.415 45.8293 412.552 62.9393 411.522 88.6253L405.174 246.917C404.546 262.566 391.352 274.743 375.703 274.115C360.583 273.509 348.603 261.138 348.482 246.007Z" fill="black"/>
+        </g>
+        </g>
+        </g>
+        <g>
+        <mask id="mask1_31_4812-s12" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="261" y="24" width="120" height="262">
+        <path d="M314.11 25.2579C274.53 30.8328 258.792 73.5255 261.323 113.202C264.152 157.545 298.596 296.406 345.48 284.577C392.403 272.737 381.454 157.668 372.501 92.8416C369.542 71.4179 361.46 18.5884 314.11 25.2579Z" fill="black"/>
+        </mask>
+        <g mask="url(#mask1_31_4812-s12)">
+        <ellipse cx="315.535" cy="40.6273" rx="130.646" ry="44.9727" transform="rotate(-7.20404 315.535 40.6273)" fill="white"/>
+        </g>
+        </g>
+        </g>
+        </g>
+        <path d="M339.117 183.068C303.572 177.416 270.199 201.501 264.576 236.863L173.555 789.255L339.117 789.255L393.297 257.33C398.92 221.968 374.663 188.72 339.117 183.068Z" fill="url(#paint0_linear_31_4812-s12)"/>
+        </g>
+        <g>
+        <g>
+        <g>
+        <g>
+        <path d="M502.721 25.2584C542.301 30.8333 558.039 73.526 555.508 113.202C552.679 157.545 518.235 296.407 471.351 284.577C424.428 272.738 435.377 157.669 444.33 92.8421C447.289 71.4184 455.371 18.5889 502.721 25.2584Z" fill="black"/>
+        </g>
+        <g>
+        <path d="M460.382 136.572C481.931 125.655 514.866 127.303 527.224 129.239" stroke="#6155F5" stroke-width="8" stroke-linecap="round"/>
+        <path d="M525.604 141.732C506.04 127.562 473.255 124.011 460.746 123.978" stroke="white" stroke-width="8" stroke-linecap="round"/>
+        </g>
+        <g>
+        <path d="M458.21 164.019C479.759 153.102 512.694 154.751 525.052 156.686" stroke="#6155F5" stroke-width="8" stroke-linecap="round"/>
+        <path d="M523.432 169.18C503.868 155.01 471.083 151.458 458.574 151.426" stroke="white" stroke-width="8" stroke-linecap="round"/>
+        </g>
+        <g>
+        <path d="M456.039 191.467C477.588 180.55 510.524 182.199 522.881 184.134" stroke="#6155F5" stroke-width="8" stroke-linecap="round"/>
+        <path d="M521.26 196.628C501.696 182.458 468.911 178.906 456.403 178.874" stroke="white" stroke-width="8" stroke-linecap="round"/>
+        </g>
+        <path d="M456.154 106.178C466.96 104.887 478.428 104.632 490.25 105.568C505.975 106.812 520.749 110.036 533.916 114.771" stroke="white" stroke-width="8" stroke-linecap="round"/>
+        <g>
+        <mask id="mask2_31_4812-s12" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="436" y="24" width="120" height="262">
+        <path d="M502.721 25.2584C542.301 30.8333 558.039 73.526 555.508 113.202C552.679 157.545 518.235 296.407 471.351 284.577C424.428 272.738 435.377 157.669 444.33 92.8421C447.289 71.4184 455.371 18.5889 502.721 25.2584Z" fill="black"/>
+        </mask>
+        <g mask="url(#mask2_31_4812-s12)">
+        <g>
+        <path d="M492.664 251.842L530.646 93.6534C533.206 82.9894 542.555 74.0473 553.12 71.1059C577.321 64.3686 599.363 88.9434 592.314 113.055L547.476 266.425C543.08 281.462 527.326 290.089 512.288 285.693C497.767 281.447 489.132 266.553 492.664 251.842Z" fill="black"/>
+        <path d="M468.349 246.007L469.613 87.5555C469.702 76.3411 462.829 65.2316 453.287 59.3382C431.416 45.8293 404.279 62.9393 405.309 88.6253L411.657 246.917C412.285 262.566 425.48 274.743 441.129 274.115C456.248 273.509 468.228 261.138 468.349 246.007Z" fill="black"/>
+        </g>
+        </g>
+        </g>
+        <g>
+        <mask id="mask3_31_4812-s12" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="436" y="24" width="120" height="262">
+        <path d="M502.72 25.2584C542.3 30.8333 558.038 73.526 555.507 113.202C552.678 157.545 518.234 296.407 471.35 284.577C424.427 272.738 435.376 157.669 444.329 92.8421C447.288 71.4184 455.37 18.5889 502.72 25.2584Z" fill="black"/>
+        </mask>
+        <g mask="url(#mask3_31_4812-s12)">
+        <ellipse cx="130.646" cy="44.9727" rx="130.646" ry="44.9727" transform="matrix(-0.992106 -0.125403 -0.125403 0.992106 636.548 12.3936)" fill="white"/>
+        </g>
+        </g>
+        </g>
+        </g>
+        <path d="M477.714 183.069C513.259 177.417 546.632 201.501 552.255 236.863L643.276 789.256L477.714 789.256L423.534 257.331C417.911 221.969 442.168 188.721 477.714 183.069Z" fill="url(#paint1_linear_31_4812-s12)"/>
+        </g>
+        </g>
+        <defs>
+        <linearGradient id="paint0_linear_31_4812-s12" x1="334.553" y1="182.343" x2="293.59" y2="439.963" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#5856D6"/>
+        <stop offset="1" stop-color="#17017A"/>
+        </linearGradient>
+        <linearGradient id="paint1_linear_31_4812-s12" x1="482.278" y1="182.344" x2="523.241" y2="439.963" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#5856D6"/>
+        <stop offset="1" stop-color="#17017A"/>
+        </linearGradient>
+        <clipPath id="clip0_31_4812-s12">
+        <rect width="818" height="789" fill="white"/>
+        </clipPath>
+        </defs>
+      </svg>
+      <svg class="s12-board" viewBox="0 0 1186 336" fill="none" aria-hidden="true">
+        <g>
+        <g>
+        <circle cx="305.644" cy="288.137" r="47.4156" fill="black"/>
+        <circle cx="879.374" cy="288.137" r="47.4156" fill="black"/>
+        </g>
+        <!-- 側面の影：フィルターではなく同じ形を下にずらして重ねる（境目に隙間が出ないように） -->
+        <path d="M381.45 18.3484C455.552 18.3484 743.495 18.3484 803.569 18.3484C863.642 18.3484 979.888 0.0375396 1057.42 0.0375396C1148.28 0.0375396 1185.02 61.6571 1185.02 132.13C1185.02 202.602 1127.89 269.221 1057.42 269.221C979.888 269.221 863.81 269.911 803.569 269.911C743.329 269.911 436.626 269.911 381.449 269.911C326.273 269.911 205.13 268.221 127.601 268.221C57.1291 268.221 0.00014509 202.602 0 132.13C0 61.6572 50.0725 1.03754 127.601 0.0375396C205.13 -0.96246 307.348 18.3484 381.45 18.3484Z" fill="black" transform="translate(0 18.07)"/>
+        <path d="M381.45 18.3484C455.552 18.3484 743.495 18.3484 803.569 18.3484C863.642 18.3484 979.888 0.0375396 1057.42 0.0375396C1148.28 0.0375396 1185.02 61.6571 1185.02 132.13C1185.02 202.602 1127.89 269.221 1057.42 269.221C979.888 269.221 863.81 269.911 803.569 269.911C743.329 269.911 436.626 269.911 381.449 269.911C326.273 269.911 205.13 268.221 127.601 268.221C57.1291 268.221 0.00014509 202.602 0 132.13C0 61.6572 50.0725 1.03754 127.601 0.0375396C205.13 -0.96246 307.348 18.3484 381.45 18.3484Z" fill="#6155F5"/>
+        </g>
+        
+      </svg>
+      <button class="next btn-white btn-blue-shadow s12-ride" type="button">乗る<span class="material-symbols-outlined">chevron_right</span></button>
+      <button class="back" type="button">
+        <span class="material-symbols-outlined">chevron_left</span>BACK
+      </button>
+    </section>
+    <!-- 壁の上を走る2人と問い（13） -->
+    <section class="scene scene-run" data-scene="13">
+      <div class="s13-wall">
+        <div class="s13-wall-text"></div>
+      </div>
+      <div class="s13-lines"></div>
+      <div class="s13-skater-wrap">
+        <svg class="s13-skater" viewBox="0 0 2563 929" aria-hidden="true">
+          <defs>
+            <!-- 髪のストライプ（57px x 3色、45度） -->
+            <pattern id="s13-hair-stripe" patternUnits="userSpaceOnUse" width="171" height="171" patternTransform="rotate(45)">
+              <rect width="57" height="171" fill="#FFD7D8"/>
+              <rect x="57" width="57" height="171" fill="#FF2D55"/>
+              <rect x="114" width="57" height="171" fill="#FF9C9E"/>
+            </pattern>
+            <clipPath id="s13-hair-clip"><path id="s13-hair" d="M2029.09 290.94C2158.03 265.26 2181.6 183.368 2256.85 197.117C2332.11 210.867 2311.95 334.676 2301.89 393.501C2289.31 467.031 2196.44 561.125 2051.47 621.337C1898 685.08 1743.66 790.308 1644.71 702.772C1536.06 606.662 1336.43 746.932 1119.5 621.337C782.93 426.483 732.749 682.872 457.794 557.671C182.838 432.469 27.72 171.88 5.66455 18.8442C239.408 213.057 323.678 147.536 559.73 168.188C795.782 188.84 457.794 393.501 1161.36 242.259C1453.42 179.477 1722.15 352.067 2029.09 290.94Z"/></clipPath>
+            <!-- モーフィング用の髪の形 -->
+            <path id="s13-hair-2" d="M1972.01 227.796C2100.96 202.116 2181.59 183.368 2256.85 197.117C2332.10 210.866 2311.94 334.676 2301.88 393.5C2275.25 549.194 1985.26 514.104 1899.70 711.948C1841.53 846.471 1569.18 628.511 1339.72 608.436C950.69 574.4 609.49 704.273 468.68 506.429C327.88 308.585 268.61 321.202 -3.48 393.5C233.88 227.796 339.38 207.144 575.43 227.796C811.49 248.448 1254.70 -18.133 1401.13 227.796C1539.05 459.431 1734.11 275.174 1972.01 227.796Z"/>
+            <path id="s13-hair-3" d="M1972.02 227.799C2100.97 202.119 2181.6 183.371 2256.85 197.121C2332.11 210.87 2311.95 334.679 2301.89 393.504C2275.26 549.197 2026.36 776.704 1876.38 776.704C1606.08 776.704 1568.59 317.698 1339.72 608.439C1096.5 917.42 727.489 348.145 468.691 506.432C209.892 664.72 118.546 369.54 53.8452 55.0901C168.022 301.033 411.6 -56.493 636.148 85.5377C860.696 227.568 1047.18 466.128 1401.14 227.8C1627.19 75.588 1734.12 275.178 1972.02 227.799Z"/>
+            <linearGradient id="s13-skater-grad" x1="2246.75" y1="548.273" x2="2301.63" y2="655.748" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#9B08D9"/>
+        <stop offset="1" stop-color="#CD58FF"/>
+        </linearGradient>
+          </defs>
+          <g id="s13-skater-art">
+          <g clip-path="url(#s13-hair-clip)">
+            <g class="s13-hair-stripe"><rect x="-200" y="-200" width="3000" height="1400" fill="url(#s13-hair-stripe)"/></g>
+          </g>
+        <g>
+        <path d="M2155.94 706.588C2090.81 704.946 2070.1 675.93 2064.73 649.103C2078.04 516.155 2448.04 456.151 2488.63 527.069C2459.68 579.794 2394.81 595.743 2341.33 618.949C2281.3 645.002 2256.96 709.136 2155.94 706.588Z" fill="url(#s13-skater-grad)"/>
+        <path d="M2081.1 449.906C2061.74 421.784 2062.45 350.677 2073.62 330.417C2081.91 315.392 2122.38 315.422 2135.42 313.829L2142.01 338.694C2142.01 338.694 2106.56 332.252 2096.74 343.488C2089.66 351.581 2082.92 377.934 2087.96 401.807C2092.76 418.589 2112.89 427.939 2112.89 433.214C2112.89 438.488 2092.66 426.927 2096.74 437.29C2104.58 457.193 2119.27 449.445 2118.89 455.75C2117.7 463.413 2096.74 472.619 2081.1 449.906Z" fill="#FFE2DB"/>
+        <path d="M2524.3 311.123C2530.34 321.746 2510.9 303.773 2502.06 291.857C2471.69 301.385 2421.84 328.193 2392.67 327.106C2375.74 326.475 2355.12 324.088 2339.6 322.148L2345.39 293.407C2368.19 296.592 2378.42 299.275 2396.36 300.113C2414.3 300.951 2487.69 276.531 2495.49 273.858C2503.29 271.186 2514.67 271.454 2523.53 276.459C2532.39 281.465 2545.9 301.12 2552.57 316.671C2561.2 336.798 2540.59 311.154 2528.07 300.553C2520.72 294.33 2513.49 292.098 2524.3 311.123Z" fill="#FFE2DB"/>
+        <path d="M2064.78 645.728C2067.24 633.854 2073.93 625.843 2077.15 621.423C2098.42 616.176 2132.12 624.185 2143.16 640.204C2115.13 652.147 2098.67 653.517 2100.6 661.071C2114.08 713.741 2112.8 776.857 2120.5 825.37C2113.69 830.305 2109.44 830.646 2103.18 827.563C2091.12 770.76 2062.33 657.601 2064.78 645.728Z" fill="#FFE2DB"/>
+        <path d="M2335.36 706.571L2352.02 707.181C2366.78 587.663 2385.35 485.503 2344.88 492.451C2309.82 498.471 2345.63 569.98 2335.36 706.571Z" fill="#FFE2DB"/>
+        <path d="M2324.69 346.694C2338.7 337.741 2365.33 342.739 2374.65 346.694C2374.63 329.868 2373.75 310.153 2383.55 295.77C2300.37 287.872 2278.01 287.792 2225.87 291.627C2185.41 294.601 2192 308.55 2123.89 313.717C2132.91 333.793 2135.59 359.174 2135.33 381.012C2151.72 373.104 2190.83 354.584 2194.31 407.144C2199.48 484.949 2051.88 580.972 2062.89 652.992C2068.73 623.626 2096.41 647.577 2128.19 649.159C2205.15 652.992 2266.81 521.869 2349.91 516.847C2386.48 514.637 2406.61 536.611 2424.41 538.862C2446.06 541.6 2466.16 517.913 2488.72 527.006C2449.4 483.445 2441.73 501.66 2419.21 498.008C2391.98 493.593 2374.65 465.008 2341.33 465.008C2336.39 458.406 2328.03 444.822 2317.33 436.49C2304.42 426.429 2289.94 421.04 2284.75 418.445C2312.36 387.427 2306.8 358.124 2324.69 346.694Z" fill="black"/>
+        <path d="M2270.12 271.283C2275.12 261.158 2278.33 241.863 2275.12 233.16C2271.91 224.458 2268.59 218.463 2257.52 217.18C2247.44 216.01 2235.44 218.963 2225.99 221.743C2217.95 224.107 2219.44 230.707 2214.98 240.11C2213.5 243.235 2209.66 243.981 2206.2 243.832C2202.64 243.677 2199.3 245.053 2197.88 248.804C2195.69 254.61 2199.54 261.626 2209.9 263.398C2221.15 265.324 2205.88 302.931 2226.89 302.931C2239.79 302.931 2237.22 285.133 2249.22 280.256C2256.75 277.193 2266.89 277.811 2270.12 271.283Z" fill="#FFE2DB"/>
+        <g>
+        <path d="M2050.68 843.77C2046.26 846.322 2045.71 850.193 2045.99 851.81L2135.76 858.233C2135.91 856.555 2136.11 852.521 2135.67 849.815C2134.09 839.988 2125.12 832.66 2122.71 821.778C2122.05 822.967 2123.18 826.535 2119.13 827.615C2114.06 828.965 2102.71 818.531 2095.36 819.836C2090.28 820.738 2086.25 830.129 2077.41 835.218C2068.57 840.307 2056.19 840.58 2050.68 843.77Z" fill="black" stroke="black" stroke-width="7" stroke-linejoin="round"/>
+        <path d="M2086.35 848.517C2077.07 847.733 2056.74 844.583 2048.97 848.764C2036.3 855.591 2070.77 865.086 2086.25 865.814C2101.72 866.541 2113.26 867.24 2119.56 866.497C2125.87 865.755 2136.77 863.931 2135.22 859.295C2133.67 854.659 2124.35 856.914 2115.31 854.393C2106.27 851.871 2100.51 849.715 2086.35 848.517Z" fill="black" stroke="black" stroke-width="8"/>
+        </g>
+        <g>
+        <path d="M2336.75 693.982C2329.9 693.868 2327.53 698.213 2325.92 698.884C2324.32 699.554 2295.62 701.817 2293.94 719.733L2363.25 732.958C2364.07 716.81 2359.69 710.022 2354.41 696.694C2353.7 697.229 2352.19 699.683 2349.06 699.269C2345.08 698.743 2345.42 694.127 2336.75 693.982Z" fill="black" stroke="black" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M2329.21 740.045C2339.37 742.665 2347.39 744.731 2359.86 738.999C2375.43 731.849 2348.15 717.465 2339.11 714.498C2326.63 710.402 2307.44 705.454 2296.92 712.282C2284.93 720.067 2297.67 733.87 2304.97 736.592C2312.26 739.314 2321.39 738.031 2329 739.992L2329.21 740.045Z" fill="black" stroke="black" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <g>
+        <path d="M2368.6 685.769C2343.31 700.799 2070.37 854.438 2058.75 858.024C2047.12 861.61 1997.35 876.227 1989.66 886.883C1981.96 897.539 1996.53 907.27 2016.11 907.142C2035.7 907.014 2065.48 891.491 2108.14 873.078C2108.14 873.078 2388.85 717.225 2412.24 701.278C2435.63 685.33 2480.59 660.048 2485.04 632.655C2486.89 621.236 2474.44 600.839 2452.06 611.515C2440.15 617.194 2393.89 670.738 2368.6 685.769Z" fill="black"/>
+        <path d="M2374.99 691.766C2349.7 706.795 2076.78 860.413 2065.15 863.999C2053.53 867.584 1997.39 886.047 1991.56 894.125C1985.72 902.203 2004.97 908.74 2022.58 907.5C2040.19 906.261 2075.01 899.216 2114.54 879.051C2154.07 858.885 2395.24 723.219 2418.63 707.274C2442.02 691.328 2480.66 663.163 2485.1 635.773C2486.96 624.355 2480.82 606.848 2458.44 617.522C2446.54 623.201 2400.28 676.737 2374.99 691.766Z" fill="#6155F5"/>
+        <g>
+        <g>
+        <path d="M2438.21 737.354C2433.5 745.631 2424.61 748.175 2418.73 744.777C2412.85 741.378 2410.53 732.351 2415.24 724.074C2419.95 715.797 2428.85 713.252 2434.72 716.651C2440.6 720.05 2442.92 729.077 2438.21 737.354Z" fill="black" stroke="black" stroke-width="9"/>
+        <rect x="4.29124" y="-1.22036" width="34.8762" height="6.3355" transform="matrix(0.500712 -0.877288 0.853952 0.492042 2409.86 746.332)" fill="black" stroke="black" stroke-width="6.3355"/>
+        <path d="M2428.57 731.81C2423.86 740.087 2414.97 742.631 2409.09 739.233C2403.21 735.834 2400.89 726.807 2405.6 718.53C2410.31 710.253 2419.21 707.708 2425.09 711.107C2430.96 714.506 2433.28 723.533 2428.57 731.81Z" fill="white" stroke="black" stroke-width="9"/>
+        <path d="M2408.76 732.207C2413.31 733.918 2418.25 731.39 2419.79 726.559C2421.32 721.729 2418.87 716.426 2414.31 714.715L2411.54 723.461L2408.76 732.207ZM2371.92 698.793C2367.37 697.082 2362.43 699.61 2360.9 704.441C2359.36 709.271 2361.81 714.574 2366.37 716.286L2369.15 707.54L2371.92 698.793ZM2411.54 723.461L2414.31 714.715L2371.92 698.793L2369.15 707.54L2366.37 716.286L2408.76 732.207L2411.54 723.461Z" fill="black"/>
+        </g>
+        <g>
+        <path d="M2389.08 719.578C2384.36 727.861 2375.46 730.406 2369.59 727.012C2363.72 723.617 2361.41 714.592 2366.12 706.309C2370.83 698.026 2379.73 695.481 2385.6 698.875C2391.47 702.269 2393.79 711.295 2389.08 719.578Z" fill="black" stroke="black" stroke-width="9"/>
+        <rect x="4.28871" y="-1.21963" width="34.8856" height="6.33059" transform="matrix(0.500845 -0.877297 0.854071 0.491984 2360.73 728.564)" fill="black" stroke="black" stroke-width="6.33059"/>
+        <path d="M2379.44 714.034C2374.72 722.317 2365.83 724.862 2359.95 721.468C2354.08 718.073 2351.77 709.048 2356.48 700.765C2361.19 692.482 2370.09 689.937 2375.96 693.331C2381.84 696.725 2384.15 705.751 2379.44 714.034Z" fill="white" stroke="black" stroke-width="9"/>
+        </g>
+        </g>
+        <g>
+        <g>
+        <path d="M2152.18 902.387C2147.47 910.664 2138.57 913.209 2132.69 909.81C2126.81 906.411 2124.5 897.384 2129.21 889.107C2133.91 880.83 2142.81 878.285 2148.69 881.684C2154.57 885.083 2156.88 894.111 2152.18 902.387Z" fill="black" stroke="black" stroke-width="9"/>
+        <rect x="4.29124" y="-1.22036" width="34.8762" height="6.3355" transform="matrix(0.500712 -0.877288 0.853952 0.492042 2123.82 911.365)" fill="black" stroke="black" stroke-width="6.3355"/>
+        <path d="M2142.54 896.844C2137.83 905.12 2128.93 907.665 2123.05 904.266C2117.18 900.867 2114.86 891.84 2119.57 883.563C2124.28 875.286 2133.17 872.741 2139.05 876.14C2144.93 879.539 2147.25 888.567 2142.54 896.844Z" fill="white" stroke="black" stroke-width="9"/>
+        <path d="M2122.73 897.24C2127.28 898.951 2132.22 896.423 2133.75 891.593C2135.29 886.762 2132.84 881.459 2128.28 879.748L2125.5 888.494L2122.73 897.24ZM2085.89 863.827C2081.33 862.115 2076.4 864.644 2074.86 869.474C2073.33 874.304 2075.78 879.608 2080.34 881.319L2083.11 872.573L2085.89 863.827ZM2125.5 888.494L2128.28 879.748L2085.89 863.827L2083.11 872.573L2080.34 881.319L2122.73 897.24L2125.5 888.494Z" fill="black"/>
+        </g>
+        <g>
+        <path d="M2103.04 884.611C2098.33 892.894 2089.43 895.439 2083.56 892.045C2077.69 888.651 2075.37 879.625 2080.08 871.342C2084.8 863.059 2093.7 860.514 2099.57 863.908C2105.44 867.303 2107.76 876.328 2103.04 884.611Z" fill="black" stroke="black" stroke-width="9"/>
+        <rect x="4.28871" y="-1.21963" width="34.8856" height="6.33059" transform="matrix(0.500845 -0.877297 0.854071 0.491984 2074.69 893.597)" fill="black" stroke="black" stroke-width="6.33059"/>
+        <path d="M2093.4 879.067C2088.69 887.35 2079.79 889.895 2073.92 886.501C2068.05 883.107 2065.73 874.081 2070.45 865.798C2075.16 857.515 2084.06 854.97 2089.93 858.364C2095.8 861.759 2098.12 870.784 2093.4 879.067Z" fill="white" stroke="black" stroke-width="9"/>
+        </g>
+        </g>
+        </g>
+        <g>
+        <path d="M2229.98 232.398C2230.91 227.039 2237.76 225.949 2245.67 227.953C2253.58 229.956 2255.78 235.31 2254.35 240.922C2252.92 246.534 2248.08 248.82 2239.44 246.905C2230.81 244.991 2229.04 237.758 2229.98 232.398Z" fill="black"/>
+        <path d="M2285.36 241.561C2285.96 236.075 2280.43 233.126 2273.19 232.901C2265.95 232.675 2262.69 237.29 2262.44 243.158C2262.19 249.026 2265.72 252.592 2273.55 253.104C2281.38 253.616 2284.76 247.047 2285.36 241.561Z" fill="black"/>
+        <path d="M2248.98 237.926L2249 239.925C2251.41 239.861 2254.93 240.156 2258.44 240.781C2261.98 241.411 2265.28 242.338 2267.34 243.438L2268.3 241.671L2269.26 239.903C2266.65 238.508 2262.86 237.494 2259.19 236.842C2255.5 236.184 2251.69 235.853 2248.95 235.926L2248.98 237.926Z" fill="black"/>
+        </g>
+        </g>
+          </g>
+        </svg>
+      </div>
+      <svg class="s13-me" viewBox="0 0 576 750" fill="none" aria-hidden="true">
+          <defs>
+            <clipPath id="s13-me-hair-clip"><use href="#s13-me-hair"/></clipPath>
+            <pattern id="s13-me-stripe" patternUnits="userSpaceOnUse" width="60" height="60" patternTransform="rotate(45)">
+              <rect width="20" height="60" fill="#79D997"/>
+              <rect x="20" width="20" height="60" fill="#007AFF"/>
+              <rect x="40" width="20" height="60" fill="#FFE8A3"/>
+            </pattern>
+            <!-- モーフィング用の髪の形（体の位置に合わせて補正済み） -->
+            <path id="s13-me-hair-2" d="M152.347 12.802C181.062 14.782 157.736 -30.477 208.773 -6.850C263.234 18.362 295.569 3.105 298.167 56.371C300.148 96.969 273.412 99.940 254.599 113.803C238.536 125.638 188.308 86.769 152.347 73.566C114.562 59.692 78.9189 7.738 152.347 12.802Z"/>
+            <path id="s13-me-hair-3" d="M175.975 -2.259C194.984 -2.259 174.56 -19.243 207.114 -29.859C266.476 -49.216 295.569 3.104 298.167 56.370C300.148 96.969 273.412 99.939 254.599 113.802C238.536 125.637 179.995 39.722 148.375 71.342C128.559 91.158 112.217 -2.259 175.975 -2.259Z"/>
+          </defs>
+          <g>
+          <path d="M145.682 646.671C140.927 643.614 100.771 611.49 103.527 633.536C105.635 639.009 106.664 646.671 122.992 659.91C128.395 664.291 145.682 663.892 145.682 646.671Z" fill="#FFE8A3"/>
+          <path d="M377.145 521.341C374.179 512.294 348.357 494.841 338.458 512.294C338.458 524.322 345.509 530.617 358.795 533.077C372.08 535.538 375.004 528.728 377.145 521.341Z" fill="#FFE8A3"/>
+          <path d="M324.339 278.934C291.138 234.286 125.374 328.565 103.213 352.54C88.8734 380.858 144.03 396.213 202.431 373.558C260.833 350.903 343.49 304.691 324.339 278.934Z" fill="#FFE8A3"/>
+          <path id="s13-me-hair" d="M151.618 39.537C180.334 41.5174 149.638 37.5565 200.138 12.8018C256.203 -14.6809 295.569 3.10523 298.167 56.3713C300.148 96.9695 273.412 99.9401 254.599 113.803C238.536 125.638 185.874 123.415 163.5 124.694C123.315 126.99 78.1903 34.473 151.618 39.537Z" fill="#79D997"/>
+          <!-- 髪のストライプ（流す） -->
+          <g clip-path="url(#s13-me-hair-clip)"><g class="s13-me-hair-stripe"><rect x="-100" y="-200" width="800" height="700" fill="url(#s13-me-stripe)"/></g></g>
+          <path d="M94.1959 270.955C74.8367 242.834 75.5448 171.727 86.715 151.466C94.9984 136.442 135.474 136.472 148.508 134.878L155.105 159.743C155.105 159.743 119.654 153.302 109.832 164.537C102.756 172.631 96.0113 198.984 101.052 222.857C105.847 239.639 125.986 248.989 125.986 254.264C125.986 259.538 105.751 247.977 109.832 258.339C117.67 278.243 132.363 270.495 131.979 276.8C130.794 284.463 109.832 293.669 94.1959 270.955Z" fill="#FFE2DB"/>
+          <path d="M537.39 132.173C543.427 142.796 523.987 124.823 515.154 112.907C484.782 122.435 434.932 149.243 405.763 148.156C388.828 147.525 368.208 145.138 352.696 143.198L358.483 114.457C381.285 117.642 391.512 120.325 409.451 121.163C427.391 122.001 500.784 97.5804 508.583 94.9083C516.381 92.2361 527.764 92.5035 536.625 97.5089C545.485 102.514 558.991 122.17 565.661 137.721C574.294 157.848 553.681 132.204 541.162 121.602C533.814 115.38 526.578 113.148 537.39 132.173Z" fill="#FFE2DB"/>
+          <path d="M77.8755 466.778C80.3321 454.904 87.0238 446.892 90.246 442.473C111.513 437.226 115.853 428.729 126.901 444.748C98.8635 456.691 111.763 474.567 113.696 482.121C127.171 534.791 125.893 597.907 133.591 646.42C126.783 651.355 122.528 651.696 116.274 648.613C104.214 591.809 75.419 478.651 77.8755 466.778Z" fill="#FFE2DB"/>
+          <path d="M348.457 527.621L365.113 528.231C379.87 408.712 398.446 306.553 357.976 313.501C322.913 319.521 358.722 391.029 348.457 527.621Z" fill="#FFE2DB"/>
+          <g>
+          <path d="M63.7678 664.82C59.3568 667.372 58.8069 671.244 59.0834 672.86L148.852 679.283C149.004 677.605 149.2 673.572 148.764 670.865C147.184 661.039 138.208 653.711 135.802 642.828C135.147 644.017 136.269 647.585 132.219 648.665C127.156 650.015 115.8 639.581 108.454 640.886C103.375 641.788 99.3406 651.18 90.4991 656.269C81.6577 661.357 69.2815 661.63 63.7678 664.82Z" fill="black" stroke="black" stroke-width="7" stroke-linejoin="round"/>
+          <path d="M99.4448 669.568C90.1614 668.783 69.8323 665.633 62.0664 669.815C49.3875 676.642 83.8626 686.137 99.3385 686.864C114.814 687.592 126.355 688.29 132.657 687.548C138.958 686.805 149.858 684.982 148.312 680.345C146.767 675.709 137.438 677.965 128.402 675.443C119.365 672.921 113.606 670.765 99.4448 669.568Z" fill="black" stroke="black" stroke-width="8"/>
+          </g>
+          <g>
+          <path d="M349.84 515.032C342.995 514.918 340.619 519.263 339.016 519.933C337.414 520.604 308.707 522.867 307.028 540.782L376.343 554.008C377.159 537.859 372.778 531.072 367.504 517.744C366.791 518.279 365.287 520.733 362.155 520.319C358.17 519.793 358.512 515.177 349.84 515.032Z" fill="black" stroke="black" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M342.299 561.095C352.462 563.715 360.478 565.78 372.956 560.049C388.524 552.898 361.246 538.514 352.207 535.548C339.726 531.452 320.533 526.504 310.013 533.332C298.021 541.116 310.765 554.92 318.059 557.642C325.353 560.364 334.483 559.081 342.09 561.041L342.299 561.095Z" fill="black" stroke="black" stroke-width="3" stroke-linecap="round"/>
+          </g>
+          <path d="M69.1817 465.244C65.5181 436.852 124.897 338.167 155.045 292.373L295.861 253.448L317.264 279.835C337.108 279.835 361.4 280.964 381.549 304.777C401.698 328.59 401.394 347.868 377.144 521.341C374.178 512.295 348.357 494.841 338.458 512.295C339.985 467.264 342.427 371.681 330.52 347.868C315.637 318.102 256.812 330.292 202.381 369.981C157.624 402.616 145.682 421.895 129.239 465.244C122.662 482.584 145.682 591.673 145.682 646.671C140.927 643.614 100.771 611.49 103.527 633.536C93.6051 589.269 72.8452 493.636 69.1817 465.244Z" fill="url(#s13-me-grad)"/>
+          <path d="M238.357 113.05C280.422 104.899 317.246 106.309 367.571 113.754C353.453 137.532 353.673 158.387 353.673 185.327C274.264 135.932 325.07 273.927 324.338 278.934C291.138 234.286 125.374 328.565 103.213 352.54C143.026 296.375 218.811 135.932 137.052 206.539C137.052 185.327 137.052 163.171 120.078 135.932C177.457 131.355 186.372 113.05 238.357 113.05Z" fill="white"/>
+          <g>
+          <path d="M283.209 92.3324C288.211 82.2074 291.423 62.9125 288.211 54.2102C284.998 45.5079 281.681 39.5125 270.614 38.2293C260.531 37.0603 248.535 40.0124 239.082 42.7928C231.043 45.1572 232.534 51.7571 228.073 61.1601C226.591 64.285 222.752 65.031 219.297 64.8815C215.731 64.7272 212.389 66.1028 210.973 69.8533C208.782 75.6595 212.63 82.6753 222.991 84.4478C234.246 86.3734 218.975 123.981 239.983 123.981C252.882 123.981 250.309 106.183 262.308 101.306C269.843 98.2432 279.984 98.8608 283.209 92.3324Z" fill="#FFE2DB"/>
+          <circle cx="261.113" cy="52.595" r="3.84058" fill="black"/>
+          <circle cx="282.568" cy="58.5276" r="3.84058" fill="black"/>
+          </g>
+          <g>
+          <path d="M381.695 506.819C356.404 521.849 83.465 675.488 71.8406 679.074C60.2162 682.66 10.4468 697.276 2.74903 707.933C-4.94872 718.589 9.61904 728.32 29.2032 728.192C48.7874 728.064 78.5731 712.541 121.228 694.128C121.228 694.128 401.94 538.275 425.334 522.328C448.727 506.38 493.682 481.098 498.131 453.705C499.985 442.285 487.528 421.889 465.15 432.565C453.247 438.244 406.987 491.788 381.695 506.819Z" fill="black"/>
+          <g>
+          <g>
+          <path d="M451.302 558.404C446.594 566.681 437.698 569.225 431.819 565.827C425.94 562.428 423.625 553.401 428.333 545.124C433.041 536.847 441.938 534.302 447.817 537.701C453.696 541.1 456.01 550.127 451.302 558.404Z" fill="black" stroke="black" stroke-width="9"/>
+          <rect x="4.29124" y="-1.22036" width="34.8762" height="6.3355" transform="matrix(0.500712 -0.877288 0.853952 0.492042 422.951 567.381)" fill="black" stroke="black" stroke-width="6.3355"/>
+          <path d="M441.664 552.86C436.956 561.137 428.059 563.682 422.18 560.283C416.301 556.884 413.986 547.857 418.694 539.58C423.402 531.303 432.3 528.758 438.178 532.157C444.057 535.556 446.371 544.584 441.664 552.86Z" fill="white" stroke="black" stroke-width="9"/>
+          <path d="M421.851 553.257C426.407 554.968 431.344 552.44 432.878 547.609C434.411 542.779 431.961 537.476 427.405 535.764L424.628 544.511L421.851 553.257ZM385.016 519.843C380.46 518.132 375.523 520.66 373.99 525.491C372.456 530.321 374.906 535.624 379.463 537.336L382.24 528.589L385.016 519.843ZM424.628 544.511L427.405 535.764L385.016 519.843L382.24 528.589L379.463 537.336L421.851 553.257L424.628 544.511Z" fill="black"/>
+          </g>
+          <g>
+          <path d="M402.168 540.628C397.455 548.911 388.557 551.456 382.684 548.062C376.812 544.667 374.497 535.642 379.21 527.359C383.923 519.076 392.821 516.531 398.694 519.925C404.567 523.319 406.881 532.345 402.168 540.628Z" fill="black" stroke="black" stroke-width="9"/>
+          <rect x="4.28871" y="-1.21963" width="34.8856" height="6.33059" transform="matrix(0.500845 -0.877297 0.854071 0.491984 373.819 549.614)" fill="black" stroke="black" stroke-width="6.33059"/>
+          <path d="M392.529 535.084C387.816 543.367 378.918 545.912 373.045 542.518C367.172 539.123 364.858 530.098 369.571 521.815C374.284 513.532 383.182 510.987 389.055 514.381C394.928 517.775 397.242 526.801 392.529 535.084Z" fill="white" stroke="black" stroke-width="9"/>
+          </g>
+          </g>
+          <g>
+          <g>
+          <path d="M165.269 723.438C160.561 731.714 151.664 734.259 145.785 730.86C139.906 727.461 137.591 718.434 142.299 710.157C147.007 701.88 155.905 699.336 161.783 702.734C167.662 706.134 169.977 715.161 165.269 723.438Z" fill="black" stroke="black" stroke-width="9"/>
+          <rect x="4.29124" y="-1.22036" width="34.8762" height="6.3355" transform="matrix(0.500712 -0.877288 0.853952 0.492042 136.917 732.415)" fill="black" stroke="black" stroke-width="6.3355"/>
+          <path d="M155.63 717.894C150.922 726.17 142.025 728.715 136.146 725.316C130.267 721.917 127.952 712.89 132.66 704.613C137.368 696.336 146.266 693.792 152.144 697.191C158.023 700.59 160.338 709.617 155.63 717.894Z" fill="white" stroke="black" stroke-width="9"/>
+          <path d="M135.817 718.29C140.373 720.001 145.31 717.473 146.844 712.643C148.378 707.812 145.927 702.509 141.371 700.798L138.594 709.544L135.817 718.29ZM98.9827 684.877C94.4263 683.165 89.4894 685.694 87.9557 690.524C86.4221 695.354 88.8724 700.658 93.4288 702.369L96.2057 693.623L98.9827 684.877ZM138.594 709.544L141.371 700.798L98.9827 684.877L96.2057 693.623L93.4288 702.369L135.817 718.29L138.594 709.544Z" fill="black"/>
+          </g>
+          <g>
+          <path d="M116.134 705.661C111.421 713.944 102.523 716.489 96.6506 713.095C90.778 709.701 88.4637 700.675 93.1767 692.392C97.8898 684.109 106.788 681.564 112.66 684.958C118.533 688.353 120.847 697.378 116.134 705.661Z" fill="black" stroke="black" stroke-width="9"/>
+          <rect x="4.28871" y="-1.21963" width="34.8856" height="6.33059" transform="matrix(0.500845 -0.877297 0.854071 0.491984 87.7854 714.647)" fill="black" stroke="black" stroke-width="6.33059"/>
+          <path d="M106.495 700.117C101.782 708.4 92.8843 710.945 87.0116 707.551C81.139 704.157 78.8246 695.131 83.5377 686.848C88.2508 678.565 97.1487 676.02 103.021 679.414C108.894 682.809 111.208 691.834 106.495 700.117Z" fill="white" stroke="black" stroke-width="9"/>
+          </g>
+          </g>
+          <path d="M388.083 512.816C362.793 527.845 89.8687 681.463 78.245 685.049C66.6212 688.634 10.4844 707.097 4.64888 715.175C-1.1866 723.252 18.0635 729.79 35.6736 728.55C53.2837 727.311 88.1008 720.266 127.63 700.101C167.159 679.935 408.327 544.269 431.719 528.324C455.112 512.378 493.748 484.213 498.196 456.823C500.051 445.405 493.91 427.898 471.533 438.572C459.63 444.251 413.373 497.787 388.083 512.816Z" fill="#6155F5"/>
+          </g>
+          </g>
+          <defs>
+          <linearGradient id="s13-me-grad" x1="232.531" y1="253.448" x2="232.531" y2="646.671" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#5856D6"/>
+          <stop offset="1" stop-color="#17017A"/>
+          </linearGradient>
+          </defs>
+        </svg>
+
+      <div class="s13-overlay"></div>
+      <div class="s13-card">
+        <div class="s13-q">
+          <p>クリエイティブの壁を<br>登るのに必要なのは？</p>
+          <div class="s13-answers">
+            <button class="btn-white btn-blue-shadow s13-effort" type="button">血眼な努力</button>
+            <button class="next btn-white btn-pink-shadow" type="button">ポップな狂気</button>
+          </div>
+        </div>
+        <div class="s13-a">
+          <p>それも大事だけれども</p>
+          <button class="btn-black s13-return" type="button"><span class="material-symbols-outlined">chevron_left</span>戻る</button>
+        </div>
+      </div>
+
+      <button class="back" type="button">
+        <span class="material-symbols-outlined">chevron_left</span>BACK
+      </button>
+    </section>
+    <!-- ポップな狂気を解放しますか？（14） -->
+    <section class="scene scene-ready" data-scene="14">
+      <p class="s14-title">ポップな狂気を解放しますか？</p>
+      <svg class="s14-skater" viewBox="0 0 1503 850" fill="none" aria-hidden="true">
+        <defs>
+        <clipPath id="s14-sk-hair-clip"><path d="M1003.83 152.022C1038.45 53.3614 1099.03 -0.300703 1183.84 -0.300781C1268.66 -0.30086 1335.11 84.9682 1321.39 245.414C1305.78 428.044 1524.47 376.698 1482.44 554.524C1444.64 714.435 1313.61 976.608 1255.46 976.608H681.233C442.578 969.34 -63.8061 938.084 -180.105 871.213C-325.479 787.623 -176.471 780.354 -34.7314 776.72C107.008 773.085 457.094 550.89 736.938 554.524C1016.78 558.158 697.575 434.478 890.195 372.694C1082.82 310.91 962.902 268.67 1003.83 152.022Z"/></clipPath>
+        <pattern id="s14-sk-stripe" patternUnits="userSpaceOnUse" width="75" height="75" patternTransform="rotate(45)">
+        <rect width="25" height="75" fill="#FFD7D8"/>
+        <rect x="25" width="25" height="75" fill="#FF2D55"/>
+        <rect x="50" width="25" height="75" fill="#FF9C9E"/>
+        </pattern>
+        </defs>
+        <g clip-path="url(#clip0_68_7696-s14)">
+        <g>
+        <path d="M1003.83 152.022C1038.45 53.3614 1099.03 -0.300703 1183.84 -0.300781C1268.66 -0.30086 1335.11 84.9682 1321.39 245.414C1305.78 428.044 1524.47 376.698 1482.44 554.524C1444.64 714.435 1313.61 976.608 1255.46 976.608H681.233C442.578 969.34 -63.8061 938.084 -180.105 871.213C-325.479 787.623 -176.471 780.354 -34.7314 776.72C107.008 773.085 457.094 550.89 736.938 554.524C1016.78 558.158 697.575 434.478 890.195 372.694C1082.82 310.91 962.902 268.67 1003.83 152.022Z" fill="#FFD7D8"/>
+        <!-- 髪のストライプ（流す） -->
+        <g clip-path="url(#s14-sk-hair-clip)"><g class="s14-sk-hair-stripe"><rect x="-400" y="-500" width="2400" height="2200" fill="url(#s14-sk-stripe)"/></g></g>
+        <g filter="url(#filter0_d_68_7696-s14)">
+        <path d="M1278.09 390.424L1305 334.519C1373.13 400.819 1429.24 441.819 1429.24 507.669C1429.24 548.669 1360.9 603.336 1323.63 625.7L1298.87 594.547C1337.3 564.821 1378.99 526.095 1379.54 507.669C1381 458.718 1315.18 409.15 1278.09 390.424Z" fill="#FFE2DB"/>
+        </g>
+        <g filter="url(#filter1_d_68_7696-s14)">
+        <path d="M1090.12 390.424L1063.21 334.519C995.081 400.819 938.973 441.819 938.973 507.669C938.973 548.669 1007.31 603.336 1044.58 625.7L1069.34 594.547C1030.91 564.821 989.22 526.095 988.67 507.669C987.209 458.718 1053.03 409.15 1090.12 390.424Z" fill="#FFE2DB"/>
+        </g>
+        <path d="M1039.56 501.958C1016.19 469.683 979.401 440.292 942.896 423.375C1039.56 323.257 1035.55 243.523 1174.32 243.523C1313.09 243.523 1303.05 317.417 1405.1 386.004C1366.62 423.375 1339.86 451.547 1339.86 491.394C1295.68 455.539 1246.32 443.702 1246.32 501.958C1347.73 616.855 1476.63 782.097 1502.85 980.234L825.326 980.234C889.76 802.241 953.428 665.37 1103.98 501.958C1112.35 449.572 1063.7 466.131 1039.56 501.958Z" fill="black"/>
+        <path d="M1083.15 137.7C1089.87 130.978 1080.93 121.344 1093.89 103.199C1101.14 93.049 1122.17 90.7027 1143.1 84.9853C1163.72 79.3542 1169.94 61.0195 1195.5 61.0195C1221.07 61.0195 1235.03 82.5602 1238.32 103.199C1241.84 125.218 1255.2 135.154 1262.26 137.7C1268.9 140.097 1292.81 137.7 1292.81 155.372C1292.81 173.043 1258.33 170.178 1255.27 179.562L1255.2 179.782C1252.57 187.841 1248.63 199.938 1230.24 209.151C1200.52 224.043 1195.29 214.708 1188.39 260.934C1185.45 280.61 1159.87 280.076 1157.01 260.934C1150.11 214.708 1144.88 224.043 1115.16 209.151C1096.77 199.938 1092.83 187.841 1090.21 179.782L1090.13 179.562C1087.08 170.178 1052.6 173.043 1052.6 155.372C1052.6 137.7 1078.15 142.694 1083.15 137.7Z" fill="#FFE2DB"/>
+        <g>
+        <path d="M1099.8 128.301C1101.2 115.614 1117.07 112.063 1135.89 115.6C1154.7 119.137 1160.64 131.351 1158.12 144.702C1155.59 158.052 1144.57 164.112 1124.07 160.889C1103.58 157.667 1098.39 140.987 1099.8 128.301Z" fill="black"/>
+        <path d="M1245.61 128.299C1244.2 115.612 1228.33 112.062 1209.52 115.598C1190.71 119.135 1184.76 131.349 1187.29 144.7C1189.81 158.051 1200.84 164.11 1221.33 160.887C1241.83 157.665 1247.01 140.986 1245.61 128.299Z" fill="black"/>
+        <path d="M1149.89 136.084H1195.9" stroke="black" stroke-width="10.2819"/>
+        </g>
+        <g>
+        <g>
+        <mask id="path-9-inside-1_68_7696-s14" fill="white">
+        <path d="M1227.75 164.507C1223.19 190.224 1200.36 209.773 1172.89 209.773C1145.42 209.773 1122.6 190.223 1118.03 164.507C1130.35 178.191 1150.34 187.088 1172.89 187.088C1195.45 187.088 1215.43 178.191 1227.75 164.507Z"/>
+        </mask>
+        <path d="M1227.75 164.507C1223.19 190.224 1200.36 209.773 1172.89 209.773C1145.42 209.773 1122.6 190.223 1118.03 164.507C1130.35 178.191 1150.34 187.088 1172.89 187.088C1195.45 187.088 1215.43 178.191 1227.75 164.507Z" fill="white"/>
+        <path d="M1227.75 164.507L1230.71 165.031C1230.94 163.713 1230.27 162.399 1229.07 161.811C1227.87 161.224 1226.42 161.504 1225.52 162.499L1227.75 164.507ZM1172.89 209.773L1172.89 212.773H1172.89V209.773ZM1118.03 164.507L1120.26 162.499C1119.37 161.504 1117.92 161.224 1116.72 161.811C1115.51 162.399 1114.84 163.713 1115.08 165.031L1118.03 164.507ZM1172.89 187.088L1172.89 190.088H1172.89V187.088ZM1227.75 164.507L1224.8 163.983C1220.49 188.256 1198.92 206.773 1172.89 206.773V209.773V212.773C1201.81 212.773 1225.89 192.191 1230.71 165.031L1227.75 164.507ZM1172.89 209.773L1172.89 206.773C1146.86 206.773 1125.29 188.255 1120.99 163.983L1118.03 164.507L1115.08 165.031C1119.9 192.191 1143.98 212.773 1172.89 212.773L1172.89 209.773ZM1118.03 164.507L1115.8 166.514C1128.75 180.896 1149.58 190.088 1172.89 190.088L1172.89 187.088L1172.89 184.088C1151.09 184.088 1131.96 175.486 1120.26 162.499L1118.03 164.507ZM1172.89 187.088V190.088C1196.21 190.088 1217.03 180.896 1229.98 166.514L1227.75 164.507L1225.52 162.499C1213.83 175.486 1194.69 184.088 1172.89 184.088V187.088Z" fill="black" mask="url(#path-9-inside-1_68_7696-s14)"/>
+        </g>
+        <g>
+        <mask id="mask0_68_7696-s14" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="1118" y="164" width="110" height="46">
+        <path d="M1227.76 164.506C1223.19 190.223 1200.37 209.773 1172.89 209.773C1145.42 209.773 1122.6 190.223 1118.03 164.506C1130.35 178.191 1150.34 187.088 1172.89 187.088C1195.45 187.088 1215.43 178.191 1227.76 164.506Z" fill="white"/>
+        </mask>
+        <g mask="url(#mask0_68_7696-s14)">
+        <path d="M1172.89 187.48V217.731C1172.31 217.731 1171.73 217.725 1171.15 217.715L1171.7 187.47C1172.09 187.477 1172.49 187.48 1172.89 187.48ZM1174.63 217.715C1174.05 217.725 1173.47 217.731 1172.89 217.731V187.48C1173.29 187.48 1173.69 187.477 1174.09 187.47L1174.63 217.715ZM1154.58 184.795C1155.3 185.016 1156.03 185.225 1156.77 185.422L1149 214.658C1147.87 214.359 1146.76 214.039 1145.66 213.7L1154.58 184.795ZM1200.12 213.701C1199.02 214.04 1197.91 214.359 1196.79 214.658L1192.9 200.041L1189.02 185.422C1189.76 185.225 1190.49 185.016 1191.2 184.795L1200.12 213.701ZM1140.29 177.822C1140.83 178.207 1141.38 178.588 1141.95 178.961L1125.4 204.282C1124.42 203.645 1123.47 202.99 1122.54 202.315L1140.29 177.822ZM1223.25 202.314C1222.32 202.989 1221.36 203.645 1220.39 204.282L1203.84 178.961C1204.41 178.588 1204.96 178.207 1205.49 177.822L1223.25 202.314ZM1131.56 168.477C1131.8 168.892 1132.05 169.313 1132.33 169.738L1107.02 186.305C1106.38 185.333 1105.78 184.345 1105.22 183.342L1131.56 168.477ZM1240.46 183.28L1240.57 183.342C1240 184.345 1239.4 185.333 1238.77 186.305L1213.46 169.738C1213.73 169.313 1213.99 168.892 1214.22 168.477L1240.46 183.28Z" fill="black"/>
+        </g>
+        </g>
+        </g>
+        </g>
+        </g>
+        <defs>
+        <filter id="filter0_d_68_7696-s14" x="1270.9" y="334.52" width="165.522" height="305.552" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+        <feOffset dy="7.18571"/>
+        <feGaussianBlur stdDeviation="3.59285"/>
+        <feComposite in2="hardAlpha" operator="out"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 0.142785 0 0 0 0 0.118088 0 0 0 0 0.118088 0 0 0 0.5 0"/>
+        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_68_7696"/>
+        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_68_7696" result="shape"/>
+        </filter>
+        <filter id="filter1_d_68_7696-s14" x="931.787" y="334.52" width="165.522" height="305.552" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+        <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+        <feOffset dy="7.18571"/>
+        <feGaussianBlur stdDeviation="3.59285"/>
+        <feComposite in2="hardAlpha" operator="out"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 0.142785 0 0 0 0 0.118088 0 0 0 0 0.118088 0 0 0 0.5 0"/>
+        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_68_7696"/>
+        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_68_7696" result="shape"/>
+        </filter>
+        <linearGradient x1="624.076" y1="-0.300781" x2="624.076" y2="976.608" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#D9D9D9"/>
+        <stop offset="1" stop-color="#737373"/>
+        </linearGradient>
+        <clipPath id="clip0_68_7696-s14">
+        <rect width="1503" height="850" fill="white"/>
+        </clipPath>
+        </defs>
+      </svg>
+      <svg class="s14-me" viewBox="0 0 422 851" fill="none" aria-hidden="true">
+        <defs>
+        <clipPath id="s14-me-hair-clip"><path d="M303.106 55.0522C277.283 38.9133 276.248 7.39518 210.143 0.556739C149.789 -5.68674 73.7075 41.3485 64.2881 103.136C39.8535 263.418 190.587 226.427 263.617 226.427C341.574 226.427 366.265 178.557 360.807 123.973C357.094 86.8385 328.059 70.6477 303.106 55.0522Z"/></clipPath>
+        <pattern id="s14-me-stripe" patternUnits="userSpaceOnUse" width="69" height="69" patternTransform="rotate(45)">
+        <rect width="23" height="69" fill="#79D997"/>
+        <rect x="23" width="23" height="69" fill="#007AFF"/>
+        <rect x="46" width="23" height="69" fill="#FFE8A3"/>
+        </pattern>
+        </defs>
+        <g clip-path="url(#clip0_68_7764-s14)">
+        <path d="M132.94 609.823L105.435 641.36C27.8391 571.749 35.9784 411.962 59.9835 341.66L86.946 363.162C79.9333 421.759 58.9544 551.505 132.94 609.823Z" fill="#FEC0B1"/>
+        <path d="M288.727 609.823L316.233 641.36C393.828 571.749 385.689 411.962 361.684 341.66L334.722 363.162C341.734 421.759 362.713 551.505 288.727 609.823Z" fill="#FEC0B1"/>
+        <path d="M128.807 500.335H301.395C320.263 574.308 327.759 820.858 327.759 886.672H235.573C235.573 853.008 238.909 618.456 213.162 618.456C187.416 618.456 190.224 854.783 190.224 886.672H96.6235C96.6234 814.318 96.6233 566.95 128.807 500.335Z" fill="url(#paint0_linear_68_7764-s14)"/>
+        <path d="M18.3535 393.808C85.7313 250.07 167.856 249.042 210.096 247.848C252.336 249.042 334.46 250.07 401.838 393.808L334.194 434.394C328.35 393.808 316.323 363.744 316.323 363.744C301.274 420.521 322.673 548.983 331.191 596.083C247.603 615.738 159.159 614.721 89.0004 596.083C97.5185 548.983 119.48 425.936 103.868 363.744C103.868 363.744 90.2501 403.555 85.9979 434.394L18.3535 393.808Z" fill="white"/>
+        <path d="M303.106 55.0522C277.283 38.9133 276.248 7.39518 210.143 0.556739C149.789 -5.68674 73.7075 41.3485 64.2881 103.136C39.8535 263.418 190.587 226.427 263.617 226.427C341.574 226.427 366.265 178.557 360.807 123.973C357.094 86.8385 328.059 70.6477 303.106 55.0522Z" fill="#79D997"/>
+        <!-- 髪のストライプ（流す） -->
+        <g clip-path="url(#s14-me-hair-clip)"><g class="s14-me-hair-stripe"><rect x="-400" y="-500" width="2400" height="2200" fill="url(#s14-me-stripe)"/></g></g>
+        <g>
+        <path d="M284.686 205.256C302.642 191.828 308.629 121.671 291.388 106.346C250.23 81.9865 178.181 77.7126 131.072 106.346C111.36 118.327 119.818 191.828 137.773 205.256C155.908 218.819 183.899 222.97 192.966 235.979C197.684 242.749 192.966 275.705 211.23 275.705C229.494 275.705 224.776 242.749 229.494 235.979C238.561 222.97 266.552 218.819 284.686 205.256Z" fill="url(#paint1_linear_68_7764-s14)"/>
+        <g>
+        <g>
+        <path d="M236.053 139.669L236.887 139.188L231.388 134.141L230.554 134.622L229.721 135.103L235.22 140.15L236.053 139.669Z" fill="black"/>
+        <path d="M246.561 129.367L247.465 129.038L243.996 123.098L243.092 123.427L242.187 123.757L245.657 129.696L246.561 129.367Z" fill="black"/>
+        <path d="M258.814 126.141L258.814 119.489" stroke="black" stroke-width="1.9246" stroke-linejoin="round"/>
+        <path d="M271.044 129.367L271.949 129.696L275.418 123.757L274.514 123.427L273.61 123.098L270.14 129.038L271.044 129.367Z" fill="black"/>
+        <path d="M281.575 139.669L282.408 140.15L287.907 135.103L287.074 134.622L286.24 134.141L280.741 139.188L281.575 139.669Z" fill="black"/>
+        </g>
+        <g>
+        <g>
+        <circle cx="13.4029" cy="13.4029" r="13.4029" transform="matrix(-1 0 0 1 272.206 128.073)" fill="#7E7E7E"/>
+        <path d="M258.803 124.053C246.517 124.053 236.09 132.602 232.391 142.447C236.09 152.292 246.517 158.416 258.803 158.416C271.088 158.416 281.515 152.292 285.214 142.447C281.515 132.602 271.088 124.053 258.803 124.053Z" fill="white"/>
+        <circle cx="16.4958" cy="16.4958" r="16.4958" transform="matrix(-1 0 0 1 275.298 124.98)" fill="black"/>
+        <circle cx="7.49135" cy="7.49135" r="7.49135" transform="matrix(-1 0 0 1 266.293 133.984)" fill="#FFE8A3"/>
+        </g>
+        </g>
+        </g>
+        <g>
+        <g>
+        <path d="M142.603 139.667L143.436 139.186L137.938 134.139L137.104 134.62L136.271 135.101L141.77 140.148L142.603 139.667Z" fill="black"/>
+        <path d="M153.111 129.365L154.016 129.036L150.546 123.096L149.642 123.425L148.738 123.755L152.207 129.694L153.111 129.365Z" fill="black"/>
+        <path d="M165.364 126.139L165.364 119.487" stroke="black" stroke-width="1.9246" stroke-linejoin="round"/>
+        <path d="M177.595 129.365L178.499 129.694L181.968 123.755L181.064 123.425L180.16 123.096L176.69 129.036L177.595 129.365Z" fill="black"/>
+        <path d="M188.125 139.667L188.958 140.148L194.457 135.101L193.624 134.62L192.791 134.139L187.292 139.186L188.125 139.667Z" fill="black"/>
+        </g>
+        <g>
+        <g>
+        <circle cx="13.4029" cy="13.4029" r="13.4029" transform="matrix(-1 0 0 1 178.755 128.072)" fill="#7E7E7E"/>
+        <path d="M165.353 124.052C153.067 124.052 142.64 132.601 138.942 142.446C142.64 152.291 153.067 158.415 165.353 158.415C177.638 158.415 188.066 152.291 191.764 142.446C188.066 132.601 177.638 124.052 165.353 124.052Z" fill="white"/>
+        <circle cx="16.4958" cy="16.4958" r="16.4958" transform="matrix(-1 0 0 1 181.849 124.979)" fill="black"/>
+        <circle cx="7.49135" cy="7.49135" r="7.49135" transform="matrix(-1 0 0 1 172.844 133.983)" fill="#FFE8A3"/>
+        </g>
+        </g>
+        </g>
+        <g>
+        <g>
+        <mask id="path-25-inside-1_68_7764-s14" fill="white">
+        <path d="M266.292 165.887C261.686 191.847 238.646 211.581 210.915 211.581C183.184 211.581 160.143 191.847 155.536 165.888C167.974 179.701 188.146 188.682 210.915 188.682C233.683 188.682 253.854 179.7 266.292 165.887Z"/>
+        </mask>
+        <path d="M266.292 165.887C261.686 191.847 238.646 211.581 210.915 211.581C183.184 211.581 160.143 191.847 155.536 165.888C167.974 179.701 188.146 188.682 210.915 188.682C233.683 188.682 253.854 179.7 266.292 165.887Z" fill="white"/>
+        <path d="M266.292 165.887L268.989 166.365C269.203 165.162 268.593 163.962 267.494 163.426C266.396 162.889 265.075 163.146 264.257 164.054L266.292 165.887ZM210.915 211.581V214.32V214.32V211.581ZM155.536 165.888L157.571 164.055C156.753 163.147 155.432 162.89 154.334 163.427C153.235 163.963 152.626 165.163 152.839 166.366L155.536 165.888ZM210.915 188.682V191.42L210.915 191.42L210.915 188.682ZM266.292 165.887L263.596 165.408C259.223 190.05 237.328 208.842 210.915 208.842V211.581V214.32C239.963 214.32 264.148 193.643 268.989 166.365L266.292 165.887ZM210.915 211.581V208.842C184.501 208.842 162.605 190.051 158.232 165.409L155.536 165.888L152.839 166.366C157.68 193.644 181.866 214.32 210.915 214.32V211.581ZM155.536 165.888L153.5 167.72C166.512 182.171 187.455 191.42 210.915 191.42V188.682V185.943C188.837 185.943 169.436 177.232 157.571 164.055L155.536 165.888ZM210.915 188.682L210.915 191.42C234.375 191.42 255.316 182.17 268.328 167.719L266.292 165.887L264.257 164.054C252.392 177.231 232.992 185.943 210.915 185.943L210.915 188.682Z" fill="black" mask="url(#path-25-inside-1_68_7764-s14)"/>
+        </g>
+        <g>
+        <mask id="mask0_68_7764-s14" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="155" y="165" width="112" height="47">
+        <path d="M266.293 165.887C261.686 191.846 238.645 211.581 210.914 211.581C183.183 211.581 160.142 191.846 155.535 165.887C167.974 179.701 188.145 188.682 210.914 188.682C233.683 188.682 253.855 179.701 266.293 165.887Z" fill="white"/>
+        </mask>
+        <g mask="url(#mask0_68_7764-s14)">
+        <path d="M210.914 189.077V219.614L209.95 219.609C209.686 219.607 209.421 219.602 209.157 219.598L209.707 189.066C210.108 189.074 210.51 189.077 210.914 189.077ZM212.67 219.598C212.086 219.608 211.501 219.614 210.914 219.614V189.077C211.318 189.077 211.721 189.074 212.122 189.066L212.67 219.598ZM192.431 186.367C193.154 186.59 193.889 186.802 194.636 187L186.793 216.512C185.658 216.21 184.535 215.887 183.426 215.545L192.431 186.367ZM238.401 215.545C237.292 215.887 236.17 216.209 235.035 216.511L231.114 201.756L227.193 187C227.94 186.802 228.675 186.59 229.397 186.367L238.401 215.545ZM178.008 179.328C178.544 179.717 179.1 180.1 179.677 180.477L162.971 206.038C161.987 205.395 161.025 204.733 160.085 204.052L178.008 179.328ZM261.743 204.052C260.804 204.733 259.841 205.395 258.857 206.038L242.151 180.477C242.728 180.1 243.285 179.717 243.821 179.328L261.743 204.052ZM169.193 169.894C169.43 170.313 169.689 170.738 169.97 171.168L144.419 187.891C143.777 186.909 143.169 185.912 142.598 184.899L169.193 169.894ZM279.23 184.9C278.659 185.913 278.051 186.91 277.409 187.891L251.859 171.168C252.141 170.738 252.399 170.313 252.636 169.894L279.23 184.9Z" fill="black"/>
+        </g>
+        </g>
+        </g>
+        </g>
+        </g>
+        <defs>
+        <linearGradient id="paint0_linear_68_7764-s14" x1="211.839" y1="500.335" x2="211.839" y2="694.898" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#5856D6"/>
+        <stop offset="1" stop-color="#17017A"/>
+        </linearGradient>
+        <linearGradient id="paint1_linear_68_7764-s14" x1="210.7" y1="86.4414" x2="210.7" y2="289.34" gradientUnits="userSpaceOnUse">
+        <stop offset="0.41644" stop-color="#FFE2DB"/>
+        <stop offset="1" stop-color="#FF997F"/>
+        </linearGradient>
+        <clipPath id="clip0_68_7764-s14">
+        <rect width="421.4" height="850.781" fill="white"/>
+        </clipPath>
+        </defs>
+      </svg>
+      <p class="s14-bubble s14-bubble-l">ARE YOU READY?</p>
+      <p class="s14-bubble s14-bubble-r">YES, YOU CAN</p>
+      <button class="next btn-white btn-pink-shadow s14-yes" type="button">はい<span class="material-symbols-outlined">chevron_right</span></button>
+      <button class="back" type="button">
+        <span class="material-symbols-outlined">chevron_left</span>BACK
+      </button>
+    </section>
+    <!-- 君の狂気はどんな色だい？（15） -->
+    <section class="scene scene-last" data-scene="15">
+      <svg class="s15-mirror" viewBox="0 0 1332 1526" fill="none" aria-hidden="true">
+        <defs>
+          <clipPath id="s15-glass-clip"><path d="M331.361 955.572C331.361 770.676 481.248 620.788 666.144 620.788V620.788C851.04 620.788 1000.93 770.676 1000.93 955.571V1156.22C1000.93 1341.11 851.04 1491 666.144 1491V1491C481.248 1491 331.361 1341.11 331.361 1156.22V955.572Z"/></clipPath>
+        </defs>
+        <path d="M983.23 993.37C957.755 1023.93 990.303 944.107 1016.52 903.551C1014.8 754.205 988.68 481.355 988.68 352.728L1102.46 352.729C1093.92 439.815 1075.98 795.765 1075.92 822.605C1075.86 849.444 1093.14 918.647 1088.02 951.381C1082.9 984.115 1038.43 1047.77 998.662 1085.89C947.186 1135.23 1001.77 1043.06 1019.77 992.775C1030.33 963.259 1028.85 938.648 983.23 993.37Z" fill="#FFE2DB"/>
+        <path d="M349.079 993.37C374.553 1023.93 342.005 944.107 315.789 903.551C317.51 754.205 343.629 481.355 343.629 352.728L229.848 352.729C238.391 439.815 256.324 795.765 256.385 822.605C256.447 849.444 239.17 918.647 244.291 951.381C249.413 984.115 293.875 1047.77 333.647 1085.89C385.123 1135.23 330.535 1043.06 312.542 992.775C301.982 963.259 303.455 938.648 349.079 993.37Z" fill="#FFE2DB"/>
+        <path d="M331.361 955.572C331.361 770.676 481.248 620.788 666.144 620.788V620.788C851.04 620.788 1000.93 770.676 1000.93 955.571V1156.22C1000.93 1341.11 851.04 1491 666.144 1491V1491C481.248 1491 331.361 1341.11 331.361 1156.22V955.572Z" fill="#87E5F6"/>
+        <!-- 鏡に走る光の帯 -->
+        <g clip-path="url(#s15-glass-clip)">
+          <rect class="s15-glint" x="0" y="300" width="110" height="1600" fill="#fff" opacity="0.55" transform="rotate(25 666 1100)"/>
+        </g>
+        <path d="M1000.93 955.571C1000.93 771.398 852.208 621.96 668.309 620.795L666.144 620.788C481.249 620.788 331.361 770.676 331.361 955.571V1156.22C331.361 1340.39 480.08 1489.83 663.979 1490.99L666.144 1491C850.317 1491 999.756 1342.28 1000.92 1158.38L1000.93 1156.22V955.571ZM1024.93 1156.22C1024.93 1354.37 864.294 1515 666.144 1515C467.994 1515 307.361 1354.37 307.361 1156.22V955.571C307.361 757.421 467.994 596.788 666.144 596.788C864.294 596.788 1024.93 757.421 1024.93 955.571V1156.22Z" fill="#1DB3D8"/>
+        <path d="M1020.37 867.611C980.993 908.021 957.755 1023.93 983.23 993.371C1019.94 949.344 1024.1 931.63 1026.6 960.028L1028.57 989.172C1027.72 976.547 1027.21 966.927 1026.6 960.028L1020.37 867.611Z" fill="#FFE2DB"/>
+        <path d="M311.941 867.611C351.315 908.021 374.553 1023.93 349.078 993.371C312.372 949.344 308.204 931.63 305.707 960.028L303.741 989.172C304.593 976.547 305.101 966.927 305.707 960.028L311.941 867.611Z" fill="#FFE2DB"/>
+      </svg>
+      <div class="s15-text">
+        <p class="s15-line">君の狂気は</p>
+        <p class="s15-line">どんな色だい？</p>
+      </div>
+      <button class="back" type="button">
+        <span class="material-symbols-outlined">chevron_left</span>BACK
+      </button>
+      <button class="btn-black btn-next s15-top" type="button" data-goto="1">
+        TOPへ<span class="material-symbols-outlined">chevron_right</span>
+      </button>
     </section>
   </main>
 
+  <script src="js/vendor/gsap.min.js"></script>
+  <script src="js/vendor/MorphSVGPlugin.min.js"></script>
+  <script src="js/scenes.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

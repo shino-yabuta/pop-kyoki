@@ -1,0 +1,27 @@
+<svg width="900" height="607" viewBox="0 0 900 607" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="eye4">
+<g id="Group 29">
+<path id="white" d="M449.551 0C655.304 0.000133578 829.937 143.176 891.879 308.057C829.937 472.938 655.305 575.507 449.551 575.507C243.797 575.507 69.1638 472.939 7.22131 308.057C69.164 143.176 243.797 0 449.551 0Z" fill="white"/>
+<circle id="ring" cx="449.55" cy="291.814" r="276.267" fill="black"/>
+<circle id="iris" cx="449.358" cy="291.814" r="236.772" fill="url(#paint0_linear_59_6970)"/>
+<g id="lashes">
+<path id="Vector 43" d="M812.205 362.181L804.789 365.181L884.272 461.659L891.688 458.659L899.104 455.658L819.621 359.18L812.205 362.181Z" fill="black"/>
+<path id="Vector 44" d="M654.858 462.616L646.995 464.093L688.138 571.7L696.001 570.223L703.863 568.747L662.72 461.14L654.858 462.616Z" fill="black"/>
+<path id="Vector 45" d="M449.551 494.718L449.551 606.121" stroke="black" stroke-width="16" stroke-linejoin="round"/>
+<path id="Vector 46" d="M243.858 462.616L235.995 461.14L194.852 568.747L202.715 570.223L210.577 571.7L251.72 464.093L243.858 462.616Z" fill="black"/>
+<path id="Vector 47" d="M86.8983 362.181L79.4823 359.18L1.46209e-05 455.658L7.41598 458.659L14.8319 461.659L94.3143 365.181L86.8983 362.181Z" fill="black"/>
+</g>
+<path id="lid" d="M449.359 0C655.112 0.000133578 829.744 143.176 891.687 308.057C891.687 308.057 813.225 508.057 449.359 508.057C85.4919 508.057 7.02893 308.057 7.02893 308.057C68.9716 143.176 243.605 0 449.359 0Z" fill="url(#paint1_linear_59_6970)"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_59_6970" x1="449.358" y1="55.042" x2="449.358" y2="528.586" gradientUnits="userSpaceOnUse">
+<stop stop-color="#171717"/>
+<stop offset="1" stop-color="#9A9A9A"/>
+</linearGradient>
+<linearGradient id="paint1_linear_59_6970" x1="449.358" y1="0" x2="449.358" y2="508.057" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFE2DB"/>
+<stop offset="1" stop-color="#FFBAA9"/>
+</linearGradient>
+</defs>
+</svg>

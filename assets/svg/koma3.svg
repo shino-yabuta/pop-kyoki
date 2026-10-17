@@ -1,0 +1,49 @@
+<svg width="424" height="323" viewBox="0 0 424 323" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="koma3">
+<rect width="423.333" height="323" fill="white"/>
+<rect width="423.333" height="323" fill="#21005D" fill-opacity="0.3"/>
+<g id="&#232;&#161;&#128;&#231;&#156;&#188;">
+<g id="Group 25">
+<path id="Vector 43" d="M353.929 165.976L351.343 164.483L385.713 132.939L388.298 134.431L390.884 135.924L356.514 167.468L353.929 165.976Z" fill="black"/>
+<path id="Vector 44" d="M288.252 101.59L285.446 100.569L307.131 63.4434L309.936 64.4645L312.742 65.4856L291.057 102.611L288.252 101.59Z" fill="black"/>
+<path id="Vector 45" d="M211.667 81.4233L211.667 39.8476" stroke="black" stroke-width="5.97122" stroke-linejoin="round"/>
+<path id="Vector 46" d="M135.225 101.59L132.419 102.611L110.735 65.4856L113.54 64.4645L116.346 63.4434L138.031 100.569L135.225 101.59Z" fill="black"/>
+<path id="Vector 47" d="M69.4045 165.976L66.8189 167.468L32.4495 135.924L35.0351 134.431L37.6207 132.939L71.9902 164.483L69.4045 165.976Z" fill="black"/>
+</g>
+<circle id="Ellipse 12" cx="211.738" cy="177.278" r="83.7714" fill="#7E7E7E"/>
+<path id="Intersect" d="M211.739 68.373C288.526 68.3731 353.699 121.806 376.816 183.34C353.699 244.874 288.526 283.153 211.739 283.153C134.951 283.153 69.7777 244.874 46.6606 183.34C69.7777 121.806 134.951 68.373 211.739 68.373Z" fill="url(#paint0_linear_56_6825)"/>
+<g id="Mask group">
+<mask id="mask0_56_6825" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="46" y="68" width="331" height="216">
+<path id="Intersect_2" d="M211.739 68.373C288.526 68.3731 353.699 121.806 376.816 183.34C353.699 244.874 288.526 283.153 211.739 283.153C134.951 283.153 69.7777 244.874 46.6606 183.34C69.7777 121.806 134.951 68.373 211.739 68.373Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_56_6825)">
+<path id="Vector 54" opacity="0.7" d="M195.138 288.023C202.139 282.099 215.816 267.022 214.524 254.098M214.524 254.098C213.231 241.174 206.447 222.865 203.216 215.326M214.524 254.098C218.95 245.147 232.542 224.13 251.5 211.665" stroke="#FF3B30" stroke-width="9.11341" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector 56" opacity="0.7" d="M162.091 60.3462C174.709 63.9418 201.429 75.5354 207.363 93.1459M207.363 93.1459C213.296 110.756 214.781 140.795 202.082 163.088M207.363 93.1459C223.529 93.1459 251.748 90.5643 278.275 134.586" stroke="#FF3B30" stroke-width="9.11341" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector 57" opacity="0.7" d="M41.3383 134.431C49.0044 145.079 68.9815 166.275 87.5605 165.877M87.5605 165.877C106.14 165.479 133.014 157.848 144.128 154.083M87.5605 165.877C99.8325 173.191 128.291 194.929 143.952 223.364" stroke="#FF3B30" stroke-width="9.11341" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector 55" opacity="0.7" d="M334.058 178.502C338.239 184.876 343.146 191.546 347.862 196.215C357.092 205.354 377.417 204.215 386.426 202.503M347.862 196.215C334.058 192.958 309.064 196.215 286.05 209.798M294.47 157.596C310.187 159.56 328.649 170.256 334.058 178.502M334.058 178.502C343.585 164.612 344.186 150.032 337.41 133.459" stroke="#FF3B30" stroke-width="9.11341" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+<g id="Mask group_2">
+<mask id="mask1_56_6825" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="46" y="68" width="331" height="216">
+<path id="Intersect_3" d="M211.739 68.373C288.526 68.3731 353.699 121.806 376.816 183.34C353.699 244.874 288.526 283.153 211.739 283.153C134.951 283.153 69.7777 244.874 46.6606 183.34C69.7777 121.806 134.951 68.373 211.739 68.373Z" fill="url(#paint1_linear_56_6825)"/>
+</mask>
+<g mask="url(#mask1_56_6825)">
+<g id="iris">
+<circle id="Ellipse 11" cx="85.7318" cy="184.526" r="103.103" fill="black"/>
+<circle id="Ellipse 13" cx="85.7317" cy="183.011" r="44.6302" fill="#808080" fill-opacity="0.55"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_56_6825" x1="211.738" y1="68.373" x2="211.738" y2="355.435" gradientUnits="userSpaceOnUse">
+<stop offset="0.110733" stop-color="white"/>
+<stop offset="1" stop-color="#FFDBDB"/>
+</linearGradient>
+<linearGradient id="paint1_linear_56_6825" x1="211.738" y1="68.373" x2="211.738" y2="283.153" gradientUnits="userSpaceOnUse">
+<stop stop-color="white"/>
+<stop offset="1" stop-color="#999999"/>
+</linearGradient>
+</defs>
+</svg>

@@ -1,0 +1,51 @@
+<svg width="539" height="267" viewBox="0 0 539 267" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="face_me_1">
+<g id="Group 44">
+<g id="eye">
+<path id="white" d="M114.881 0.000976562C166.398 0.00101001 210.123 35.8498 225.632 77.1331C210.123 118.417 166.398 144.098 114.881 144.098C63.3639 144.098 19.6387 118.417 4.12939 77.1331C19.6388 35.8497 63.3639 0.000976562 114.881 0.000976562Z" fill="white"/>
+<circle id="ring" cx="114.881" cy="73.066" r="69.1724" fill="black"/>
+<circle id="iris" cx="114.833" cy="73.0658" r="59.2836" fill="url(#paint0_linear_64_7184)"/>
+<g id="lashes">
+<path id="Vector 43" d="M205.684 73.917L201.506 75.6074L221.407 99.7638L225.585 98.0734L229.763 96.383L209.862 72.2266L205.684 73.917Z" fill="black"/>
+<path id="Vector 44" d="M160.107 72.5234L155.677 73.3552L165.979 100.298L170.408 99.4664L174.838 98.6346L164.536 71.6917L160.107 72.5234Z" fill="black"/>
+<path id="Vector 45" d="M114.881 72.0488L114.881 99.9422" stroke="black" stroke-width="9.01378" stroke-linejoin="round"/>
+<path id="Vector 46" d="M69.6562 72.5234L65.2268 71.6917L54.9253 98.6346L59.3547 99.4664L63.7842 100.298L74.0857 73.3552L69.6562 72.5234Z" fill="black"/>
+<path id="Vector 47" d="M24.0791 73.917L19.9012 72.2266L0.000229782 96.383L4.1781 98.0734L8.35597 99.7638L28.257 75.6074L24.0791 73.917Z" fill="black"/>
+</g>
+<path id="lid" d="M114.833 0C166.35 3.34458e-05 210.075 35.8488 225.585 77.1322C225.585 77.1322 166.35 77.1321 114.833 77.1322C63.3161 77.1322 4.08154 77.1322 4.08154 77.1322C19.5909 35.8487 63.3161 0 114.833 0Z" fill="url(#paint1_linear_64_7184)"/>
+</g>
+<g id="eye_2">
+<path id="white_2" d="M423.376 0.000976562C474.893 0.00101001 518.618 35.8498 534.128 77.1331C518.618 118.417 474.893 144.098 423.376 144.098C371.859 144.098 328.134 118.417 312.625 77.1331C328.134 35.8497 371.859 0.000976562 423.376 0.000976562Z" fill="white"/>
+<circle id="ring_2" cx="423.377" cy="73.066" r="69.1724" fill="black"/>
+<circle id="iris_2" cx="423.328" cy="73.0658" r="59.2836" fill="url(#paint2_linear_64_7184)"/>
+<g id="lashes_2">
+<path id="Vector 43_2" d="M514.179 73.917L510.001 75.6074L529.902 99.7638L534.08 98.0734L538.258 96.383L518.357 72.2266L514.179 73.917Z" fill="black"/>
+<path id="Vector 44_2" d="M468.602 72.5234L464.173 73.3552L474.474 100.298L478.904 99.4664L483.333 98.6346L473.032 71.6917L468.602 72.5234Z" fill="black"/>
+<path id="Vector 45_2" d="M423.376 72.0488L423.376 99.9422" stroke="black" stroke-width="9.01378" stroke-linejoin="round"/>
+<path id="Vector 46_2" d="M378.151 72.5234L373.722 71.6917L363.42 98.6346L367.85 99.4664L372.279 100.298L382.581 73.3552L378.151 72.5234Z" fill="black"/>
+<path id="Vector 47_2" d="M332.574 73.917L328.396 72.2266L308.495 96.383L312.673 98.0734L316.851 99.7638L336.752 75.6074L332.574 73.917Z" fill="black"/>
+</g>
+<path id="lid_2" d="M423.328 0C474.845 3.34458e-05 518.57 35.8488 534.08 77.1322C534.08 77.1322 474.846 77.1321 423.328 77.1322C371.811 77.1322 312.577 77.1322 312.577 77.1322C328.086 35.8487 371.811 0 423.328 0Z" fill="url(#paint3_linear_64_7184)"/>
+</g>
+<path id="mouth" d="M151.364 259.642H386.893" stroke="black" stroke-width="14"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_64_7184" x1="114.833" y1="13.7822" x2="114.833" y2="132.349" gradientUnits="userSpaceOnUse">
+<stop stop-color="#171717"/>
+<stop offset="1" stop-color="#9A9A9A"/>
+</linearGradient>
+<linearGradient id="paint1_linear_64_7184" x1="114.833" y1="0" x2="114.833" y2="77.1322" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFE2DB"/>
+<stop offset="1" stop-color="#FFBAA9"/>
+</linearGradient>
+<linearGradient id="paint2_linear_64_7184" x1="423.328" y1="13.7822" x2="423.328" y2="132.349" gradientUnits="userSpaceOnUse">
+<stop stop-color="#171717"/>
+<stop offset="1" stop-color="#9A9A9A"/>
+</linearGradient>
+<linearGradient id="paint3_linear_64_7184" x1="423.328" y1="0" x2="423.328" y2="77.1322" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFE2DB"/>
+<stop offset="1" stop-color="#FFBAA9"/>
+</linearGradient>
+</defs>
+</svg>

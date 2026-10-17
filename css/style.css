@@ -5,23 +5,35 @@
   margin: 0;
 }
 
+:root {
+  /* Figma（1440x1024）の 1px に相当する長さ。画面の縦横どちらか小さい方に合わせる */
+  --u: min(calc(100vw / 1440), calc(100dvh / 1024));
+
+  --font-ja: "vdl-logomaru-jr", sans-serif;
+  --font-en: "bungee", sans-serif;
+  --font-note: "Noto Sans JP", sans-serif;
+
+  --color-red: #ff2d55;
+  --color-purple: #5b4ff5;
+}
+
 html,
 body {
   width: 100vw;
   height: 100dvh;
   overflow: hidden;
-  background: #000;
+  background: #fff;
 }
 
-/* Figma のフレームサイズ（1440x1024）で組み、JS で画面に収まるよう拡縮する */
+body {
+  font-family: var(--font-ja);
+  color: #000;
+}
+
 .stage {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 1440px;
-  height: 1024px;
-  transform: translate(-50%, -50%) scale(var(--scale, 1));
-  background: #fff;
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -33,4 +45,1672 @@ body {
 
 .scene.is-active {
   display: block;
+}
+
+/* ---------- 初期画面 ---------- */
+.scene-top.is-active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 黒文字の背面にピンクと青のズレた文字を重ねる */
+.title {
+  position: relative;
+  isolation: isolate;
+  font-size: calc(110 * var(--u));
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.title::before,
+.title::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.title::before {
+  color: rgba(255, 45, 85, 0.25);
+  transform: translate(calc(10 * var(--u)), calc(-4 * var(--u)));
+}
+
+.title::after {
+  color: rgba(0, 122, 255, 0.2);
+  transform: translate(calc(-10 * var(--u)), calc(12 * var(--u)));
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: calc(20 * var(--u));
+  margin-top: calc(70 * var(--u));
+  font-family: var(--font-note);
+  font-size: calc(22 * var(--u));
+  letter-spacing: 0.1em;
+}
+
+.notice .material-symbols-outlined {
+  font-size: calc(36 * var(--u));
+}
+
+.btn-start {
+  margin-top: calc(90 * var(--u));
+  width: calc(214 * var(--u));
+  height: calc(78 * var(--u));
+  border: none;
+  border-radius: calc(14 * var(--u));
+  background: var(--color-red);
+  box-shadow: 0 calc(8 * var(--u)) 0 var(--color-purple);
+  color: #fff;
+  font-family: var(--font-en);
+  font-size: calc(44 * var(--u));
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* 押したときに沈み込む */
+.btn-start:active {
+  transform: translateY(calc(8 * var(--u)));
+  box-shadow: none;
+}
+
+/* ---------- クリエイティブの壁 ---------- */
+.scene-wall {
+  --wall-top: 32.4%; /* 壁の上端（画面の高さに対する割合） */
+  /* ズームの基点（壁の上の人のあたり）。ここを中心に拡大する */
+  --zoom-x: calc(50% + 12 * var(--u));
+  --zoom-y: calc(var(--wall-top) - 41 * var(--u));
+}
+
+/* ズームで拡大する範囲。空の色もここに持たせて、中のブレンドが空の色と混ざるようにする */
+.camera {
+  position: absolute;
+  inset: 0;
+  background: #37d3f0;
+  transform-origin: var(--zoom-x) var(--zoom-y);
+  isolation: isolate;
+}
+
+.wall {
+  position: absolute;
+  top: var(--wall-top);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, #edf3ff 0%, #6155f5 100%);
+}
+
+/* 「クリエイティブの壁」を横に繰り返す帯（中央の1つが画面中央にくる） */
+.wall-text,
+.wall-text-strong {
+  position: absolute;
+  top: calc(7 * var(--u));
+  height: calc(77 * var(--u));
+  mix-blend-mode: color-burn;
+}
+
+.wall-text {
+  /* 横に流すため、左右に1つ分ずつはみ出させておく */
+  left: calc(-728 * var(--u));
+  right: calc(-728 * var(--u));
+  background: url(../assets/svg/wall-text.svg) repeat-x center / auto 100%;
+  /* 右から左へ1つ分ずつ流す。JS で再生を開始する */
+  animation: wall-flow 8s linear infinite paused;
+  will-change: transform;
+}
+
+@keyframes wall-flow {
+  to {
+    transform: translateX(calc(-728 * var(--u)));
+  }
+}
+
+/* 中央だけ重ねて濃くする（SVG は前後に 10px ずつ余白を足して 728px） */
+.wall-text-strong {
+  left: calc(50% - 364 * var(--u));
+  width: calc(728 * var(--u));
+}
+
+/* 後輪が壁の向こうに少し隠れるよう、壁の上端より少し下げて壁の背面に置く */
+.skater-wrap {
+  position: absolute;
+  bottom: calc(100% - var(--wall-top) - 2.5 * var(--u));
+  z-index: -1;
+  left: calc(50% - 155 * var(--u));
+  width: calc(186 * var(--u));
+  mix-blend-mode: luminosity;
+}
+
+/* カラー版。最初は透明で、ズーム時に表示する */
+.skater-color {
+  mix-blend-mode: normal;
+  opacity: 0;
+}
+
+.skater {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tategaki {
+  position: absolute;
+  top: calc(100% - 404 * var(--u));
+  writing-mode: vertical-rl;
+  color: #fff;
+  font-size: calc(46 * var(--u));
+  line-height: 1;
+  letter-spacing: 0.1em;
+}
+
+.tategaki-left {
+  left: calc(99 * var(--u));
+}
+
+.tategaki-right {
+  right: calc(97 * var(--u));
+}
+
+.me {
+  position: absolute;
+  bottom: 0;
+  left: calc(50% - 82 * var(--u));
+  width: calc(164 * var(--u));
+}
+
+/* 吹き出し */
+.bubble {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(112 * var(--u));
+  border-radius: 999px;
+  background: #fff;
+  font-size: calc(40 * var(--u));
+}
+
+.bubble-l {
+  left: calc(50% - 311 * var(--u));
+  bottom: calc(200 * var(--u));
+  width: calc(216 * var(--u));
+}
+
+.bubble-r {
+  left: calc(50% + 103 * var(--u));
+  bottom: calc(68 * var(--u));
+  width: calc(212 * var(--u));
+}
+
+.bubble-dot {
+  position: absolute;
+  width: calc(16 * var(--u));
+  height: calc(16 * var(--u));
+  border-radius: 50%;
+  background: #fff;
+}
+
+.dot-l1 { left: calc(50% - 133 * var(--u)); bottom: calc(172 * var(--u)); }
+.dot-l2 { left: calc(50% - 111 * var(--u)); bottom: calc(152 * var(--u)); }
+.dot-r1 { left: calc(50% + 86 * var(--u)); bottom: calc(68 * var(--u)); }
+
+/* 虫眼鏡（クリックで次へ） */
+.zoom {
+  position: absolute;
+  left: calc(50% - 175 * var(--u));
+  bottom: calc(100% - var(--wall-top) - 144 * var(--u));
+  width: calc(350 * var(--u));
+  height: calc(350 * var(--u));
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(255, 45, 85, 0.35);
+}
+
+.zoom .material-symbols-outlined {
+  position: relative;
+  color: #fff;
+  font-size: calc(120 * var(--u));
+}
+
+/* 前の画面に戻る */
+.back {
+  position: absolute;
+  left: calc(30 * var(--u));
+  bottom: calc(29 * var(--u));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(4 * var(--u));
+  height: calc(56 * var(--u));
+  padding: calc(16 * var(--u)) calc(24 * var(--u));
+  border: calc(2 * var(--u)) solid #fff;
+  border-radius: calc(12 * var(--u));
+  box-shadow: 0 calc(8 * var(--u)) 0 0 rgba(255, 255, 255, 0.72);
+  background: none;
+  color: #fff;
+  font-family: var(--font-en);
+  font-size: calc(24 * var(--u));
+  cursor: pointer;
+}
+
+/* 押したときに沈み込む */
+.back:active {
+  translate: 0 calc(8 * var(--u));
+  box-shadow: none;
+}
+
+.back .material-symbols-outlined {
+  font-size: calc(24 * var(--u));
+}
+
+/* ズームのあしらい：半透明の円を4重に重ねる（中心ほど濃くなる）
+   カメラの中に置き、6倍に拡大されたときに画面を覆う大きさ（1400 / 6） */
+.zoom-fx {
+  --ring: rgba(0, 110, 200, 0.12);
+  position: absolute;
+  left: calc(var(--zoom-x) - 117 * var(--u));
+  top: calc(var(--zoom-y) - 117 * var(--u));
+  width: calc(234 * var(--u));
+  height: calc(234 * var(--u));
+  background:
+    radial-gradient(circle closest-side, var(--ring) 46%, transparent 46.2%),
+    radial-gradient(circle closest-side, var(--ring) 64%, transparent 64.2%),
+    radial-gradient(circle closest-side, var(--ring) 82%, transparent 82.2%),
+    radial-gradient(circle closest-side, var(--ring) 99.8%, transparent 100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ---------- 共通ボタン ---------- */
+/* 白いボタン（紫の影） */
+.btn-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(16 * var(--u));
+  height: calc(72 * var(--u));
+  padding: calc(16 * var(--u)) calc(40 * var(--u));
+  border: none;
+  border-radius: calc(12 * var(--u));
+  background: #fff;
+  box-shadow: 0 calc(8 * var(--u)) 0 0 #6155f5;
+  color: #000;
+  font-family: var(--font-ja);
+  font-feature-settings: "palt" on;
+  font-size: calc(40 * var(--u));
+  line-height: 1.2;
+  letter-spacing: calc(4 * var(--u));
+  cursor: pointer;
+}
+
+.btn-white:active {
+  translate: 0 calc(8 * var(--u));
+  box-shadow: none;
+}
+
+.btn-white .material-symbols-outlined {
+  font-size: calc(40 * var(--u));
+}
+
+/* 「あれは…」（ズーム後に表示） */
+.btn-are {
+  position: absolute;
+  left: calc(50% + 185 * var(--u));
+  top: calc(50% - 163 * var(--u));
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* クリエイティブパーソンの赤い帯 */
+.person-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% - 204 * var(--u));
+  height: calc(315 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(56 * var(--u));
+  isolation: isolate;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* 帯の色だけを 90% にする（文字とボタンは不透明のまま） */
+.person-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #ff2d55 0%, #ff383c 100%);
+  opacity: 0.9;
+  z-index: -1;
+}
+
+.person-title {
+  color: #fff;
+  font-size: calc(100 * var(--u));
+  font-feature-settings: "palt" on;
+  line-height: 1;
+  letter-spacing: 0.08em;
+}
+
+/* タイプライター用に1文字ずつ分けた span */
+.person-title .char {
+  visibility: hidden;
+}
+
+/* 「もっとよく見る」（文字が出たあとに表示） */
+.person-band .btn-white {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* 空を流れる効果線：長い線＋短い線＋点を1組にして、右から左へ流す
+   スケーター（z-index: -1）と壁の背面に置き、空の部分だけに見えるようにする */
+.speed-lines {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.speed-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+}
+
+.speed-line i {
+  display: block;
+  width: calc(var(--len) * var(--u));
+  height: calc(4 * var(--u));
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+/* ---------- いーな（5） ---------- */
+/* シーン5の要素は最初は非表示。JS で順に表示する */
+.s5 {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.s5-overlay,
+.s5-navy {
+  position: absolute;
+  inset: 0;
+}
+
+.s5-overlay {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.s5-navy {
+  background: #4847a9;
+}
+
+.s5-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 画面中央を基準に、Figma の座標（中央からのずれ）で配置する */
+.iina-bubble {
+  position: absolute;
+  left: calc(50% + var(--x) * var(--u));
+  top: calc(50% + var(--y) * var(--u));
+  width: calc(var(--w) * var(--u));
+  height: calc(var(--h) * var(--u));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: #5856d6;
+  font-size: calc(var(--f) * var(--u));
+}
+
+.s5-panel {
+  position: absolute;
+  left: calc(50% - 522 * var(--u));
+  top: calc(50% - 382 * var(--u));
+  width: calc(1044 * var(--u));
+  height: calc(765 * var(--u));
+  border-radius: calc(24.7 * var(--u));
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.s5-eye {
+  position: absolute;
+  left: calc(50% - 480 * var(--u));
+  top: calc(50% - 316 * var(--u));
+  width: calc(961 * var(--u));
+  height: calc(652 * var(--u));
+  overflow: visible;
+}
+
+.s5-text {
+  position: absolute;
+  color: #fff;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.s5-left,
+.s5-right {
+  top: calc(50% - 379 * var(--u));
+  writing-mode: vertical-rl;
+  font-size: calc(46 * var(--u));
+  letter-spacing: 0.12em;
+}
+
+.s5-left {
+  left: calc(50% - 622 * var(--u));
+}
+
+.s5-right {
+  left: calc(50% + 576 * var(--u));
+}
+
+.s5-top,
+.s5-bottom {
+  left: 50%;
+  translate: -50% 0;
+  font-size: calc(42 * var(--u));
+}
+
+.s5-top {
+  top: calc(50% - 452 * var(--u));
+}
+
+.s5-bottom {
+  top: calc(50% + 410 * var(--u));
+}
+
+.s5-iina {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 421 * var(--u));
+  translate: -50% 0;
+  color: #fff;
+  font-size: calc(56 * var(--u));
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* 黒い枠と影のボタン */
+.btn-black {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(8 * var(--u));
+  padding: calc(8 * var(--u)) calc(24 * var(--u));
+  border: calc(3 * var(--u)) solid #090909;
+  border-radius: calc(12 * var(--u));
+  background: #fff;
+  box-shadow: 0 calc(8 * var(--u)) 0 0 #090909;
+  color: #090909;
+  font-family: var(--font-en);
+  font-size: calc(40 * var(--u));
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.btn-black:active {
+  translate: 0 calc(8 * var(--u));
+  box-shadow: none;
+}
+
+.btn-black .material-symbols-outlined {
+  font-size: calc(40 * var(--u));
+}
+
+.btn-next {
+  position: absolute;
+  right: calc(32 * var(--u));
+  bottom: calc(40 * var(--u));
+}
+
+/* ---------- 努力を続けますか？（6） ---------- */
+/* シーン6で壁を暗くする乗算レイヤー */
+.wall-shade {
+  position: absolute;
+  inset: 0;
+  background: #5c50e6;
+  mix-blend-mode: multiply;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.s6-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* シーン6の要素は最初は非表示。JS で順に表示する */
+.koma,
+.s6-quote,
+.q-panel,
+.s6-question,
+.s6-answers {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* 漫画のコマ（3つ横並び） */
+.koma-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + 29 * var(--u));
+  display: flex;
+  justify-content: center;
+  gap: calc(40 * var(--u));
+}
+
+.koma {
+  margin: 0;
+}
+
+.koma-frame {
+  width: calc(424 * var(--u));
+  height: calc(323 * var(--u));
+  box-shadow: 0 calc(4 * var(--u)) calc(60 * var(--u)) 0 rgba(97, 85, 245, 0.5);
+}
+
+.koma-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.koma figcaption {
+  margin-top: calc(29 * var(--u));
+  color: #fff;
+  font-size: calc(40 * var(--u));
+  line-height: 1;
+  text-align: center;
+}
+
+/* 質問のテキスト */
+.s6-quote,
+.s6-question {
+  position: absolute;
+  left: 0;
+  right: 0;
+  color: #fff;
+  font-feature-settings: "palt" on;
+  font-size: calc(48 * var(--u));
+  line-height: 1.1;
+  text-align: center;
+}
+
+.s6-quote {
+  top: calc(50% - 410 * var(--u));
+}
+
+.s6-question {
+  top: calc(50% + 278 * var(--u));
+}
+
+/* 2つのパネル */
+.q-panel {
+  position: absolute;
+  top: calc(50% - 236 * var(--u));
+  width: calc(655 * var(--u));
+  height: calc(466 * var(--u));
+  border-radius: calc(24 * var(--u));
+  overflow: hidden;
+  background: #37d3f0;
+}
+
+.q-panel-l {
+  left: calc(50% - 675 * var(--u));
+}
+
+.q-panel-r {
+  left: calc(50% + 20 * var(--u));
+}
+
+.q-skater {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 右のパネル：シーン2の構図を縮小して組み直す */
+.q-panel-r {
+  --q-wall-top: calc(75 * var(--u));
+}
+
+.q-wall {
+  position: absolute;
+  top: var(--q-wall-top);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #edf3ff 0%, #6155f5 100%);
+}
+
+.q-wall-text {
+  position: absolute;
+  top: calc(4 * var(--u));
+  left: calc(-415 * var(--u));
+  right: calc(-415 * var(--u));
+  height: calc(44 * var(--u));
+  background: url(../assets/svg/wall-text.svg) repeat-x center / auto 100%;
+  mix-blend-mode: color-burn;
+  animation: q-wall-flow 8s linear infinite;
+}
+
+@keyframes q-wall-flow {
+  to {
+    transform: translateX(calc(-415 * var(--u)));
+  }
+}
+
+.q-mini-skater {
+  position: absolute;
+  left: calc(243 * var(--u));
+  bottom: calc(100% - var(--q-wall-top) - 1.4 * var(--u));
+  width: calc(101 * var(--u));
+}
+
+.q-me {
+  position: absolute;
+  left: calc(50% - 131 * var(--u));
+  bottom: 0;
+  width: calc(262 * var(--u));
+}
+
+/* はい／いいえ */
+.s6-answers {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + 358 * var(--u));
+  display: flex;
+  justify-content: center;
+  gap: calc(64 * var(--u));
+}
+
+/* 白いボタンの影を青にする */
+.btn-blue-shadow {
+  box-shadow: 0 calc(8 * var(--u)) 0 0 #08f;
+}
+
+/* ---------- GIVE UP → パチン（7） ---------- */
+.scene-snap {
+  background: #0d0d20;
+}
+
+/* シーン7の要素は最初は非表示。JS で順に表示する */
+.s7-burst,
+.s7-burst-blue,
+.s7-eye-closed,
+.s7-giveup .char,
+.s7-eye-open,
+.s7-hand-wrap,
+.s7-snap-lines,
+.s7-flash,
+.s7-btn,
+.scene-snap .back {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.s7-burst {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.s7-eye-closed {
+  position: absolute;
+  left: calc(50% - 450 * var(--u));
+  top: calc(50% - 400 * var(--u));
+  width: calc(900 * var(--u));
+  height: calc(607 * var(--u));
+}
+
+.s7-giveup {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + 244 * var(--u));
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--font-en);
+  font-feature-settings: "palt" on;
+  font-size: calc(120 * var(--u));
+  letter-spacing: calc(12 * var(--u));
+  text-align: center;
+  white-space: nowrap;
+}
+
+.s7-eye-open {
+  position: absolute;
+  left: calc(50% - 480 * var(--u));
+  top: calc(50% - 396 * var(--u));
+  width: calc(961 * var(--u));
+  height: calc(652 * var(--u));
+  overflow: visible;
+}
+
+.s7-eye-frame {
+  opacity: 0;
+}
+
+/* パチンの場面の手 */
+.s7-hand-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+/* 手の絵は書き出し枠の外まで描かれているので、枠で切り取らない（画面の下端で自然に切れる） */
+.s7-hand {
+  position: absolute;
+  left: calc(50% - 268.5 * var(--u));
+  top: calc(50% - 456 * var(--u));
+  overflow: visible;
+  width: calc(537 * var(--u));
+  height: calc(969 * var(--u));
+}
+
+/* パチン！の効果線（指先のまわり） */
+.s7-snap-lines {
+  position: absolute;
+  left: calc(50% + 209 * var(--u) - 100 * var(--u));
+  top: calc(50% - 188 * var(--u) - 100 * var(--u));
+  width: calc(200 * var(--u));
+  height: calc(200 * var(--u));
+  overflow: visible;
+  stroke: #fe5227;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.s7-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+}
+
+.s7-btn {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 323 * var(--u));
+  translate: -50% 0;
+}
+
+.s7-btn:active {
+  translate: -50% calc(8 * var(--u));
+}
+
+/* ---------- 私とスケーター（8） ---------- */
+.scene-slides {
+  background: #37d3f0;
+}
+
+/* 2枚のスライドを横に並べ、まとめて動かす */
+.s8-track {
+  position: absolute;
+  inset: 0;
+}
+
+.s8-slide {
+  position: absolute;
+  inset: 0;
+}
+
+.s8-slide + .s8-slide {
+  left: 100%;
+  right: -100%;
+}
+
+/* シーン5と同じ大きさの白い半透明パネル。中のイラストはパネルの形で切り抜く */
+.s8-panel {
+  position: absolute;
+  left: calc(50% - 522 * var(--u));
+  top: calc(50% - 382 * var(--u));
+  width: calc(1044 * var(--u));
+  height: calc(765 * var(--u));
+  border-radius: calc(24.7 * var(--u));
+  background: rgba(255, 255, 255, 0.4);
+  overflow: hidden;
+}
+
+/* 位置と大きさはパネルの左上からの Figma の値 */
+.s8-me {
+  position: absolute;
+  left: calc(236 * var(--u));
+  top: calc(26 * var(--u));
+  width: calc(571 * var(--u));
+  height: calc(786 * var(--u));
+}
+
+.s8-skater {
+  position: absolute;
+  left: calc(-680 * var(--u));
+  top: calc(-1 * var(--u));
+  width: calc(1578 * var(--u));
+  height: calc(943 * var(--u));
+}
+
+/* ‹ › ボタン */
+.s8-arrow {
+  position: absolute;
+  top: calc(50% - 48 * var(--u));
+  display: grid;
+  place-items: center;
+  width: calc(96 * var(--u));
+  height: calc(96 * var(--u));
+  padding: 0;
+  border: none;
+  border-radius: calc(16 * var(--u));
+  background: #6155f5;
+  color: #fff;
+  cursor: pointer;
+}
+
+.s8-arrow .material-symbols-outlined {
+  font-size: calc(64 * var(--u));
+}
+
+.s8-arrow-next {
+  left: calc(50% + 569 * var(--u));
+}
+
+.s8-arrow-prev {
+  left: calc(50% - 668 * var(--u));
+}
+
+/* 吹き出し（左にしっぽ） */
+.s8-bubble {
+  position: absolute;
+  left: calc(50% + 248 * var(--u));
+  top: calc(50% - 210 * var(--u));
+  width: calc(351 * var(--u));
+  height: calc(243 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(28 * var(--u));
+  border-radius: calc(140 * var(--u));
+  background: #fff;
+}
+
+.s8-bubble::before {
+  content: "";
+  position: absolute;
+  left: calc(-30 * var(--u));
+  top: calc(110 * var(--u));
+  width: calc(44 * var(--u));
+  height: calc(44 * var(--u));
+  background: #fff;
+  clip-path: polygon(0 50%, 100% 0, 100% 100%);
+}
+
+.s8-bubble p {
+  color: #000;
+  font-feature-settings: "palt" on;
+  font-size: calc(40 * var(--u));
+  line-height: 1.1;
+  letter-spacing: calc(4 * var(--u));
+}
+
+/* 紫の塗りと青い影のボタン */
+.btn-indigo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(16 * var(--u));
+  height: calc(72 * var(--u));
+  padding: calc(16 * var(--u)) calc(40 * var(--u));
+  border: none;
+  border-radius: calc(12 * var(--u));
+  background: #5856d6;
+  box-shadow: 0 calc(8 * var(--u)) 0 0 #08f;
+  color: #fff;
+  font-family: var(--font-ja);
+  font-feature-settings: "palt" on;
+  font-size: calc(40 * var(--u));
+  line-height: 1.2;
+  letter-spacing: calc(4 * var(--u));
+  cursor: pointer;
+}
+
+.btn-indigo:active {
+  translate: 0 calc(8 * var(--u));
+  box-shadow: none;
+}
+
+.btn-indigo .material-symbols-outlined {
+  font-size: calc(40 * var(--u));
+}
+
+/* シーン8の要素は最初は非表示。JS で順に表示する */
+.s8-slide:first-child .s8-panel,
+.s8-me,
+.s8-arrow-next,
+.s8-bubble,
+.scene-slides .back {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---------- 鏡（9） ---------- */
+.scene-mirror {
+  background: #37d3f0;
+}
+
+/* 位置は Figma の座標（画面中央からのずれ） */
+/* me_2.svg は Figma 上で約0.93倍で描かれているので、モックの大きさに合わせて 1.0797 倍で置く */
+.s9-me {
+  position: absolute;
+  left: calc(50% - 641.9 * var(--u));
+  top: calc(50% - 260.7 * var(--u));
+  width: calc(559.3 * var(--u));
+  height: calc(1162.8 * var(--u));
+  overflow: visible;
+}
+
+/* glass_2.svg は上に 390px 拡張されている */
+.s9-mirror {
+  position: absolute;
+  left: calc(50% - 337.5 * var(--u));
+  top: calc(50% - 1050 * var(--u));
+  width: calc(1332 * var(--u));
+  height: calc(1526 * var(--u));
+  overflow: visible;
+}
+
+.s9-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.s9-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  color: #fff;
+  font-feature-settings: "palt" on;
+  font-size: calc(56 * var(--u));
+  line-height: 1.1;
+  text-align: center;
+}
+
+.s9-line-1 {
+  top: calc(50% - 148 * var(--u));
+}
+
+.s9-line-2 {
+  top: calc(50% - 46 * var(--u));
+}
+
+.s9-btn {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 78 * var(--u));
+  translate: -50% 0;
+}
+
+.s9-btn:active {
+  translate: -50% calc(8 * var(--u));
+}
+
+/* シーン9の要素は最初は非表示。JS で順に表示する */
+.s9-overlay,
+.s9-line .char,
+.s9-btn,
+.scene-mirror .back {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---------- ハシゴを登る（10） ---------- */
+.scene-ladder {
+  --climb: 1200; /* 5回登って進む距離（横木2本分 = 240px × 5） */
+  --wall-top-end: 101; /* 登りきったときの壁のてっぺんの位置（画面上端から） */
+  background: #6155f5;
+}
+
+/* 原点を壁のてっぺんにして、登る前は climb 分だけ上にずらしておく */
+.s10-world {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc((var(--wall-top-end) - var(--climb)) * var(--u));
+  height: 0;
+}
+
+.s10-sky {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(1200 * var(--u));
+  background: #37d3f0;
+}
+
+/* 壁は縦長の1枚。上ほど白っぽく、登るにつれて白い部分が見えてくる */
+.s10-wall {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(4000 * var(--u));
+  background: linear-gradient(180deg, #edf3ff 0, #6155f5 calc(1600 * var(--u)));
+}
+
+/* ハシゴ：縦の柱2本と、120px 間隔の横木（どちらも太さ 20px）
+   形はマスクで切り抜き、色は上が #5856D6、下に行くほど濃くして紫の壁に溶けないようにする */
+.s10-ladder {
+  --rail: calc(20 * var(--u));
+  --rung-top: calc(108 * var(--u)); /* 壁のてっぺんから一番上の横木まで */
+  position: absolute;
+  left: calc(50% - 198 * var(--u));
+  top: 0;
+  width: calc(396 * var(--u));
+  height: calc(3000 * var(--u));
+  background: linear-gradient(180deg, #5856d6 0, #5856d6 calc(900 * var(--u)), #2b1fa8 calc(1700 * var(--u)));
+  -webkit-mask:
+    linear-gradient(#000 0 0) left top / var(--rail) 100% no-repeat,
+    linear-gradient(#000 0 0) right top / var(--rail) 100% no-repeat,
+    repeating-linear-gradient(180deg, #000 0 var(--rail), transparent var(--rail) calc(120 * var(--u))) 0 var(--rung-top) / 100% calc(100% - var(--rung-top)) no-repeat;
+  mask:
+    linear-gradient(#000 0 0) left top / var(--rail) 100% no-repeat,
+    linear-gradient(#000 0 0) right top / var(--rail) 100% no-repeat,
+    repeating-linear-gradient(180deg, #000 0 var(--rail), transparent var(--rail) calc(120 * var(--u))) 0 var(--rung-top) / 100% calc(100% - var(--rung-top)) no-repeat;
+}
+
+/* バロメーター */
+.s10-meter {
+  position: absolute;
+  left: calc(50% + 508 * var(--u));
+  top: calc(50% - 369 * var(--u));
+  width: calc(50 * var(--u));
+  height: calc(822 * var(--u));
+  display: flex;
+  flex-direction: column-reverse;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.s10-seg {
+  position: relative;
+  flex: 1;
+}
+
+.s10-seg + .s10-seg {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.s10-fill {
+  position: absolute;
+  inset: 0;
+  background: #ff2d55;
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+}
+
+.s10-climb,
+.s10-go {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+}
+
+.s10-climb:active,
+.s10-go:active {
+  translate: -50% calc(8 * var(--u));
+}
+
+.s10-climb {
+  top: calc(50% + 352 * var(--u));
+}
+
+.s10-go {
+  top: calc((var(--wall-top-end) - 36) * var(--u));
+}
+
+/* シーン10の要素は最初は非表示。JS で順に表示する */
+.s10-meter,
+.s10-climb,
+.s10-go,
+.scene-ladder .back {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---------- 解放しなよ（11） ---------- */
+.scene-free {
+  background: #37d3f0;
+}
+
+.s11-intro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(40 * var(--u));
+}
+
+.s11-line {
+  color: #000;
+  font-feature-settings: "palt" on;
+  font-size: calc(56 * var(--u));
+  line-height: 1.1;
+}
+
+/* 左右の半分。中の要素は半分の中央を基準に Figma の値で置く */
+.s11-half {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+}
+
+.s11-left {
+  left: 0;
+}
+
+.s11-right {
+  left: 50%;
+}
+
+.s11-right-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #3530ae 0%, #6155f5 100%);
+}
+
+.s11-right-bg-on {
+  background: #37d3f0;
+  opacity: 0;
+}
+
+.s11-face {
+  position: absolute;
+  overflow: visible;
+}
+
+.s11-face-skater {
+  left: calc(50% - 241.5 * var(--u));
+  top: calc(50% - 308 * var(--u));
+  width: calc(483 * var(--u));
+  height: calc(345 * var(--u));
+}
+
+/* 私の顔（半目 → 開いた目）。2つの顔のパーツを目の位置で揃えて1つにまとめている */
+.s11-face-me {
+  left: calc(50% - 269.5 * var(--u));
+  top: calc(50% - 281 * var(--u));
+  width: calc(539 * var(--u));
+  height: calc(267 * var(--u));
+}
+
+.me-lashes-up,
+.me-grin {
+  opacity: 0;
+}
+
+/* スイッチ（ボタンの中に SVG を置く） */
+.s11-toggle {
+  position: absolute;
+  left: calc(50% - 190 * var(--u));
+  top: calc(50% + 154 * var(--u));
+  width: calc(380 * var(--u));
+  height: calc(120 * var(--u));
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.s11-switch {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* 右のスイッチの「押せる」合図：スイッチの形の波紋が広がる */
+.s11-ripple {
+  position: absolute;
+  left: calc(88.5 * var(--u));
+  top: 0;
+  width: calc(220 * var(--u));
+  height: calc(120 * var(--u));
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* バロメーター（380 x 40） */
+.s11-bar {
+  position: absolute;
+  left: calc(50% - 190 * var(--u));
+  top: calc(50% + 304 * var(--u));
+  width: calc(380 * var(--u));
+  height: calc(40 * var(--u));
+  background: #fff;
+  overflow: hidden;
+}
+
+.s11-bar-off {
+  background: #8b83f0;
+}
+
+.s11-bar-fill {
+  display: block;
+  width: 28%;
+  height: 100%;
+  background-size: calc(28 * var(--u)) calc(28 * var(--u));
+  animation: s11-stripe 0.5s linear infinite;
+}
+
+.s11-bar-red {
+  background-image: repeating-linear-gradient(135deg, #ffd7d8 0 calc(6.6 * var(--u)), #ff2d55 calc(6.6 * var(--u)) calc(13.2 * var(--u)), #ff9c9e calc(13.2 * var(--u)) calc(19.8 * var(--u)));
+}
+
+.s11-bar-blue {
+  width: 0;
+  background-image: repeating-linear-gradient(135deg, #79d997 0 calc(6.6 * var(--u)), #007aff calc(6.6 * var(--u)) calc(13.2 * var(--u)), #ffe8a3 calc(13.2 * var(--u)) calc(19.8 * var(--u)));
+}
+
+@keyframes s11-stripe {
+  to {
+    background-position: calc(28 * var(--u)) 0;
+  }
+}
+
+/* OFF にできません */
+.s11-modal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.s11-modal-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(48 * var(--u));
+  width: calc(720 * var(--u));
+  height: calc(372 * var(--u));
+  border-radius: calc(24.7 * var(--u));
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.s11-modal-card p {
+  color: #000;
+  font-feature-settings: "palt" on;
+  font-size: calc(56 * var(--u));
+  line-height: 1.1;
+}
+
+.s11-close {
+  font-family: var(--font-ja);
+}
+
+/* シーン11の要素は最初は非表示。JS で順に表示する */
+.s11-line .char,
+.s11-half,
+.s11-modal,
+.scene-free .back,
+.s11-next {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---------- スケボーがやってくる（12） ---------- */
+.scene-board {
+  background: #37d3f0;
+}
+
+/* 位置は Figma の座標（画面中央からのずれ） */
+.s12-board {
+  position: absolute;
+  left: calc(50% - 592.5 * var(--u));
+  top: calc(50% - 336 * var(--u));
+  width: calc(1186 * var(--u));
+  height: calc(336 * var(--u));
+  overflow: visible;
+}
+
+/* 足元は脚が画面の下端より下まで伸びている。モックの 1.2 倍（つま先の位置はそのまま） */
+.s12-foot {
+  position: absolute;
+  left: calc(50% - 490.1 * var(--u));
+  top: calc(50% + 93.7 * var(--u));
+  width: calc(981.6 * var(--u));
+  height: calc(946.8 * var(--u));
+}
+
+.s12-ride {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 224 * var(--u));
+  translate: -50% 0;
+}
+
+.s12-ride:active {
+  translate: -50% calc(8 * var(--u));
+}
+
+/* シーン12の要素は最初は非表示。JS で順に表示する */
+.s12-ride,
+.scene-board .back {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* 画面の切り替え：消えていく画面を下に、新しい画面を上に重ねてフェードする */
+.scene.is-active {
+  z-index: 1;
+}
+
+.scene.is-leaving {
+  z-index: 0;
+}
+
+/* ---------- 壁の上を走る2人と問い（13） ---------- */
+/* シーン3（6倍にズームした壁）と同じ見え方で組む。位置は画面中央からのずれ */
+.scene-run {
+  background: #37d3f0;
+}
+
+.s13-wall {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + 26 * var(--u));
+  bottom: 0;
+  z-index: 1;
+  overflow: hidden;
+  background: linear-gradient(180deg, #edf3ff 0, #6155f5 calc(4152 * var(--u)));
+}
+
+.s13-wall-text {
+  position: absolute;
+  top: calc(42 * var(--u));
+  left: calc(-4368 * var(--u));
+  right: calc(-4368 * var(--u));
+  height: calc(462 * var(--u));
+  background: url(../assets/svg/wall-text.svg) repeat-x center / auto 100%;
+  mix-blend-mode: color-burn;
+  animation: s13-wall-flow 8s linear infinite;
+}
+
+@keyframes s13-wall-flow {
+  to {
+    transform: translateX(calc(-4368 * var(--u)));
+  }
+}
+
+.s13-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* 2人とも車輪が少し壁の向こうに隠れる位置 */
+.s13-skater-wrap {
+  position: absolute;
+  left: calc(50% - 1176 * var(--u));
+  top: calc(50% - 364.7 * var(--u));
+  width: calc(1116 * var(--u));
+}
+
+.s13-skater {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.s13-me {
+  position: absolute;
+  left: calc(50% + 140.7 * var(--u));
+  top: calc(50% - 265 * var(--u));
+  width: calc(236.2 * var(--u));
+  height: calc(307.5 * var(--u));
+  overflow: visible;
+}
+
+.s13-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* メッセージボックス（シーン11のモーダルと同じスタイル） */
+.s13-card {
+  position: absolute;
+  left: calc(50% - 433.5 * var(--u));
+  top: calc(50% - 188 * var(--u));
+  z-index: 2;
+  width: calc(867 * var(--u));
+  height: calc(376 * var(--u));
+  border-radius: calc(24.7 * var(--u));
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.s13-q,
+.s13-a {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(48 * var(--u));
+}
+
+.s13-q p,
+.s13-a p {
+  color: #000;
+  font-feature-settings: "palt" on;
+  font-size: calc(56 * var(--u));
+  line-height: 1.4;
+  text-align: center;
+}
+
+.s13-answers {
+  display: flex;
+  gap: calc(56 * var(--u));
+}
+
+.s13-return {
+  font-family: var(--font-ja);
+}
+
+/* 白いボタンの影をピンクにする */
+.btn-pink-shadow {
+  box-shadow: 0 calc(8 * var(--u)) 0 0 #ff2d55;
+}
+
+.scene-run .back {
+  z-index: 2;
+}
+
+/* シーン13の要素は最初は非表示。JS で順に表示する */
+.s13-overlay,
+.s13-card,
+.s13-a,
+.scene-run .back {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---------- ポップな狂気を解放しますか？（14） ---------- */
+.scene-ready {
+  background: #37d3f0;
+}
+
+.s14-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% - 336 * var(--u));
+  color: #000;
+  font-feature-settings: "palt" on;
+  font-size: calc(56 * var(--u));
+  line-height: 1.1;
+  text-align: center;
+}
+
+/* 位置と大きさはモックの目・サングラスの位置から合わせた値（画面中央からのずれ） */
+.s14-skater {
+  position: absolute;
+  left: calc(50% - 1498.4 * var(--u));
+  top: calc(50% + 131.6 * var(--u));
+  width: calc(1503 * var(--u));
+  height: calc(850 * var(--u));
+}
+
+.s14-me {
+  position: absolute;
+  left: calc(50% + 147.5 * var(--u));
+  top: calc(50% + 129.8 * var(--u));
+  width: calc(465 * var(--u));
+  height: calc(937.8 * var(--u));
+}
+
+/* 吹き出し（下向きのしっぽ） */
+.s14-bubble {
+  position: absolute;
+  top: calc(50% - 63 * var(--u));
+  height: calc(133 * var(--u));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  font-family: var(--font-en);
+  font-size: calc(34 * var(--u));
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.s14-bubble::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - 14 * var(--u));
+  top: calc(100% - 2 * var(--u));
+  width: calc(28 * var(--u));
+  height: calc(24 * var(--u));
+  background: #fff;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.s14-bubble-l {
+  left: calc(50% - 510.5 * var(--u));
+  width: calc(400 * var(--u));
+}
+
+.s14-bubble-r {
+  left: calc(50% + 211 * var(--u));
+  width: calc(341 * var(--u));
+}
+
+.s14-yes {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 230 * var(--u));
+  translate: -50% 0;
+}
+
+.s14-yes:active {
+  translate: -50% calc(8 * var(--u));
+}
+
+/* シーン14の要素は最初は非表示。JS で順に表示する */
+.s14-title,
+.s14-bubble,
+.s14-yes,
+.scene-ready .back {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---------- 君の狂気はどんな色だい？（15） ---------- */
+.scene-last {
+  background: #37d3f0;
+}
+
+/* シーン9と同じ鏡（glass_2）。腕は画面の上端より上まで伸びている */
+.s15-mirror {
+  position: absolute;
+  left: calc(50% - 666 * var(--u));
+  top: calc(50% - 1057 * var(--u));
+  width: calc(1332 * var(--u));
+  height: calc(1526 * var(--u));
+  overflow: visible;
+}
+
+.s15-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(34 * var(--u));
+}
+
+.s15-line {
+  color: #000;
+  font-feature-settings: "palt" on;
+  font-size: calc(56 * var(--u));
+  line-height: 1.1;
+}
+
+.s15-top {
+  font-family: var(--font-ja);
+}
+
+/* シーン15の要素は最初は非表示。JS で順に表示する */
+.s15-line .char,
+.s15-top,
+.scene-last .back {
+  opacity: 0;
+  visibility: hidden;
 }

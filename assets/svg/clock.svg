@@ -1,0 +1,7 @@
+<svg width="252" height="252" viewBox="0 0 252 252" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="clock">
+<circle id="face" cx="125.6" cy="125.6" r="119.6" fill="white" stroke="#6155F5" stroke-width="12"/>
+<path id="hour" d="M125.6 125.6V57.7212" stroke="#6155F5" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="minute" d="M125.6 125.6L184.384 159.539" stroke="#6155F5" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>
