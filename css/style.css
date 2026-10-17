@@ -279,14 +279,7 @@ body {
   left: calc(-728 * var(--u));
   right: calc(-728 * var(--u));
   background: url(../assets/svg/wall-text.svg) repeat-x center / auto 100%;
-  /* 右から左へ1つ分ずつ流す。JS で再生を開始する */
-  animation: wall-flow 8s linear infinite paused;
-}
-
-@keyframes wall-flow {
-  to {
-    transform: translateX(calc(-728 * var(--u)));
-  }
+  /* 右から左へ1つ分ずつ流す動きは JS（GSAP）で付ける */
 }
 
 /* 中央だけ重ねて濃くする（SVG は前後に 10px ずつ余白を足して 728px） */
@@ -302,12 +295,10 @@ body {
   z-index: -1;
   left: calc(50% - 155 * var(--u));
   width: calc(186 * var(--u));
-  mix-blend-mode: luminosity;
 }
 
-/* カラー版。最初は透明で、ズーム時に表示する */
+/* カラー版。最初は透明で、ズーム時に表示する（灰色版は SVG の中の色の変換で灰色にしている） */
 .skater-color {
-  mix-blend-mode: normal;
   opacity: 0;
 }
 

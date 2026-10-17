@@ -66,6 +66,10 @@ const sceneAnimations = {
     };
     gsap.ticker.add(syncLines);
 
+    // 帯の文字を右から左へ1つ分（728）ずつ流し続ける。CSS アニメーションは iPhone で GPU の層になり、
+    // 拡大したときに近くのスケーターまで粗い画像になるので、GSAP の 2D の変形で動かす
+    const wallFlow = gsap.to(q('.wall-text'), { x: -728 * u, duration: 8, ease: 'none', repeat: -1, paused: true });
+
     // 登場の流れ
     const intro = gsap.timeline()
       // 壁がゴゴゴとせり上がる（上がりながら細かく揺れる）。音は半分の音量で鳴らし、上がりきる直前にフェードアウト
@@ -83,9 +87,9 @@ const sceneAnimations = {
       // 左右の縦文字はテンポよく：帯と重ねて出し始め、右 → 左を少しずらして続ける
       .from(q('.tategaki-right'), { autoAlpha: 0, duration: 0.7 }, '-=0.4')
       .from(q('.tategaki-left'), { autoAlpha: 0, duration: 0.7 }, '-=0.35')
-      // 強調を消す → 帯が流れ始める（流れる動きは CSS の wall-flow） → スケーター登場
+      // 強調を消す → 帯が流れ始める（流れる動きは wallFlow） → スケーター登場
       .to(q('.wall-text-strong'), { autoAlpha: 0, duration: 0.8 }, '+=0.3')
-      .set(q('.wall-text'), { animationPlayState: 'running' })
+      .call(() => wallFlow.play())
       .to(q('.speed-lines'), { autoAlpha: 1, duration: 0.8 }, '<')
       .from(q('.skater-wrap:not(.skater-color)'), { autoAlpha: 0, duration: 1.2 }, '+=0.3')
       // 少し間をおいて吹き出しへ（白文字はシーン2のあいだ消さずに残す）
@@ -136,10 +140,6 @@ const sceneAnimations = {
       .to(q('.zoom-fx'), { autoAlpha: 0, duration: 0.8 }, 's2+=1.3')
       // 色を戻す（カラー版を重ねてフェードイン）
       .to(q('.skater-color'), { opacity: 1, duration: 1.5 }, 's2+=0.5')
-      // カラーが出きったら、下の灰色のスケーター（描画モード luminosity）を透明にして、描画モードも普通に戻す。
-      // iPhone（WebKit）は描画モードの要素を元の大きさの画像にしてから拡大するので、残すとギザギザに見える
-      // （非表示にするとカラー版が参照している髪の模様まで消えるので、visibility は変えない）
-      .set(q('.skater-wrap:not(.skater-color)'), { opacity: 0, mixBlendMode: 'normal' }, 's2+=2')
       // ズームと色が戻ったあとにボタンを表示
       .fromTo(q('.btn-are'), { autoAlpha: 0, y: 20 * u }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out', immediateRender: false }, '+=0.2')
       .addLabel('s3')
@@ -347,6 +347,7 @@ const sceneAnimations = {
     if (step !== '2') {
       // 途中の音は鳴らさない（true でコールバックを呼ばずに進める）
       intro.progress(1, true);
+      wallFlow.play();
       startWind();
       steps.seek('s' + step);
     }
