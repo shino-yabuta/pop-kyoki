@@ -1587,23 +1587,17 @@ body {
   overflow: visible;
 }
 
-.s13-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background: rgba(0, 0, 0, 0.5);
-}
-
 /* メッセージボックス（シーン11のモーダルと同じスタイル） */
+/* 走っている2人が見えるよう、カードは壁の部分（中央から +26 より下）に置く。壁の大きな文字が透けないよう白を濃く */
 .s13-card {
   position: absolute;
   left: calc(50% - 433.5 * var(--u));
-  top: calc(50% - 188 * var(--u));
+  top: calc(50% + 81 * var(--u));
   z-index: 2;
   width: calc(867 * var(--u));
   height: calc(376 * var(--u));
   border-radius: calc(24.7 * var(--u));
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.92);
 }
 
 .s13-q,
@@ -1631,6 +1625,15 @@ body {
   gap: calc(56 * var(--u));
 }
 
+/* 明るいカードの上で白いボタンが埋もれないよう、影と同じ色の枠線を付ける */
+.s13-answers .btn-blue-shadow {
+  border: calc(3 * var(--u)) solid #08f;
+}
+
+.s13-answers .btn-pink-shadow {
+  border: calc(3 * var(--u)) solid #ff2d55;
+}
+
 .s13-return {
   font-family: var(--font-ja);
 }
@@ -1645,7 +1648,6 @@ body {
 }
 
 /* シーン13の要素は最初は非表示。JS で順に表示する */
-.s13-overlay,
 .s13-card,
 .s13-a,
 .scene-run .back {

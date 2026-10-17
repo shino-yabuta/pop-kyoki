@@ -789,10 +789,9 @@ const sceneAnimations = {
         });
     });
 
-    // 約5秒見せてから、暗くしてメッセージボックス → BACK
+    // 約5秒見せてから、壁の部分にメッセージボックス → BACK（2人が見えるよう暗くはしない）
     const tl = gsap.timeline()
-      .to(q('.s13-overlay'), { autoAlpha: 1, duration: 0.8 }, 5.6)
-      .fromTo(q('.s13-card'), { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power2.out' }, '-=0.3')
+      .fromTo(q('.s13-card'), { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power2.out' }, 6.1)
       .to(q('.back'), { autoAlpha: 1, duration: 0.6 }, '+=0.4');
 
     // 「血眼な努力」→「それも大事だけれども」／「戻る」→ 質問に戻す（中身だけをクロスフェード）
