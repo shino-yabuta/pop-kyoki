@@ -6,8 +6,11 @@
 }
 
 :root {
-  /* Figma（1440x1024）の 1px に相当する長さ。画面の縦横どちらか小さい方に合わせる */
-  --u: min(calc(100vw / 1440), calc(100dvh / 1024));
+  /* ステージ（物語を表示する範囲）の大きさ。PC・タブレットは画面いっぱい */
+  --stage-w: 100vw;
+  --stage-h: 100dvh;
+  /* Figma（1440x1024）の 1px に相当する長さ。ステージの縦横どちらか小さい方に合わせる */
+  --u: min(calc(var(--stage-w) / 1440), calc(var(--stage-h) / 1024));
 
   --font-ja: "vdl-logomaru-jr", sans-serif;
   --font-en: "bungee", sans-serif;
@@ -32,9 +35,27 @@ body {
 
 .stage {
   position: relative;
-  width: 100vw;
-  height: 100dvh;
+  width: var(--stage-w);
+  height: var(--stage-h);
   overflow: hidden;
+  background: #fff;
+}
+
+/* スマホは 16:9 の枠に固定して画面の中央に置き、外側を黒くする */
+.is-phone {
+  --stage-w: min(100vw, calc(100dvh * 16 / 9));
+  --stage-h: min(100dvh, calc(100vw * 9 / 16));
+}
+
+.is-phone body {
+  background: #000;
+}
+
+.is-phone .stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
 }
 
 .scene {
@@ -169,9 +190,56 @@ body {
 }
 
 /* 押したときに沈み込む */
-.btn-start:active {
+.btn-start:not(:disabled):active {
   transform: translateY(calc(8 * var(--u)));
   box-shadow: none;
+}
+
+/* スマホ・タブレットが縦向きのあいだは押せない（JS で disabled にする） */
+.btn-start:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* トップの注意書き：スマホ・タブレット（タッチが主な操作の端末）では「横向きでご覧ください」に切り替える */
+.notice-touch {
+  display: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .notice-pc {
+    display: none;
+  }
+
+  .notice-touch {
+    display: flex;
+  }
+}
+
+/* 物語の途中（トップ以外）でスマホ・タブレットを縦向きにしたら、画面全体に案内をかぶせる */
+.rotate-notice {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3vw;
+  background: #000;
+  color: #fff;
+  font-family: var(--font-ja);
+  font-size: 5vw;
+}
+
+.rotate-notice .material-symbols-outlined {
+  font-size: 16vw;
+}
+
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  body:not(:has(.scene-top.is-active)) .rotate-notice {
+    display: flex;
+  }
 }
 
 /* ---------- クリエイティブの壁 ---------- */
@@ -1588,6 +1656,14 @@ body {
 }
 
 /* メッセージボックス（シーン11のモーダルと同じスタイル） */
+/* エンディング曲の導入のあいだ、シーン全体を空の色で覆う（曲の低音が入るところで JS で消す） */
+.s13-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: #37d3f0;
+}
+
 /* 走っている2人が見えるよう、カードは壁の部分（中央から +26 より下）に置く。壁の大きな文字が透けないよう白を濃く */
 .s13-card {
   position: absolute;

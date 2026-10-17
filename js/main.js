@@ -247,7 +247,7 @@ function prepareAudio() {
 document.addEventListener('pointerdown', (e) => {
   prepareAudio();
   const button = e.target.closest('button');
-  if (!button) return;
+  if (!button || button.disabled) return;
   const name = button.dataset.sound || 'start';
   if (name !== 'none') playSound(name);
 });
@@ -351,6 +351,15 @@ function stopBgm(fade = 2) {
   bgmWanted = false;
   stopSound('ending', fade);
 }
+
+// スマホ・タブレットが縦向きのあいだは START を押せなくする（横向きにしたら押せる）
+const portrait = matchMedia('(hover: none) and (pointer: coarse) and (orientation: portrait)');
+const startButton = document.querySelector('.btn-start');
+const updateStart = () => {
+  startButton.disabled = portrait.matches;
+};
+portrait.addEventListener('change', updateStart);
+updateStart();
 
 // 最初のシーンを表示する（シーンの中で音の処理を使うので、音の準備を書いたこの最後で呼ぶ）
 showFromHash();

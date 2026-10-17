@@ -1,7 +1,8 @@
 gsap.registerPlugin(MorphSVGPlugin);
 
-// Figma の 1px に相当する長さ（CSS の --u と同じ）
-const unit = () => Math.min(innerWidth / 1440, innerHeight / 1024);
+// Figma の 1px に相当する長さ（CSS の --u と同じ。スマホは 16:9 の枠になるので、ステージの大きさで計算する）
+const stageEl = document.getElementById('stage');
+const unit = () => Math.min(stageEl.clientWidth / 1440, stageEl.clientHeight / 1024);
 
 // シーンごとのアニメーション。キーは data-scene の（最初の）番号
 // シーンに入るたびに呼ばれ、離れるときに元の状態へ戻される
@@ -789,9 +790,12 @@ const sceneAnimations = {
         });
     });
 
+    // エンディング曲の導入（低音が入る 9.85 秒まで）は空の色一色。低音が入ったら覆いを消して2人を見せる
+    const INTRO = 9.85;
     // 約5秒見せてから、壁の部分にメッセージボックス → BACK（2人が見えるよう暗くはしない）
     const tl = gsap.timeline()
-      .fromTo(q('.s13-card'), { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power2.out' }, 6.1)
+      .to(q('.s13-cover'), { autoAlpha: 0, duration: 1, ease: 'power1.inOut' }, INTRO)
+      .fromTo(q('.s13-card'), { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power2.out' }, INTRO + 6.1)
       .to(q('.back'), { autoAlpha: 1, duration: 0.6 }, '+=0.4');
 
     // 「血眼な努力」→「それも大事だけれども」／「戻る」→ 質問に戻す（中身だけをクロスフェード）
