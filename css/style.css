@@ -1,0 +1,36 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html,
+body {
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Figma のフレームサイズ（1440x1024）で組み、JS で画面に収まるよう拡縮する */
+.stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1440px;
+  height: 1024px;
+  transform: translate(-50%, -50%) scale(var(--scale, 1));
+  background: #fff;
+  overflow: hidden;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+
+.scene.is-active {
+  display: block;
+}
