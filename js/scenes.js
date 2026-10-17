@@ -161,12 +161,15 @@ const sceneAnimations = {
       .fromTo(q('.s5-panel'), { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'power2.out', immediateRender: false })
       .addLabel('s5eye', '-=0.2')
       .fromTo(q('.s5-eye'), { autoAlpha: 0, scale: 0.7 }, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'back.out(1.6)', immediateRender: false }, 's5eye')
-      // 右 → 左 → 上 → 下 の順に白文字を表示（シーン2の白文字と同じペース）
-      // 右 → 左 → 上 → 下を、前の文字が出きる前に次を重ねてテンポよく出す
-      .to(q('.s5-right'), { autoAlpha: 1, duration: 1 }, '+=0.3')
-      .to(q('.s5-left'), { autoAlpha: 1, duration: 1 }, '-=0.2')
-      .to(q('.s5-top'), { autoAlpha: 1, duration: 1 }, '-=0.2')
-      .to(q('.s5-bottom'), { autoAlpha: 1, duration: 1 }, '-=0.2')
+      // 右 → 左 → 上 → 下 の順に白文字を表示。1つずつ 1 秒おきに（出始めに「ぶおん」を鳴らす。ラベル s5text1〜4）
+      .addLabel('s5text1', '+=0.3')
+      .to(q('.s5-right'), { autoAlpha: 1, duration: 1 }, 's5text1')
+      .addLabel('s5text2', 's5text1+=1')
+      .to(q('.s5-left'), { autoAlpha: 1, duration: 1 }, 's5text2')
+      .addLabel('s5text3', 's5text2+=1')
+      .to(q('.s5-top'), { autoAlpha: 1, duration: 1 }, 's5text3')
+      .addLabel('s5text4', 's5text3+=1')
+      .to(q('.s5-bottom'), { autoAlpha: 1, duration: 1 }, 's5text4')
       // 文字が出そろったらここで止まり、閲覧者のクリックを待つ（読み切れるように）
       .addLabel('s5read')
       // ひと呼吸おいて伏し目（eye2）に：文字を消し、まぶたが下りて、瞳がグレーに、まつ毛が下向きに
@@ -203,25 +206,32 @@ const sceneAnimations = {
       .addLabel('s6in')
       // 3つのコマが左 → 中 → 右の順に下から上がってくる（下の文字も一緒に）
       .fromTo(q('.koma'), { y: innerHeight * 0.6, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, ease: 'power3.out', stagger: 0.5, immediateRender: false })
-      // 読めるくらいの間をおいて、コマが上へ抜け、同時に2つのパネルが下から上がってくる
+      // ここで止まり、2秒後に「下へ」の矢印を出してクリックを待つ（s6wait）
+      .addLabel('s6wait')
+      // 矢印を押したら、コマが上へ抜け、同時に2つのパネルが下から上がってくる
       // 同じ速さ・同じタイミングで動かし、コマがパネルに押し上げられるように見せる
-      .addLabel('s6komaOut', '+=5')
+      .addLabel('s6komaOut', 's6wait')
       .to(q('.koma'), { y: -innerHeight, duration: 1.4, ease: 'power2.inOut' }, 's6komaOut')
       .fromTo(q('.q-panel'), { y: innerHeight, autoAlpha: 1 }, { y: 0, autoAlpha: 1, duration: 1.4, ease: 'power2.inOut', immediateRender: false }, '<')
+      .addLabel('s6slideEnd')
       // 上のテキスト → 下のテキストとボタン → BACK
       .to(q('.s6-quote'), { autoAlpha: 1, duration: 1 }, '+=0.2')
       .to(q('.s6-question, .s6-answers'), { autoAlpha: 1, duration: 1 }, '+=0.4')
       .to(q('.back'), { autoAlpha: 1, duration: 0.6 }, '+=0.4')
       .addLabel('s6');
 
+    // シーン5の白文字が1つ出るたびに「ぶおん」
+    [1, 2, 3, 4].forEach((i) => steps.call(() => playWarp(), null, `s5text${i}`));
+
     // 「いーな」の吹き出しが1つ出るたびに音を鳴らす（前の音を止めずに重ねる）
     q('.iina-bubble').forEach((b, i) => {
       steps.call(() => playSound('iina', 1, true), null, `iina+=${i * 0.25}`);
     });
-    // 3つのコマが出ているあいだ（上がり始めてから、上へ抜け始めるまで）、時計のちくたくを鳴らす
+    // 3つのコマが出ているあいだ（上がり始めてから、矢印を押して上へ抜け始めるまで）、時計のちくたくを鳴らす
     // （「はい」で s6in から再生し直したときにも鳴るよう、s6in の少しあと）
     steps.call(() => startTick(), null, 's6in+=0.01');
-    steps.call(() => stopTick(), null, 's6komaOut');
+    // 止める位置は s6wait と同じ時刻なので、少しあと（矢印を押してスライドが始まってから）にする
+    steps.call(() => stopTick(), null, 's6komaOut+=0.01');
     // ネイビーで塗りつぶされたら、ため息（素材の頭の2秒近くはノイズだけなので、1.8秒目から鳴らす）
     steps.call(() => playSound('sigh', 1, false, 1.8), null, 's5navy');
 
@@ -286,11 +296,35 @@ const sceneAnimations = {
       };
     });
 
+    // シーン6：3コマを見せたら、2秒後に「下へ」の矢印を出し、押されたらパネルへスライドする
+    let waitingKoma = null;
+    const stopWaitKoma = () => {
+      if (waitingKoma) waitingKoma.kill();
+      waitingKoma = null;
+    };
+    self.add('waitKoma', () => {
+      const down = q('.s6-down')[0];
+      const show = gsap.fromTo(down, { autoAlpha: 0, y: -10 * u }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power2.out', delay: 2 });
+      const go = () => {
+        stopWaitKoma();
+        move = steps.tweenTo('s6');
+      };
+      down.addEventListener('click', go);
+      waitingKoma = {
+        kill() {
+          show.kill();
+          gsap.to(down, { autoAlpha: 0, duration: 0.2 });
+          down.removeEventListener('click', go);
+        },
+      };
+    });
+
     let move;
     let soundCall;
     self.add('step', (n) => {
       if (move) move.kill();
       stopWaiting();
+      stopWaitKoma();
       // 虫眼鏡が消えるので波紋の音を止める（2 に戻ったら、虫眼鏡がまた出たところで再開する）
       stopHamon();
       stopTick();
@@ -305,6 +339,11 @@ const sceneAnimations = {
       if (n === '4' && steps.time() <= steps.labels.s3) cue('drum', 's4title', -0.1);
       // 4 から 5 へ進むとき：目が出るのと同時に eye-open
       if (n === '5' && steps.time() <= steps.labels.s4) cue('eye-open', 's5eye');
+      // 6 へ進むときは、3コマが出たところで止めて「下へ」の矢印を待つ
+      if (n === '6' && steps.time() < steps.labels.s6wait) {
+        move = steps.tweenTo('s6wait', { onComplete: () => self.waitKoma() });
+        return;
+      }
       // 5 へ進むときは、文字が出そろったところで止めてクリックを待つ
       if (n === '5' && steps.time() < steps.labels.s5read) {
         move = steps.tweenTo('s5read', { onComplete: () => self.waitRead() });
@@ -326,17 +365,22 @@ const sceneAnimations = {
       move = steps.tweenTo('s' + n, n === '2' ? { onComplete: startHamon } : {});
     });
 
-    // 「はい」：質問を消して、3つのコマからもう一度（押し続けるとループする）
+    // 「はい」：質問を消して、スライドを逆にたどって3コマへ戻る（パネルが下へ、コマが上から）。また矢印を待つ
     const replayKoma = () => {
       if (move) move.kill();
-      const question = q('.s6-quote, .q-panel, .s6-question, .s6-answers');
+      const question = q('.s6-quote, .s6-question, .s6-answers');
       move = gsap.to([...question, ...q('.back')], {
         autoAlpha: 0,
         duration: 0.5,
         onComplete: () => {
-          steps.seek('s6in');
+          steps.seek('s6slideEnd');
           gsap.set(question, { clearProps: 'opacity,visibility' });
-          move = steps.tweenTo('s6');
+          move = steps.tweenTo('s6wait', {
+            onComplete: () => {
+              startTick();
+              self.waitKoma();
+            },
+          });
         },
       });
     };
@@ -355,6 +399,7 @@ const sceneAnimations = {
     // シーンを離れるときに後片付け
     return () => {
       stopWaiting();
+      stopWaitKoma();
       stopSound('wall');
       stopHamon(0);
       stopTick();
@@ -637,7 +682,7 @@ const sceneAnimations = {
       { scale: 1, opacity: 0.8 },
       { scale: 1.5, opacity: 0, duration: 1.6, ease: 'power1.out', stagger: { each: 0.8, repeat: -1 } });
 
-    // 登場：2行をタイプ → 2.5秒 → 文字を消して左右に分かれる
+    // 登場：2行をタイプ → 「次へ」の矢印を出して止まる → 押したら文字を消して左右に分かれる
     const tl = gsap.timeline();
     let t = 0.4;
     q('.s11-line').forEach((line) => {
@@ -647,7 +692,10 @@ const sceneAnimations = {
       });
       t += 0.4;
     });
-    tl.to(q('.s11-intro'), { autoAlpha: 0, duration: 0.5 }, t + 2.5)
+    tl.to(q('.s11-go'), { autoAlpha: 1, duration: 0.5 }, t + 0.3)
+      // ここで止まり、矢印が押されたら続きを再生する
+      .addPause()
+      .to(q('.s11-intro, .s11-go'), { autoAlpha: 0, duration: 0.5 })
       .set(q('.s11-half'), { autoAlpha: 1 })
       // バロメーターがフィーバーしている音を、左右が出るのと同時にループで流す（背景なので小さめ）
       .call(() => {
@@ -705,6 +753,11 @@ const sceneAnimations = {
       return on;
     });
 
+    // 「次へ」の矢印：止めていた登場の続きを再生する
+    const goButton = q('.s11-go')[0];
+    const release = () => tl.play();
+    goButton.addEventListener('click', release);
+
     const onToggle = (e) => {
       const toggle = e.target.closest('.s11-toggle');
       if (!toggle) return;
@@ -730,6 +783,7 @@ const sceneAnimations = {
     return () => {
       el.removeEventListener('click', onToggle);
       modal.removeEventListener('click', closeModal);
+      goButton.removeEventListener('click', release);
       el.removeEventListener('pointerdown', quietFever);
       stopSound('fever');
     };
@@ -838,19 +892,22 @@ const sceneAnimations = {
       // 画面の切り替え（フェード 0.6秒）が終わって、ひと呼吸おいてから
       .to(q('.s14-title'), { autoAlpha: 1, duration: 1.2, ease: 'sine.inOut' }, 1.2)
       .from(q('.s14-skater'), rise, '+=0.3')
+      // キャラが上がってくるときに、シーン5で目が出るときと同じ音（2人とも）
+      .call(() => playSound('eye-open', 1, true), null, '<')
       .set(q('.s14-bubble-l'), { autoAlpha: 1 })
       .from(q('.s14-bubble-l'), pop)
       .from(q('.s14-me'), rise, '+=0.3')
+      .call(() => playSound('eye-open', 1, true), null, '<')
       .set(q('.s14-bubble-r'), { autoAlpha: 1 })
       .from(q('.s14-bubble-r'), pop)
       .fromTo(q('.s14-yes'), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)' }, '+=0.4')
       .to(q('.back'), { autoAlpha: 1, duration: 0.6 }, '+=0.4');
 
-    // BACK で戻ってきたときは、最後の状態から表示する
-    if (isBack) tl.progress(1);
+    // BACK で戻ってきたときは、最後の状態から表示する（途中の音は鳴らさない）
+    if (isBack) tl.progress(1, true);
   },
 
-  // 君の狂気はどんな色だい？（15）
+  // 君の狂気は何色だい？（15）
   15(el, self, step, isBack) {
     const q = gsap.utils.selector(el);
 
@@ -865,7 +922,9 @@ const sceneAnimations = {
       // 鏡が上から降りてくる
       .from(q('.s15-mirror'), { y: -innerHeight * 1.2, duration: 1.4, ease: 'power3.out' }, 0.3)
       // 止まったら、ガラスの上を光の帯がスッと横切る
-      .fromTo(q('.s15-glint'), { x: -600 }, { x: 2200, duration: 2, ease: 'sine.inOut' }, '+=0.2');
+      .fromTo(q('.s15-glint'), { x: -600 }, { x: 2200, duration: 2, ease: 'sine.inOut' }, '+=0.2')
+      // 帯がガラスの中心を通る（動き出して約0.9秒）ところに、音のいちばん大きいところ（鳴り始めて約0.3秒）を合わせる
+      .call(() => playSound('kiran'), null, '<0.6');
     // 問いかけを1文字ずつ（1文字0.12秒、行の間は0.4秒）
     let t = tl.duration() + 0.4;
     q('.s15-line').forEach((line) => {
@@ -878,7 +937,9 @@ const sceneAnimations = {
     // BACK と TOPへ を同時に
     tl.to(q('.back, .s15-top'), { autoAlpha: 1, duration: 0.6 }, t + 0.4);
 
-    // BACK で戻ってきたときは、最後の状態から表示する
-    if (isBack) tl.progress(1);
+    // BACK で戻ってきたときは、最後の状態から表示する（途中の音は鳴らさない）
+    if (isBack) tl.progress(1, true);
+
+    return () => stopSound('kiran');
   },
 };

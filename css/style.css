@@ -28,6 +28,12 @@ body {
   background: #fff;
 }
 
+/* iPhone は横向きのとき文字を自動で大きくするので止める（デザインどおりの比率にする） */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-ja);
   color: #000;
@@ -759,10 +765,34 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(50% + 29 * var(--u));
+  /* 下の矢印との間を 40 あけるため、Figma（+29）より 15 上げている */
+  top: calc(50% + 14 * var(--u));
   display: flex;
   justify-content: center;
   gap: calc(40 * var(--u));
+}
+
+/* 3コマの下の「下へ」の矢印。シーン8の矢印（.s8-arrow）と同じ見た目で、下に収まるよう少し小さく */
+.s6-down {
+  position: absolute;
+  left: calc(50% - 32 * var(--u));
+  top: calc(50% + 446 * var(--u));
+  display: grid;
+  place-items: center;
+  width: calc(64 * var(--u));
+  height: calc(64 * var(--u));
+  padding: 0;
+  border: none;
+  border-radius: calc(11 * var(--u));
+  background: #6155f5;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.s6-down .material-symbols-outlined {
+  font-size: calc(43 * var(--u));
 }
 
 .koma {
@@ -813,7 +843,8 @@ body {
 /* 2つのパネル */
 .q-panel {
   position: absolute;
-  top: calc(50% - 236 * var(--u));
+  /* 上の文字・下の文字との間を同じ（85）にするため、Figma（-236）より 36 上げている */
+  top: calc(50% - 272 * var(--u));
   width: calc(655 * var(--u));
   height: calc(466 * var(--u));
   border-radius: calc(24 * var(--u));
@@ -1363,6 +1394,29 @@ body {
   line-height: 1.1;
 }
 
+/* 2行を打ち終えたら出す「次へ」の矢印。シーン8の矢印（.s8-arrow）と同じ見た目で、文字の下に置く */
+.s11-go {
+  position: absolute;
+  left: calc(50% - 48 * var(--u));
+  top: calc(50% + 150 * var(--u));
+  display: grid;
+  place-items: center;
+  width: calc(96 * var(--u));
+  height: calc(96 * var(--u));
+  padding: 0;
+  border: none;
+  border-radius: calc(16 * var(--u));
+  background: #6155f5;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.s11-go .material-symbols-outlined {
+  font-size: calc(64 * var(--u));
+}
+
 /* 左右の半分。中の要素は半分の中央を基準に Figma の値で置く */
 .s11-half {
   position: absolute;
@@ -1780,7 +1834,8 @@ body {
 }
 
 .s14-bubble-l {
-  left: calc(50% - 510.5 * var(--u));
+  /* 三角の先端がスケーターの顔の中心に来るよう、Figma（-510.5）より 18 左へ */
+  left: calc(50% - 528.5 * var(--u));
   width: calc(400 * var(--u));
 }
 
@@ -1809,7 +1864,7 @@ body {
   visibility: hidden;
 }
 
-/* ---------- 君の狂気はどんな色だい？（15） ---------- */
+/* ---------- 君の狂気は何色だい？（15） ---------- */
 .scene-last {
   background: #37d3f0;
 }

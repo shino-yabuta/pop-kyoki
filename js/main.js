@@ -158,7 +158,7 @@ let audioCtx = null;
 // 効果音（assets/sound/名前.mp3）。ボタンを押すと基本はピコ（start）が鳴る
 // 別の音にしたいボタンには data-sound="名前"、鳴らさないボタンには data-sound="none" を付ける
 // シーンのアニメーションからは playSound('名前') で鳴らし、stopSound('名前', 秒) でフェードアウトして止める
-const SOUND_NAMES = ['start', 'wall', 'hamon', 'zoom', 'drum', 'eye-open', 'eye-ripple', 'iina', 'sigh', 'typing', 'snap', 'popper', 'birds', 'ladder', 'climb', 'fever', 'angel', 'skate', 'ending'];
+const SOUND_NAMES = ['start', 'wall', 'hamon', 'zoom', 'drum', 'eye-open', 'eye-ripple', 'iina', 'sigh', 'typing', 'snap', 'popper', 'birds', 'ladder', 'climb', 'fever', 'angel', 'skate', 'ending', 'kiran'];
 const buffers = {};
 const playing = {};
 // 最初に鳴らすときに遅れないよう、ページを開いた時点で読み込んで音のデータにしておく
@@ -350,6 +350,55 @@ function startBgm(fade = 2) {
 function stopBgm(fade = 2) {
   bgmWanted = false;
   stopSound('ending', fade);
+}
+
+// 「ぶおん」（シーン5の白文字）：サイバーな転送音。音の高さを上げながら、鳴り始めだけ FM（音で音を揺らす）で
+// 金属的なきらめきを付けてすぐ澄んだ音に戻す。短いエコーと残響で空間を、左右の動きで移動する感じを出す
+function playWarp() {
+  if (!soundOn || !audioCtx) return;
+  const now = audioCtx.currentTime;
+  const dur = 0.45;
+  // 音量の形：すっと立ち上がって、なめらかに消える
+  const amp = audioCtx.createGain();
+  amp.gain.setValueAtTime(0, now);
+  amp.gain.linearRampToValueAtTime(0.25, now + 0.015);
+  amp.gain.exponentialRampToValueAtTime(0.001, now + dur);
+  // 本体：220Hz → 440Hz へ上がるサイン波
+  const carrier = audioCtx.createOscillator();
+  carrier.frequency.setValueAtTime(220, now);
+  carrier.frequency.exponentialRampToValueAtTime(440, now + 0.25);
+  // きらめき：本体の 1.5 倍の高さで本体を揺らす。揺らす量は鳴り始めだけ大きく、すぐ 0 に
+  const mod = audioCtx.createOscillator();
+  mod.frequency.setValueAtTime(330, now);
+  mod.frequency.exponentialRampToValueAtTime(660, now + 0.25);
+  const modDepth = audioCtx.createGain();
+  modDepth.gain.setValueAtTime(500, now);
+  modDepth.gain.exponentialRampToValueAtTime(1, now + 0.3);
+  mod.connect(modDepth).connect(carrier.frequency);
+  carrier.connect(amp);
+  // 左右に少し動かす
+  const pan = audioCtx.createStereoPanner();
+  pan.pan.setValueAtTime(-0.3, now);
+  pan.pan.linearRampToValueAtTime(0.3, now + dur);
+  amp.connect(pan).connect(audioCtx.destination);
+  // 短いエコー（0.09秒おきに小さくなりながら繰り返す）
+  const delay = audioCtx.createDelay();
+  delay.delayTime.value = 0.09;
+  const feedback = audioCtx.createGain();
+  feedback.gain.value = 0.35;
+  const echo = audioCtx.createGain();
+  echo.gain.value = 0.35;
+  pan.connect(delay);
+  delay.connect(feedback).connect(delay);
+  delay.connect(echo).connect(audioCtx.destination);
+  // 残響
+  const wet = audioCtx.createGain();
+  wet.gain.value = 0.4;
+  pan.connect(getReverb()).connect(wet).connect(audioCtx.destination);
+  carrier.start(now);
+  mod.start(now);
+  carrier.stop(now + dur + 0.05);
+  mod.stop(now + dur + 0.05);
 }
 
 // スマホ・タブレットが縦向きのあいだは START を押せなくする（横向きにしたら押せる）
