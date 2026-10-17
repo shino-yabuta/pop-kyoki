@@ -606,10 +606,16 @@ body {
   visibility: hidden;
 }
 
+/* 画面全体を覆う入れ物なので、クリックは下（虫眼鏡など）へ通し、中のボタンだけ押せるようにする */
 .s6-layer {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  pointer-events: none;
+}
+
+.s6-layer button {
+  pointer-events: auto;
 }
 
 /* シーン6の要素は最初は非表示。JS で順に表示する */
