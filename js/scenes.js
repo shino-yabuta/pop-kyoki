@@ -136,6 +136,10 @@ const sceneAnimations = {
       .to(q('.zoom-fx'), { autoAlpha: 0, duration: 0.8 }, 's2+=1.3')
       // 色を戻す（カラー版を重ねてフェードイン）
       .to(q('.skater-color'), { opacity: 1, duration: 1.5 }, 's2+=0.5')
+      // カラーが出きったら、下の灰色のスケーター（描画モード luminosity）を透明にして、描画モードも普通に戻す。
+      // iPhone（WebKit）は描画モードの要素を元の大きさの画像にしてから拡大するので、残すとギザギザに見える
+      // （非表示にするとカラー版が参照している髪の模様まで消えるので、visibility は変えない）
+      .set(q('.skater-wrap:not(.skater-color)'), { opacity: 0, mixBlendMode: 'normal' }, 's2+=2')
       // ズームと色が戻ったあとにボタンを表示
       .fromTo(q('.btn-are'), { autoAlpha: 0, y: 20 * u }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out', immediateRender: false }, '+=0.2')
       .addLabel('s3')
