@@ -765,8 +765,8 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  /* 下の矢印との間を 40 あけるため、Figma（+29）より 15 上げている */
-  top: calc(50% + 14 * var(--u));
+  /* 下の矢印との間を 40 あけ、矢印が画面の下端（16:9 で +512）に付かないよう、Figma（+29）より 35 上げている */
+  top: calc(50% - 6 * var(--u));
   display: flex;
   justify-content: center;
   gap: calc(40 * var(--u));
@@ -776,7 +776,7 @@ body {
 .s6-down {
   position: absolute;
   left: calc(50% - 32 * var(--u));
-  top: calc(50% + 446 * var(--u));
+  top: calc(50% + 426 * var(--u));
   display: grid;
   place-items: center;
   width: calc(64 * var(--u));

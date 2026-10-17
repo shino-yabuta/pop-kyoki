@@ -732,6 +732,8 @@ const sceneAnimations = {
         .to(sw.querySelector('.sw-on'), { attr: { fill: '#FF3B30' }, duration: 0.35 }, 0)
         .to(sw.querySelector('.sw-off'), { attr: { opacity: 0.6 }, duration: 0.35 }, 0)
         .to(q('.s11-right-bg-on'), { opacity: 1, duration: 0.6 }, 0.2)
+        // シアンが出きったら下の紺の背景を消す（重ねたままだと、iPhone で左端の半ピクセルが混ざって中央に濃い線が出る）
+        .set(q('.s11-right-bg:not(.s11-right-bg-on)'), { autoAlpha: 0 }, 0.8)
         .to(q('.s11-bar-off'), { backgroundColor: '#fff', duration: 0.4 }, 0.2)
         // 一度ぎゅっと目を閉じる（タメ）：まぶたが下まで伸び、下向きのまつ毛も一緒に下がる
         .to(q('.me-lid'), { scaleY: 1.95, transformOrigin: '50% 0%', duration: 0.12, ease: 'power2.in' }, 0.25)
