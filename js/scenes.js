@@ -1,4 +1,7 @@
 gsap.registerPlugin(MorphSVGPlugin);
+// GPU 用の 3D 変形（translate3d）を使わない。iPhone（WebKit）では、動く要素を画像に焼き付けてから拡大するため、
+// イラストの輪郭がギザギザになる。2D の変形なら、拡大しても図形として描き直されてなめらかなまま
+gsap.config({ force3D: false });
 
 // Figma の 1px に相当する長さ（CSS の --u と同じ。スマホは 16:9 の枠になるので、ステージの大きさで計算する）
 const stageEl = document.getElementById('stage');
