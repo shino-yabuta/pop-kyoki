@@ -64,14 +64,18 @@ const sceneAnimations = {
 
     // 登場の流れ
     const intro = gsap.timeline()
-      // 壁がゴゴゴとせり上がる（上がりながら細かく揺れる）
-      .from(q('.wall'), { yPercent: 100, duration: 1.8, ease: 'power1.inOut' })
+      // 壁がゴゴゴとせり上がる（上がりながら細かく揺れる）。音は半分の音量で鳴らし、上がりきる直前にフェードアウト
+      .call(() => playSound('wall', 0.5), null, 0)
+      .call(() => stopSound('wall', 0.5), null, 1.3)
+      // 壁の音が消えていくのに合わせて、風を切る音を流し始める（シーン6まで流し続ける）
+      .call(() => startWind(), null, 1.3)
+      .from(q('.wall'), { yPercent: 100, duration: 1.8, ease: 'power1.inOut' }, 0)
       .to(q('.wall'), { x: () => gsap.utils.random(-3, 3) * u, duration: 0.05, repeat: 33, repeatRefresh: true, ease: 'none' }, 0)
       .to(q('.wall'), { x: 0, duration: 0.05 })
       // 壁がせり上がりきってから人物を表示
       .from(q('.me'), { y: '30%', autoAlpha: 0, duration: 1.2, ease: 'power2.out' }, '+=0.2')
-      // 人物が出てから余韻をおいて帯を表示
-      .from(q('.wall-text, .wall-text-strong'), { autoAlpha: 0, duration: 1.4, ease: 'sine.inOut' }, '+=0.8')
+      // 帯は壁が上がりきったらすぐに表示（人物と重ねて出す）
+      .from(q('.wall-text, .wall-text-strong'), { autoAlpha: 0, duration: 1.4, ease: 'sine.inOut' }, 1.8)
       // 左右の縦文字はテンポよく：帯と重ねて出し始め、右 → 左を少しずらして続ける
       .from(q('.tategaki-right'), { autoAlpha: 0, duration: 0.7 }, '-=0.4')
       .from(q('.tategaki-left'), { autoAlpha: 0, duration: 0.7 }, '-=0.35')
@@ -80,15 +84,17 @@ const sceneAnimations = {
       .set(q('.wall-text'), { animationPlayState: 'running' })
       .to(q('.speed-lines'), { autoAlpha: 1, duration: 0.8 }, '<')
       .from(q('.skater-wrap:not(.skater-color)'), { autoAlpha: 0, duration: 1.2 }, '+=0.3')
-      // 少し間をおいて：白文字を消して吹き出しへ
-      .to(q('.tategaki'), { autoAlpha: 0, duration: 0.5 }, '+=0.8')
+      // 少し間をおいて吹き出しへ（白文字はシーン2のあいだ消さずに残す）
       // 吹き出し：小さい丸 → 本体をぽぽんと続けて出し、左 → 右はひと呼吸ずらす
-      .addLabel('bubbles', '-=0.2')
+      .addLabel('bubbles', '+=1.1')
       .from([...q('.dot-l2'), ...q('.dot-l1'), ...q('.bubble-l')],
         { scale: 0, autoAlpha: 0, duration: 0.35, stagger: 0.15, ease: 'back.out(2)' }, 'bubbles')
       .from([...q('.dot-r1'), ...q('.bubble-r')],
         { scale: 0, autoAlpha: 0, duration: 0.35, stagger: 0.15, ease: 'back.out(2)' }, 'bubbles+=0.8')
       .from(q('.zoom'), { scale: 0, autoAlpha: 0, duration: 0.6, ease: 'back.out(1.7)' }, '+=0.4')
+      // 虫眼鏡が出たら、波紋の音（ぼわんぼわんと弱まっていく）を繰り返し鳴らす
+      // （登場の途中で URL から 3 以降へ移っていたら鳴らさない）
+      .call(() => { if (steps.time() === steps.labels.s2) startHamon(); }, null, '<')
       .from(q('.back'), { autoAlpha: 0, duration: 0.6 }, '<');
 
     // タイプライター用に、タイトルを1文字ずつ span に分ける（初回だけ）
@@ -100,12 +106,25 @@ const sceneAnimations = {
     // まぶたは最初は白目の上に隠しておく（白目の形で切り抜いているので見えない）
     gsap.set(q('.eye-lid'), { y: -310 });
 
+    // 虫眼鏡の波紋の音：虫眼鏡が出ているあいだ、波紋1つが広がって消えるまで（3.6秒）ごとに鳴らす
+    let hamonLoop = null;
+    const startHamon = () => {
+      stopHamon(0);
+      playSound('hamon');
+      hamonLoop = setInterval(() => playSound('hamon'), 3600);
+    };
+    const stopHamon = (fade = 0.5) => {
+      clearInterval(hamonLoop);
+      hamonLoop = null;
+      stopSound('hamon', fade);
+    };
+
     // 3 以降の流れ。ラベル s2 / s3 / s4 の位置まで再生（戻るときは逆再生）して切り替える
     const steps = gsap.timeline({ paused: true })
       .addLabel('s2')
       // ズームイン（3）
       .to(q('.zoom'), { autoAlpha: 0, duration: 0.3 })
-      .to(q('.me, .bubble, .bubble-dot'), { autoAlpha: 0, duration: 0.6 }, '<')
+      .to(q('.me, .bubble, .bubble-dot, .tategaki'), { autoAlpha: 0, duration: 0.6 }, '<')
       // 壁の上の人を中心に、画面全体を同じ倍率で拡大する（基点は CSS の --zoom-x / --zoom-y）
       .to(q('.camera'), { scale: 6, duration: 2, ease: 'power2.inOut' }, 's2')
       // 同心円のあしらい：カメラと一緒に広がる。ズームの前半で現れて、後半で消える
@@ -122,7 +141,8 @@ const sceneAnimations = {
       // 赤い帯をフェードインし、タイトルをタイプライターで1文字ずつ表示
       .addLabel('s4band', '-=0.3')
       .to(q('.person-band'), { autoAlpha: 1, duration: 0.8 }, 's4band')
-      .to(q('.person-title .char'), { visibility: 'visible', duration: 0.01, stagger: 0.1 }, '+=0.2')
+      .addLabel('s4title', '+=0.2')
+      .to(q('.person-title .char'), { visibility: 'visible', duration: 0.01, stagger: 0.1 }, 's4title')
       .to(q('.person-band .btn-white'), { autoAlpha: 1, duration: 1.2, ease: 'sine.inOut' }, '+=1')
       .addLabel('s4')
       // いーな（5）：赤い帯を消してオーバーレイを重ねる
@@ -131,7 +151,8 @@ const sceneAnimations = {
       .addLabel('s5in')
       // 白いパネルと目（瞳にはシーン4のスケーターが映る）
       .fromTo(q('.s5-panel'), { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'power2.out', immediateRender: false })
-      .fromTo(q('.s5-eye'), { autoAlpha: 0, scale: 0.7 }, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'back.out(1.6)', immediateRender: false }, '-=0.2')
+      .addLabel('s5eye', '-=0.2')
+      .fromTo(q('.s5-eye'), { autoAlpha: 0, scale: 0.7 }, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'back.out(1.6)', immediateRender: false }, 's5eye')
       // 右 → 左 → 上 → 下 の順に白文字を表示（シーン2の白文字と同じペース）
       // 右 → 左 → 上 → 下を、前の文字が出きる前に次を重ねてテンポよく出す
       .to(q('.s5-right'), { autoAlpha: 1, duration: 1 }, '+=0.3')
@@ -149,9 +170,10 @@ const sceneAnimations = {
       // 下向きのまつ毛は、まぶたが下りきる直前から、まぶたと一緒に下りてくるようにふわっと出す
       .fromTo(q('.lashes-down'), { opacity: 0, y: -40 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }, 's5lid+=0.5')
       // ひと呼吸おいて「いーな」の吹き出しがポンポン出る（順番はばらばら）
+      .addLabel('iina', '+=0.8')
       .fromTo(gsap.utils.shuffle(q('.iina-bubble')),
         { autoAlpha: 0, scale: 0 },
-        { autoAlpha: 1, scale: 1, duration: 0.4, stagger: 0.25, ease: 'back.out(2)', immediateRender: false }, '+=0.8')
+        { autoAlpha: 1, scale: 1, duration: 0.4, stagger: 0.25, ease: 'back.out(2)', immediateRender: false }, 'iina')
       // 文字を消し、吹き出しが膨らんで背景をネイビーで埋め尽くす
       .to(q('.iina-bubble span'), { opacity: 0, duration: 0.5 }, '+=0.5')
       .to(q('.iina-bubble'), { scale: 4, duration: 1, stagger: 0.05, ease: 'power2.in' }, '-=0.1')
@@ -161,6 +183,7 @@ const sceneAnimations = {
       .to(q('.eye-lid'), { morphSVG: q('#lid-3')[0], duration: 0.6, ease: 'sine.inOut' }, '<')
       .to(q('.lash-mid'), { y: 69.737, duration: 0.6, ease: 'sine.inOut' }, '<')
       .to(q('.lash-center'), { y: 89.737, duration: 0.6, ease: 'sine.inOut' }, '<')
+      .addLabel('s5navy')
       .to(q('.iina-bubble'), { autoAlpha: 0, duration: 0.3 })
       // （いーな）→ BACK と NEXT
       .to(q('.s5-iina'), { autoAlpha: 1, duration: 1 }, '+=0.3')
@@ -174,13 +197,25 @@ const sceneAnimations = {
       .fromTo(q('.koma'), { y: innerHeight * 0.6, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, ease: 'power3.out', stagger: 0.5, immediateRender: false })
       // 読めるくらいの間をおいて、コマが上へ抜け、同時に2つのパネルが下から上がってくる
       // 同じ速さ・同じタイミングで動かし、コマがパネルに押し上げられるように見せる
-      .to(q('.koma'), { y: -innerHeight, duration: 1.4, ease: 'power2.inOut' }, '+=5')
+      .addLabel('s6komaOut', '+=5')
+      .to(q('.koma'), { y: -innerHeight, duration: 1.4, ease: 'power2.inOut' }, 's6komaOut')
       .fromTo(q('.q-panel'), { y: innerHeight, autoAlpha: 1 }, { y: 0, autoAlpha: 1, duration: 1.4, ease: 'power2.inOut', immediateRender: false }, '<')
       // 上のテキスト → 下のテキストとボタン → BACK
       .to(q('.s6-quote'), { autoAlpha: 1, duration: 1 }, '+=0.2')
       .to(q('.s6-question, .s6-answers'), { autoAlpha: 1, duration: 1 }, '+=0.4')
       .to(q('.back'), { autoAlpha: 1, duration: 0.6 }, '+=0.4')
       .addLabel('s6');
+
+    // 「いーな」の吹き出しが1つ出るたびに音を鳴らす（前の音を止めずに重ねる）
+    q('.iina-bubble').forEach((b, i) => {
+      steps.call(() => playSound('iina', 1, true), null, `iina+=${i * 0.25}`);
+    });
+    // 3つのコマが出ているあいだ（上がり始めてから、上へ抜け始めるまで）、時計のちくたくを鳴らす
+    // （「はい」で s6in から再生し直したときにも鳴るよう、s6in の少しあと）
+    steps.call(() => startTick(), null, 's6in+=0.01');
+    steps.call(() => stopTick(), null, 's6komaOut');
+    // ネイビーで塗りつぶされたら、ため息（素材の頭の2秒近くはノイズだけなので、1.8秒目から鳴らす）
+    steps.call(() => playSound('sigh', 1, false, 1.8), null, 's5navy');
 
     // 左のコマの時計：長針は2秒、短針は24秒で1周（ずっとループ）
     gsap.to(q('.clock-minute'), { rotation: 360, svgOrigin: '211.667 161.5', duration: 2, ease: 'none', repeat: -1 });
@@ -219,6 +254,9 @@ const sceneAnimations = {
       const ripple = gsap.timeline({ delay: 1.5 })
         .set(q('.s5-eye-ripples'), { autoAlpha: 1 })
         .fromTo(q('.s5-eye-ripple'), { scale: 1, opacity: 1 }, { scale: 1.35, opacity: 0, duration: 2.4, ease: 'power1.out', stagger: { each: 0.8, repeat: -1 } });
+      // 波紋が出ているあいだ、輪1つが広がって消えるまで（2.4秒）ごとに音を鳴らす
+      const rippleSound = gsap.timeline({ delay: 1.5, repeat: -1, repeatDelay: 2.4 })
+        .call(() => playSound('eye-ripple'));
       gsap.set(el, { cursor: 'pointer' });
       const go = (e) => {
         if (e.type === 'keydown' && !['Enter', ' ', 'ArrowRight'].includes(e.key)) return;
@@ -230,6 +268,8 @@ const sceneAnimations = {
       waiting = {
         kill() {
           ripple.kill();
+          rippleSound.kill();
+          stopSound('eye-ripple', 0.5);
           gsap.set(q('.s5-eye-ripples'), { autoAlpha: 0 });
           gsap.set(el, { cursor: '' });
           el.removeEventListener('click', go);
@@ -239,9 +279,24 @@ const sceneAnimations = {
     });
 
     let move;
+    let soundCall;
     self.add('step', (n) => {
       if (move) move.kill();
       stopWaiting();
+      // 虫眼鏡が消えるので波紋の音を止める（2 に戻ったら、虫眼鏡がまた出たところで再開する）
+      stopHamon();
+      stopTick();
+      // 2 から 3 へ進むとき（虫眼鏡を押してズームするとき）だけ、ズームの音を鳴らす
+      if (n === '3' && steps.time() < steps.labels.s3) playSound('zoom');
+      // タイムラインのラベルの位置（＋ずらす秒数）で音を鳴らす。前の予約は取り消す
+      if (soundCall) soundCall.kill();
+      const cue = (name, label, offset = 0) => {
+        soundCall = gsap.delayedCall(steps.labels[label] - steps.time() + offset, () => playSound(name));
+      };
+      // 3 から 4 へ進むとき：クリエイティブパーソンのタイトルの1文字目が出る 0.1 秒前にドラム
+      if (n === '4' && steps.time() <= steps.labels.s3) cue('drum', 's4title', -0.1);
+      // 4 から 5 へ進むとき：目が出るのと同時に eye-open
+      if (n === '5' && steps.time() <= steps.labels.s4) cue('eye-open', 's5eye');
       // 5 へ進むときは、文字が出そろったところで止めてクリックを待つ
       if (n === '5' && steps.time() < steps.labels.s5read) {
         move = steps.tweenTo('s5read', { onComplete: () => self.waitRead() });
@@ -260,7 +315,7 @@ const sceneAnimations = {
         });
         return;
       }
-      move = steps.tweenTo('s' + n);
+      move = steps.tweenTo('s' + n, n === '2' ? { onComplete: startHamon } : {});
     });
 
     // 「はい」：質問を消して、3つのコマからもう一度（押し続けるとループする）
@@ -282,13 +337,19 @@ const sceneAnimations = {
 
     // URL で直接 3 以降を開いたときは、その状態から表示する
     if (step !== '2') {
-      intro.progress(1);
+      // 途中の音は鳴らさない（true でコールバックを呼ばずに進める）
+      intro.progress(1, true);
+      startWind();
       steps.seek('s' + step);
     }
 
     // シーンを離れるときに後片付け
     return () => {
       stopWaiting();
+      stopSound('wall');
+      stopHamon(0);
+      stopTick();
+      stopWind();
       gsap.ticker.remove(syncLines);
       yes.removeEventListener('click', replayKoma);
     };
@@ -324,19 +385,34 @@ const sceneAnimations = {
 
     // GIVE UP をタイプ（文字は0.18秒、点は0.35秒ずつ）
     let t = tl.duration() + 0.5;
+    // タイプしているあいだキーボードの音を鳴らす（素材の頭の無音を飛ばして 0.2 秒目から）
+    tl.call(() => playSound('typing', 1, false, 0.2), null, t);
+    let lastKey = t;
     chars.forEach((c) => {
       tl.set(c, { autoAlpha: 1 }, t);
+      lastKey = t;
       t += c.textContent === '.' ? 0.35 : 0.18;
     });
+    // 最後の1文字が出たところで止める
+    tl.call(() => stopSound('typing', 0.1), null, lastKey);
 
     // パチン！：目と文字を一瞬で消し、爆発と手を出す。白いフラッシュと画面の揺れで衝撃を出す
-    tl.addLabel('snap', t + 0.5)
+    // 打ち終わってから余韻をおいてパチン
+    tl.addLabel('snap', t + 1)
+      // 音：指パッチン（頭の無音を飛ばして 0.12 秒目から）とクラッカーを重ねて鳴らす。残響で余韻を足す
+      // 2つを重ねると上限を超えて音割れするので、それぞれ 0.85 倍にする
+      .call(() => {
+        playSound('snap', 0.85, false, 0.12, 0.8);
+        playSound('popper', 0.85, false, 0, 0.8);
+      }, null, 'snap')
       .set(q('.s7-eye-closed, .s7-giveup'), { autoAlpha: 0 }, 'snap')
       .fromTo(q('.s7-burst'), { autoAlpha: 1, scale: 0 }, { scale: 1.15, duration: 0.12, ease: 'power2.out', immediateRender: false }, 'snap')
       .to(q('.s7-burst'), { scale: 1, duration: 0.25, ease: 'power2.inOut' })
       .fromTo(q('.s7-hand-wrap'), { autoAlpha: 1, scale: 0.7, transformOrigin: '50% 100%' }, { scale: 1, duration: 0.35, ease: 'back.out(2.5)', immediateRender: false }, 'snap')
       .fromTo(q('.s7-flash'), { autoAlpha: 0.85 }, { autoAlpha: 0, duration: 0.25, immediateRender: false }, 'snap')
-      .fromTo(q('.s7-snap-lines'), { autoAlpha: 1, scale: 0.6 }, { scale: 1.3, autoAlpha: 0, duration: 0.4, ease: 'power2.out', immediateRender: false }, 'snap+=0.05')
+      // キラキラ：はじいた瞬間に大きめでパッと出て一瞬で締まり、フェードせずにパッと消える
+      .fromTo(q('.s7-sparkle'), { autoAlpha: 1, scale: 1.4 }, { scale: 1, duration: 0.08, ease: 'power2.out', immediateRender: false }, 'snap')
+      .set(q('.s7-sparkle'), { autoAlpha: 0 }, 'snap+=0.22')
       .to(el, { x: () => gsap.utils.random(-8, 8) * u, y: () => gsap.utils.random(-8, 8) * u, duration: 0.04, repeat: 5, repeatRefresh: true }, 'snap')
       .to(el, { x: 0, y: 0, duration: 0.04 })
       // 余韻：爆発がゆっくり脈打つ
@@ -352,8 +428,10 @@ const sceneAnimations = {
       .to(q('.s7-btn'), { autoAlpha: 1, duration: 0.6 }, '+=0.4')
       .to(q('.back'), { autoAlpha: 1, duration: 0.6 }, '+=0.4');
 
-    // BACK で戻ってきたときは、最後の状態（瞳の中の手と「え!?」ボタン）から表示する
-    if (isBack) tl.progress(1);
+    // BACK で戻ってきたときは、最後の状態（瞳の中の手と「え!?」ボタン）から表示する（途中の音は鳴らさない）
+    if (isBack) tl.progress(1, true);
+
+    return () => stopSound('typing');
   },
 
   // 私とスケーター（8）：パネルを左右にスライドする
@@ -435,6 +513,11 @@ const sceneAnimations = {
       // 私は下から、鏡は上から同時に入ってくる
       .from(me, { y: innerHeight, duration: 1.4, ease: 'power3.out' }, 0.3)
       .from(mirror, { y: -innerHeight * 1.2, duration: 1.4, ease: 'power3.out' }, 0.3)
+      // 鏡が差し出されたら、朝の鳥の声を背景に流す（目が醒めるシーン。繰り返し）
+      .call(() => {
+        const birds = playSound('birds');
+        if (birds) birds.loop = true;
+      }, null, '>')
       // 3秒そのまま → 暗いオーバーレイ
       .to(q('.s9-overlay'), { autoAlpha: 1, duration: 0.8 }, '+=3');
     // 2行をタイプ（1文字0.12秒、行の間は0.4秒）
@@ -452,7 +535,17 @@ const sceneAnimations = {
     // BACK で戻ってきたときは、最後の状態から表示する
     if (isBack) tl.progress(1);
 
-    return () => gsap.ticker.remove(syncReflection);
+    // 次（ハシゴの音）へ進むときや BACK のときは、画面が切り替わる前に鳥の声を消しておく
+    const quietBirds = (e) => {
+      if (e.target.closest('.next, .back')) stopSound('birds', 0.4);
+    };
+    el.addEventListener('pointerdown', quietBirds);
+
+    return () => {
+      gsap.ticker.remove(syncReflection);
+      el.removeEventListener('pointerdown', quietBirds);
+      stopSound('birds');
+    };
   },
 
   // ハシゴを登る（10）
@@ -477,29 +570,39 @@ const sceneAnimations = {
       busy = true;
       const y = (count + 1) * STEP * u;
       gsap.timeline({ onComplete: () => { busy = false; if (count >= fills.length) finish(); } })
+        // 登る音：1歩ずつゆっくり「トン・トン」と2回。同じ大きさだと機械的に聞こえるので、2歩目は少し小さく
+        // （タイムラインに入れているので、2歩目が鳴るまで次の「登る」は受け付けない）
+        .call(() => playSound('climb', 0.7, true), null, 0)
+        .call(() => playSound('climb', 0.6, true), null, 0.6)
         .to(fills[count], { scaleY: 1, duration: 0.4, ease: 'power2.out' }, 0)
         .to(q('.s10-world'), { y: y + 24 * u, duration: 0.35, ease: 'power2.out' }, 0)
-        .to(q('.s10-world'), { y, duration: 0.3, ease: 'sine.inOut' });
+        .to(q('.s10-world'), { y, duration: 0.3, ease: 'sine.inOut' }, 0.35);
       count += 1;
     };
     climb.addEventListener('click', climbOnce);
 
     // 登場：ハシゴが上から降りてくる → バロメーターと「登る」
     const intro = gsap.timeline()
+      // ハシゴが降りてくる音（動き出すのと同時に）
+      .call(() => playSound('ladder'), null, 0.3)
       .from(q('.s10-ladder'), { y: -3000 * u, duration: 1.8, ease: 'power2.out' }, 0.3)
       .to(q('.s10-meter'), { autoAlpha: 1, duration: 0.6 }, '+=0.2')
       .to(climb, { autoAlpha: 1, duration: 0.6 }, '<0.2');
 
     // BACK で戻ってきたときは、登りきった状態から表示する
     if (isBack) {
-      intro.progress(1);
+      // 途中の音は鳴らさない
+      intro.progress(1, true);
       count = fills.length;
       gsap.set(fills, { scaleY: 1 });
       gsap.set(q('.s10-world'), { y: count * STEP * u });
       finish().progress(1);
     }
 
-    return () => climb.removeEventListener('click', climbOnce);
+    return () => {
+      climb.removeEventListener('click', climbOnce);
+      stopSound('ladder');
+    };
   },
 
   // 解放しなよ（11）
@@ -537,6 +640,11 @@ const sceneAnimations = {
     });
     tl.to(q('.s11-intro'), { autoAlpha: 0, duration: 0.5 }, t + 2.5)
       .set(q('.s11-half'), { autoAlpha: 1 })
+      // バロメーターがフィーバーしている音を、左右が出るのと同時にループで流す（背景なので小さめ）
+      .call(() => {
+        const fever = playSound('fever', 0.5);
+        if (fever) fever.loop = true;
+      })
       .from(q('.s11-right'), { xPercent: 100, duration: 0.8, ease: 'power3.out' })
       // 顔・スイッチ・バロメーターは左右とも同時に、そろってふわっと出す
       .from(q('.s11-face-skater, .s11-face-me, .s11-toggle, .s11-bar'), { autoAlpha: 0, y: 20, duration: 0.6, ease: 'power2.out' }, '-=0.1');
@@ -560,6 +668,8 @@ const sceneAnimations = {
       gsap.set(q('.s11-ripple'), { opacity: 0 });
       const sw = q('.s11-toggle-me .s11-switch')[0];
       const on = gsap.timeline()
+        // スイッチを ON にした瞬間に Angel
+        .call(() => playSound('angel'), null, 0)
         .to(sw.querySelector('.sw-knob'), { attr: { cx: 248.543, fill: '#FF2D55' }, duration: 0.35, ease: 'power2.inOut' }, 0)
         .to(sw.querySelector('.sw-track'), { attr: { fill: '#FFE3E4' }, duration: 0.35 }, 0)
         .to(sw.querySelector('.sw-on'), { attr: { fill: '#FF3B30' }, duration: 0.35 }, 0)
@@ -568,7 +678,8 @@ const sceneAnimations = {
         .to(q('.s11-bar-off'), { backgroundColor: '#fff', duration: 0.4 }, 0.2)
         // 一度ぎゅっと目を閉じる（タメ）：まぶたが下まで伸び、下向きのまつ毛も一緒に下がる
         .to(q('.me-lid'), { scaleY: 1.95, transformOrigin: '50% 0%', duration: 0.12, ease: 'power2.in' }, 0.25)
-        .to(q('.me-lashes-down'), { y: 72, duration: 0.12, ease: 'power2.in' }, 0.25)
+        // まつ毛は閉じたまぶたの縁（白目の下のカーブ）に沿うよう、外側ほど下げる量を小さくする
+        .to(q('.me-lashes-down > *'), { y: (i) => [35, 64, 72, 64, 35][i % 5], duration: 0.12, ease: 'power2.in' }, 0.25)
         // パチッと開く：まぶたが上へ引っ込み、瞳が黄色に、まつ毛が上向きに立つ
         .addLabel('open', 0.45)
         .to(q('.me-lid'), { y: -170, scaleY: 1, duration: 0.3, ease: 'power3.out' }, 'open')
@@ -596,13 +707,22 @@ const sceneAnimations = {
     // BACK で戻ってきたときは、私のスイッチが ON になった状態から表示する
     if (isBack) {
       tl.progress(1);
-      self.turnOn().progress(1);
+      // ON の状態から表示する（Angel は鳴らさない）
+      self.turnOn().progress(1, true);
       blueFever.progress(redFever.progress()).play();
     }
+
+    // 次へ進むときや BACK のときは、画面が切り替わる前にフィーバーの音を消しておく
+    const quietFever = (e) => {
+      if (e.target.closest('.next, .back')) stopSound('fever', 0.5);
+    };
+    el.addEventListener('pointerdown', quietFever);
 
     return () => {
       el.removeEventListener('click', onToggle);
       modal.removeEventListener('click', closeModal);
+      el.removeEventListener('pointerdown', quietFever);
+      stopSound('fever');
     };
   },
 
@@ -612,14 +732,23 @@ const sceneAnimations = {
     const board = q('.s12-board')[0];
 
     const tl = gsap.timeline()
+      // 転がってくる音：素材のいちばん大きい部分（1.0秒目）から鳴らし、0.2秒でフェードイン
+      .call(() => {
+        playSound('skate', 0, false, 1.0);
+        fadeSound('skate', 1, 0.2);
+      }, null, 0.3)
+      // 止まる 0.6 秒前からフェードアウトして、止まった瞬間に消す
+      .call(() => stopSound('skate', 0.6), null, 2.3)
       // 左からゆっくり流れてきて、自然に減速して止まる
       .from(board, { x: -(innerWidth + board.getBoundingClientRect().width), duration: 2.6, ease: 'power2.out' }, 0.3)
       // 「乗る」→ BACK
       .fromTo(q('.s12-ride'), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)' }, '-=0.1')
       .to(q('.back'), { autoAlpha: 1, duration: 0.6 }, '+=0.4');
 
-    // BACK で戻ってきたときは、最後の状態から表示する
-    if (isBack) tl.progress(1);
+    // BACK で戻ってきたときは、最後の状態から表示する（途中の音は鳴らさない）
+    if (isBack) tl.progress(1, true);
+
+    return () => stopSound('skate');
   },
 
   // 壁の上を走る2人と問い（13）

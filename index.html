@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=chevron_left,chevron_right,laptop_mac,search&display=block">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=chevron_left,chevron_right,laptop_mac,search,volume_off,volume_up&display=block">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -27,10 +27,21 @@
     <!-- 初期画面 -->
     <section class="scene scene-top is-active" data-scene="1">
       <h1 class="title" data-text="ポップな狂気">ポップな狂気</h1>
-      <p class="notice">
-        <span class="material-symbols-outlined" aria-hidden="true">laptop_mac</span>
-        パソコンでご覧ください
-      </p>
+      <div class="notices">
+        <p class="notice">
+          <span class="material-symbols-outlined" aria-hidden="true">laptop_mac</span>
+          パソコンでご覧ください
+        </p>
+        <p class="notice">
+          <span class="material-symbols-outlined" aria-hidden="true">volume_up</span>
+          サウンドONでお楽しみください
+          <!-- サウンドの ON/OFF（右上のボタンと連動）。START より前に ON にすると、音の準備が済んで START 以降の音がずれない -->
+          <button class="sound-switch" type="button" role="switch" aria-checked="false" aria-label="サウンド" data-sound="none">
+            <span class="sound-switch-track"><span class="sound-switch-knob"></span></span>
+            <span class="sound-switch-label">OFF</span>
+          </button>
+        </p>
+      </div>
       <button class="next btn-start" type="button">START</button>
     </section>
 
@@ -144,7 +155,7 @@
       <span class="bubble-dot dot-r1"></span>
       <p class="bubble bubble-r">誰かいる</p>
 
-      <button class="next zoom" type="button" aria-label="壁の上の人を見る">
+      <button class="next zoom" type="button" aria-label="壁の上の人を見る" data-sound="none">
         <span class="ripple"></span>
         <span class="ripple"></span>
         <span class="ripple"></span>
@@ -450,18 +461,11 @@
           </linearGradient>
           </defs>
         </svg>
+        <!-- パチン！のキラキラ（手と一緒に拡大するよう、同じ入れ物に入れる） -->
+        <svg class="s7-sparkle" viewBox="0 0 12 13" fill="none" aria-hidden="true">
+          <path d="M3.32646 7.30425C3.23346 6.90425 2.67446 6.90225 2.56846 7.28225L2.44146 7.98625C2.37505 8.35949 2.19963 8.70472 1.93732 8.97843C1.67501 9.25213 1.33754 9.44205 0.967456 9.52425L0.305455 9.67125L0.253455 9.69125C-0.0805448 9.81525 -0.0745438 10.2643 0.213456 10.4043L0.281457 10.4283L0.992455 10.5562C1.36466 10.6235 1.70871 10.7991 1.98144 11.0612C2.25417 11.3233 2.44342 11.66 2.52546 12.0293L2.67346 12.6952C2.76646 13.0952 3.32546 13.0962 3.43246 12.7172L3.55846 12.0122C3.62486 11.639 3.80028 11.2938 4.06259 11.0201C4.3249 10.7464 4.66237 10.5565 5.03246 10.4742L5.69446 10.3272C6.10846 10.2312 6.09646 9.63725 5.67946 9.55925L5.01146 9.44025C4.63839 9.37366 4.29338 9.19817 4.01987 8.93587C3.74636 8.67357 3.55659 8.3362 3.47446 7.96625L3.32646 7.30425ZM8.07446 0.46725C7.94346 -0.15575 7.05446 -0.15575 6.92246 0.46725L6.72246 1.46525C6.6111 2.02289 6.33715 2.53509 5.93514 2.93728C5.53313 3.33947 5.02105 3.61364 4.46346 3.72525L3.46646 3.92425C2.86246 4.05125 2.84346 4.89025 3.41046 5.06125L4.46346 5.27225C5.02123 5.38368 5.53353 5.65778 5.93573 6.05998C6.33793 6.46218 6.61203 6.97447 6.72346 7.53225L6.92246 8.52925L6.94946 8.60725C7.12546 9.11225 7.79946 9.11825 8.01946 8.69125L8.05646 8.58825L8.27146 7.52625C8.38391 6.97016 8.65812 6.45966 9.05965 6.05884C9.46119 5.65802 9.97216 5.38472 10.5285 5.27325L11.5305 5.07325C12.1345 4.94625 12.1535 4.10725 11.5875 3.93525L10.5335 3.72525C9.97568 3.61382 9.46339 3.33972 9.06118 2.93752C8.65898 2.53532 8.38488 2.02303 8.27346 1.46525L8.07446 0.46725Z" fill="#FE5227"/>
+        </svg>
       </div>
-
-      <!-- パチン！の効果線 -->
-      <svg class="s7-snap-lines" viewBox="-100 -100 200 200" aria-hidden="true">
-        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(-90)"/>
-        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(-60)"/>
-        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(-30)"/>
-        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(0)"/>
-        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(30)"/>
-        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(60)"/>
-        <line x1="0" y1="-48" x2="0" y2="-88" transform="rotate(90)"/>
-      </svg>
 
       <div class="s7-flash"></div>
 
@@ -799,7 +803,7 @@
         <span class="s10-seg"><span class="s10-fill"></span></span>
       </div>
 
-      <button class="btn-white s10-climb" type="button">登る<span class="material-symbols-outlined">chevron_right</span></button>
+      <button class="btn-white s10-climb" type="button" data-sound="none">登る<span class="material-symbols-outlined">chevron_right</span></button>
       <button class="next btn-white s10-go" type="button">さあ！<span class="material-symbols-outlined">chevron_right</span></button>
       <button class="back" type="button">
         <span class="material-symbols-outlined">chevron_left</span>BACK
@@ -888,8 +892,8 @@
 <path d="M69.6562 72.5234L65.2268 71.6917L54.9253 98.6346L59.3547 99.4664L63.7842 100.298L74.0857 73.3552L69.6562 72.5234Z" fill="black"/>
 <path d="M24.0791 73.917L19.9012 72.2266L0.000229782 96.383L4.1781 98.0734L8.35597 99.7638L28.257 75.6074L24.0791 73.917Z" fill="black"/>
 </g>
-            <!-- まぶた（白目の形で切り抜く） -->
-            <g clip-path="url(#me-white-1)"><path class="me-lid" d="M114.833 0C166.35 3.34458e-05 210.075 35.8488 225.585 77.1322C225.585 77.1322 166.35 77.1321 114.833 77.1322C63.3161 77.1322 4.08154 77.1322 4.08154 77.1322C19.5909 35.8487 63.3161 0 114.833 0Z" fill="url(#paint1_linear-me)"/></g>
+            <!-- まぶた（長方形を白目の形で切り抜く。縦に伸ばしても幅が白目と揃う） -->
+            <g clip-path="url(#me-white-1)"><path class="me-lid" d="M0 0H230V77.1322H0Z" fill="url(#paint1_linear-me)"/></g>
           </g>
           <defs><clipPath id="me-white-2"><path d="M423.376 0.000976562C474.893 0.00101001 518.618 35.8498 534.128 77.1331C518.618 118.417 474.893 144.098 423.376 144.098C371.859 144.098 328.134 118.417 312.625 77.1331C328.134 35.8497 371.859 0.000976562 423.376 0.000976562Z"/></clipPath></defs>
           <g class="me-eye">
@@ -911,8 +915,8 @@
 <path d="M378.151 72.5234L373.722 71.6917L363.42 98.6346L367.85 99.4664L372.279 100.298L382.581 73.3552L378.151 72.5234Z" fill="black"/>
 <path d="M332.574 73.917L328.396 72.2266L308.495 96.383L312.673 98.0734L316.851 99.7638L336.752 75.6074L332.574 73.917Z" fill="black"/>
 </g>
-            <!-- まぶた（白目の形で切り抜く） -->
-            <g clip-path="url(#me-white-2)"><path class="me-lid" d="M423.328 0C474.845 3.34458e-05 518.57 35.8488 534.08 77.1322C534.08 77.1322 474.846 77.1321 423.328 77.1322C371.811 77.1322 312.577 77.1322 312.577 77.1322C328.086 35.8487 371.811 0 423.328 0Z" fill="url(#paint3_linear-me)"/></g>
+            <!-- まぶた（長方形を白目の形で切り抜く。縦に伸ばしても幅が白目と揃う） -->
+            <g clip-path="url(#me-white-2)"><path class="me-lid" d="M308 0H539V77.1322H308Z" fill="url(#paint3_linear-me)"/></g>
           </g>
           <path class="me-mouth-line" d="M151.364 259.642H386.893" stroke="black" stroke-width="14"/>
           <!-- 笑った口（一文字の口の位置から上下に開く） -->
@@ -928,7 +932,7 @@
 </g>
 </g>
         </svg>
-        <button class="s11-toggle s11-toggle-me" type="button" aria-label="私のスイッチ">
+        <button class="s11-toggle s11-toggle-me" type="button" aria-label="私のスイッチ" data-sound="none">
           <span class="s11-ripple"></span>
           <span class="s11-ripple"></span>
           <svg class="s11-switch " viewBox="0 0 380 120" aria-hidden="true">
@@ -1421,7 +1425,7 @@
         </defs>
       </svg>
       <p class="s14-bubble s14-bubble-l">ARE YOU READY?</p>
-      <p class="s14-bubble s14-bubble-r">YES, YOU CAN</p>
+      <p class="s14-bubble s14-bubble-r">YES, YOU CAN!</p>
       <button class="next btn-white btn-pink-shadow s14-yes" type="button">はい<span class="material-symbols-outlined">chevron_right</span></button>
       <button class="back" type="button">
         <span class="material-symbols-outlined">chevron_left</span>BACK
@@ -1455,6 +1459,11 @@
         TOPへ<span class="material-symbols-outlined">chevron_right</span>
       </button>
     </section>
+
+    <!-- サウンドの ON/OFF（すべてのシーンで右上に表示） -->
+    <button class="btn-black sound-toggle" type="button" aria-label="サウンド" aria-pressed="false" data-sound="none">
+      <span class="material-symbols-outlined" aria-hidden="true">volume_off</span>
+    </button>
   </main>
 
   <script src="js/vendor/gsap.min.js"></script>

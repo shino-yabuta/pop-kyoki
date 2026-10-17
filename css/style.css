@@ -83,11 +83,19 @@ body {
   transform: translate(calc(-10 * var(--u)), calc(12 * var(--u)));
 }
 
+/* 注意書き2行：まとめて中央に置き、アイコンの左端をそろえる */
+.notices {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(16 * var(--u));
+  margin-top: calc(70 * var(--u));
+}
+
 .notice {
   display: flex;
   align-items: center;
   gap: calc(20 * var(--u));
-  margin-top: calc(70 * var(--u));
   font-family: var(--font-note);
   font-size: calc(22 * var(--u));
   letter-spacing: 0.1em;
@@ -95,6 +103,54 @@ body {
 
 .notice .material-symbols-outlined {
   font-size: calc(36 * var(--u));
+}
+
+/* サウンドのトグルスイッチ（推奨文の横）。ON で赤、つまみが右へ */
+.sound-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font-family: var(--font-en);
+  font-size: calc(20 * var(--u));
+  cursor: pointer;
+}
+
+.sound-switch-track {
+  position: relative;
+  width: calc(60 * var(--u));
+  height: calc(32 * var(--u));
+  border-radius: 999px;
+  background: #c7c7cc;
+  transition: background-color 0.2s;
+}
+
+.sound-switch-knob {
+  position: absolute;
+  top: calc(3 * var(--u));
+  left: calc(3 * var(--u));
+  width: calc(26 * var(--u));
+  height: calc(26 * var(--u));
+  border-radius: 50%;
+  background: #fff;
+  transition: translate 0.2s;
+}
+
+.sound-switch[aria-checked="true"] .sound-switch-track {
+  background: var(--color-red);
+}
+
+.sound-switch[aria-checked="true"] .sound-switch-knob {
+  translate: calc(28 * var(--u)) 0;
+}
+
+/* ON と OFF で幅が変わって位置がずれないよう、幅をそろえる */
+.sound-switch-label {
+  min-width: 2.2em;
+  text-align: left;
 }
 
 .btn-start {
@@ -590,6 +646,21 @@ body {
   font-size: calc(40 * var(--u));
 }
 
+/* サウンドの ON/OFF：右上に固定（BACK と対称の余白）。どのシーンよりも手前に出す */
+.sound-toggle {
+  position: absolute;
+  top: calc(29 * var(--u));
+  right: calc(30 * var(--u));
+  z-index: 10;
+  width: calc(56 * var(--u));
+  height: calc(56 * var(--u));
+  padding: 0;
+}
+
+.sound-toggle .material-symbols-outlined {
+  font-size: calc(32 * var(--u));
+}
+
 .btn-next {
   position: absolute;
   right: calc(32 * var(--u));
@@ -784,7 +855,7 @@ body {
 .s7-giveup .char,
 .s7-eye-open,
 .s7-hand-wrap,
-.s7-snap-lines,
+.s7-sparkle,
 .s7-flash,
 .s7-btn,
 .scene-snap .back {
@@ -850,17 +921,13 @@ body {
   height: calc(969 * var(--u));
 }
 
-/* パチン！の効果線（指先のまわり） */
-.s7-snap-lines {
+/* パチン！のキラキラ（指先の右上、指にかぶらない位置） */
+.s7-sparkle {
   position: absolute;
-  left: calc(50% + 209 * var(--u) - 100 * var(--u));
-  top: calc(50% - 188 * var(--u) - 100 * var(--u));
-  width: calc(200 * var(--u));
-  height: calc(200 * var(--u));
-  overflow: visible;
-  stroke: #fe5227;
-  stroke-width: 8;
-  stroke-linecap: round;
+  left: calc(50% + 252 * var(--u));
+  top: calc(50% - 400 * var(--u));
+  width: calc(150 * var(--u));
+  height: calc(163 * var(--u));
 }
 
 .s7-flash {
@@ -1723,20 +1790,23 @@ body {
 }
 
 /* シーン5：文字を読み終えてクリックを待つ間、瞳の黒い輪から外へ広がる波紋 */
+/* 波紋が瞳にかぶらないよう、瞳（半径 276）の内側をくり抜く。広がった波紋（1.35倍）が切れないよう、入れ物は大きめ（半径 380） */
 .s5-eye-ripples {
   position: absolute;
-  left: calc(50% + 0.4 * var(--u) - 276 * var(--u));
-  top: calc(50% + 52.2 * var(--u) - 276 * var(--u));
-  width: calc(552 * var(--u));
-  height: calc(552 * var(--u));
+  left: calc(50% + 0.4 * var(--u) - 380 * var(--u));
+  top: calc(50% + 52.2 * var(--u) - 380 * var(--u));
+  width: calc(760 * var(--u));
+  height: calc(760 * var(--u));
+  mask-image: radial-gradient(circle, transparent calc(276 * var(--u)), #000 calc(277 * var(--u)));
   opacity: 0;
   visibility: hidden;
 }
 
 .s5-eye-ripple {
   position: absolute;
-  inset: 0;
-  border: calc(14 * var(--u)) solid rgba(97, 85, 245, 0.45); /* #6155F5 */
+  inset: calc(104 * var(--u));
   border-radius: 50%;
+  /* 虫眼鏡の波紋と同じく半透明の塗り。重なって広がることで、目に近いほど濃いグラデーションに見える */
+  background: rgba(97, 85, 245, 0.35); /* #6155F5 */
   opacity: 0;
 }
