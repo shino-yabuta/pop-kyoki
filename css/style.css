@@ -135,11 +135,12 @@ body {
   isolation: isolate;
 }
 
+/* 左右に少しはみ出させて、ゴゴゴと揺れたときに画面の端に隙間が出ないようにする */
 .wall {
   position: absolute;
   top: var(--wall-top);
-  left: 0;
-  right: 0;
+  left: calc(-10 * var(--u));
+  right: calc(-10 * var(--u));
   bottom: 0;
   background: linear-gradient(180deg, #edf3ff 0%, #6155f5 100%);
 }
@@ -1719,4 +1720,23 @@ body {
 .scene-last .back {
   opacity: 0;
   visibility: hidden;
+}
+
+/* シーン5：文字を読み終えてクリックを待つ間、瞳の黒い輪から外へ広がる波紋 */
+.s5-eye-ripples {
+  position: absolute;
+  left: calc(50% + 0.4 * var(--u) - 276 * var(--u));
+  top: calc(50% + 52.2 * var(--u) - 276 * var(--u));
+  width: calc(552 * var(--u));
+  height: calc(552 * var(--u));
+  opacity: 0;
+  visibility: hidden;
+}
+
+.s5-eye-ripple {
+  position: absolute;
+  inset: 0;
+  border: calc(14 * var(--u)) solid rgba(97, 85, 245, 0.45); /* #6155F5 */
+  border-radius: 50%;
+  opacity: 0;
 }

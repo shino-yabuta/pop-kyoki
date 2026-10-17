@@ -65,28 +65,29 @@ const sceneAnimations = {
     // 登場の流れ
     const intro = gsap.timeline()
       // 壁がゴゴゴとせり上がる（上がりながら細かく揺れる）
-      .from(q('.wall'), { yPercent: 100, duration: 2.8, ease: 'power1.inOut' })
-      .to(q('.wall'), { x: () => gsap.utils.random(-3, 3) * u, duration: 0.05, repeat: 50, repeatRefresh: true, ease: 'none' }, 0)
+      .from(q('.wall'), { yPercent: 100, duration: 1.8, ease: 'power1.inOut' })
+      .to(q('.wall'), { x: () => gsap.utils.random(-3, 3) * u, duration: 0.05, repeat: 33, repeatRefresh: true, ease: 'none' }, 0)
       .to(q('.wall'), { x: 0, duration: 0.05 })
       // 壁がせり上がりきってから人物を表示
-      .from(q('.me'), { y: '30%', autoAlpha: 0, duration: 1.2, ease: 'power2.out' }, '+=0.4')
+      .from(q('.me'), { y: '30%', autoAlpha: 0, duration: 1.2, ease: 'power2.out' }, '+=0.2')
       // 人物が出てから余韻をおいて帯を表示
       .from(q('.wall-text, .wall-text-strong'), { autoAlpha: 0, duration: 1.4, ease: 'sine.inOut' }, '+=0.8')
-      .from(q('.tategaki-right'), { autoAlpha: 0, duration: 1.2 }, '+=0.4')
-      .from(q('.tategaki-left'), { autoAlpha: 0, duration: 1.2 }, '+=0.3')
+      // 左右の縦文字はテンポよく：帯と重ねて出し始め、右 → 左を少しずらして続ける
+      .from(q('.tategaki-right'), { autoAlpha: 0, duration: 0.7 }, '-=0.4')
+      .from(q('.tategaki-left'), { autoAlpha: 0, duration: 0.7 }, '-=0.35')
       // 強調を消す → 帯が流れ始める（流れる動きは CSS の wall-flow） → スケーター登場
       .to(q('.wall-text-strong'), { autoAlpha: 0, duration: 0.8 }, '+=0.3')
       .set(q('.wall-text'), { animationPlayState: 'running' })
       .to(q('.speed-lines'), { autoAlpha: 1, duration: 0.8 }, '<')
       .from(q('.skater-wrap:not(.skater-color)'), { autoAlpha: 0, duration: 1.2 }, '+=0.3')
-      // 間をおいて：白文字を消して吹き出しへ
-      .to(q('.tategaki'), { autoAlpha: 0, duration: 0.8 }, '+=1.5')
-      // 吹き出し：0.5秒おきにぽんぽんと表示
-      .from(
-        [...q('.dot-l2'), ...q('.dot-l1'), ...q('.bubble-l'), ...q('.dot-r1'), ...q('.bubble-r')],
-        { scale: 0, autoAlpha: 0, duration: 0.4, stagger: 0.5, ease: 'back.out(2)' },
-        '-=0.3'
-      )
+      // 少し間をおいて：白文字を消して吹き出しへ
+      .to(q('.tategaki'), { autoAlpha: 0, duration: 0.5 }, '+=0.8')
+      // 吹き出し：小さい丸 → 本体をぽぽんと続けて出し、左 → 右はひと呼吸ずらす
+      .addLabel('bubbles', '-=0.2')
+      .from([...q('.dot-l2'), ...q('.dot-l1'), ...q('.bubble-l')],
+        { scale: 0, autoAlpha: 0, duration: 0.35, stagger: 0.15, ease: 'back.out(2)' }, 'bubbles')
+      .from([...q('.dot-r1'), ...q('.bubble-r')],
+        { scale: 0, autoAlpha: 0, duration: 0.35, stagger: 0.15, ease: 'back.out(2)' }, 'bubbles+=0.8')
       .from(q('.zoom'), { scale: 0, autoAlpha: 0, duration: 0.6, ease: 'back.out(1.7)' }, '+=0.4')
       .from(q('.back'), { autoAlpha: 0, duration: 0.6 }, '<');
 
@@ -132,17 +133,21 @@ const sceneAnimations = {
       .fromTo(q('.s5-panel'), { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'power2.out', immediateRender: false })
       .fromTo(q('.s5-eye'), { autoAlpha: 0, scale: 0.7 }, { autoAlpha: 1, scale: 1, duration: 0.6, ease: 'back.out(1.6)', immediateRender: false }, '-=0.2')
       // 右 → 左 → 上 → 下 の順に白文字を表示（シーン2の白文字と同じペース）
-      .to(q('.s5-right'), { autoAlpha: 1, duration: 1.2 }, '+=0.4')
-      .to(q('.s5-left'), { autoAlpha: 1, duration: 1.2 }, '+=0.3')
-      .to(q('.s5-top'), { autoAlpha: 1, duration: 1.2 }, '+=0.3')
-      .to(q('.s5-bottom'), { autoAlpha: 1, duration: 1.2 }, '+=0.3')
+      // 右 → 左 → 上 → 下を、前の文字が出きる前に次を重ねてテンポよく出す
+      .to(q('.s5-right'), { autoAlpha: 1, duration: 1 }, '+=0.3')
+      .to(q('.s5-left'), { autoAlpha: 1, duration: 1 }, '-=0.2')
+      .to(q('.s5-top'), { autoAlpha: 1, duration: 1 }, '-=0.2')
+      .to(q('.s5-bottom'), { autoAlpha: 1, duration: 1 }, '-=0.2')
+      // 文字が出そろったらここで止まり、閲覧者のクリックを待つ（読み切れるように）
+      .addLabel('s5read')
       // ひと呼吸おいて伏し目（eye2）に：文字を消し、まぶたが下りて、瞳がグレーに、まつ毛が下向きに
-      .addLabel('s5lid', '+=1')
+      .addLabel('s5lid', '+=0.3')
       .to(q('.s5-text'), { autoAlpha: 0, duration: 0.8 }, 's5lid')
       .to(q('.lashes-up'), { opacity: 0, duration: 0.3 }, 's5lid')
       .to(q('.eye-lid'), { y: 0, duration: 0.8, ease: 'power2.inOut' }, 's5lid')
       .to(q('.eye-iris'), { opacity: 1, duration: 0.5 }, 's5lid+=0.4')
-      .set(q('.lashes-down'), { opacity: 1 }, 's5lid+=0.8')
+      // 下向きのまつ毛は、まぶたが下りきる直前から、まぶたと一緒に下りてくるようにふわっと出す
+      .fromTo(q('.lashes-down'), { opacity: 0, y: -40 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }, 's5lid+=0.5')
       // ひと呼吸おいて「いーな」の吹き出しがポンポン出る（順番はばらばら）
       .fromTo(gsap.utils.shuffle(q('.iina-bubble')),
         { autoAlpha: 0, scale: 0 },
@@ -204,9 +209,44 @@ const sceneAnimations = {
       5: { label: 's6in', targets: '.s6-layer' },
     };
 
+    // シーン5：文字を読み終えるまで待つ。瞳から波紋を出して合図し、画面のどこか（または Enter・スペース・→）で進む
+    let waiting = null;
+    const stopWaiting = () => {
+      if (waiting) waiting.kill();
+      waiting = null;
+    };
+    self.add('waitRead', () => {
+      const ripple = gsap.timeline({ delay: 1.5 })
+        .set(q('.s5-eye-ripples'), { autoAlpha: 1 })
+        .fromTo(q('.s5-eye-ripple'), { scale: 1, opacity: 1 }, { scale: 1.35, opacity: 0, duration: 2.4, ease: 'power1.out', stagger: { each: 0.8, repeat: -1 } });
+      gsap.set(el, { cursor: 'pointer' });
+      const go = (e) => {
+        if (e.type === 'keydown' && !['Enter', ' ', 'ArrowRight'].includes(e.key)) return;
+        stopWaiting();
+        move = steps.tweenTo('s5');
+      };
+      el.addEventListener('click', go);
+      window.addEventListener('keydown', go);
+      waiting = {
+        kill() {
+          ripple.kill();
+          gsap.set(q('.s5-eye-ripples'), { autoAlpha: 0 });
+          gsap.set(el, { cursor: '' });
+          el.removeEventListener('click', go);
+          window.removeEventListener('keydown', go);
+        },
+      };
+    });
+
     let move;
     self.add('step', (n) => {
       if (move) move.kill();
+      stopWaiting();
+      // 5 へ進むときは、文字が出そろったところで止めてクリックを待つ
+      if (n === '5' && steps.time() < steps.labels.s5read) {
+        move = steps.tweenTo('s5read', { onComplete: () => self.waitRead() });
+        return;
+      }
       const back = fadeBack[n];
       if (back && steps.time() > steps.labels[back.label]) {
         move = gsap.to(q(back.targets), {
@@ -248,6 +288,7 @@ const sceneAnimations = {
 
     // シーンを離れるときに後片付け
     return () => {
+      stopWaiting();
       gsap.ticker.remove(syncLines);
       yes.removeEventListener('click', replayKoma);
     };
