@@ -201,16 +201,12 @@ body {
   cursor: not-allowed;
 }
 
-/* トップの注意書き：スマホ・タブレット（タッチが主な操作の端末）では「横向きでご覧ください」に切り替える */
+/* トップの「横向きでご覧ください」は、スマホ・タブレット（タッチが主な操作の端末）だけに表示する */
 .notice-touch {
   display: none;
 }
 
 @media (hover: none) and (pointer: coarse) {
-  .notice-pc {
-    display: none;
-  }
-
   .notice-touch {
     display: flex;
   }
