@@ -69,17 +69,19 @@ function show(index) {
   };
 
   // BACK や TOPへで戻るときは、今の画面が消えきってから次の画面を出す（2つの画面が重ならないように）
-  if (isBack) {
+  // data-fade-out を付けた画面から進むときも同じ流れにし、余韻が残るよう少しゆっくり消す（例：シーン11）
+  const fadeThrough = !isBack && prev.el.hasAttribute('data-fade-out');
+  if (isBack || fadeThrough) {
     fade = gsap.to(prev.el, {
       opacity: 0,
-      duration: 0.45,
+      duration: fadeThrough ? 0.8 : 0.45,
       ease: 'power1.in',
       onComplete: () => {
         clearPrev();
         begin();
         fade = gsap.fromTo(next.el, { opacity: 0 }, {
           opacity: 1,
-          duration: 0.45,
+          duration: fadeThrough ? 0.6 : 0.45,
           ease: 'power1.out',
           onComplete: () => leaving.finish(),
         });
@@ -361,7 +363,7 @@ function playWarp() {
   // 音量の形：すっと立ち上がって、なめらかに消える
   const amp = audioCtx.createGain();
   amp.gain.setValueAtTime(0, now);
-  amp.gain.linearRampToValueAtTime(0.25, now + 0.015);
+  amp.gain.linearRampToValueAtTime(0.45, now + 0.015);
   amp.gain.exponentialRampToValueAtTime(0.001, now + dur);
   // 本体：220Hz → 440Hz へ上がるサイン波
   const carrier = audioCtx.createOscillator();

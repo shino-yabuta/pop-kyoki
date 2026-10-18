@@ -7,6 +7,9 @@ gsap.config({ force3D: false });
 const stageEl = document.getElementById('stage');
 const unit = () => Math.min(stageEl.clientWidth / 1440, stageEl.clientHeight / 1024);
 
+// メモ：GSAP で拡大・移動したボタンは、CSS の translate が none で上書きされ、押したときに沈まなくなる。
+// 出てくる動きの終わりに clearProps: 'transform,translate,rotate,scale' で GSAP の変形を消しておく
+
 // シーンごとのアニメーション。キーは data-scene の（最初の）番号
 // シーンに入るたびに呼ばれ、離れるときに元の状態へ戻される
 // step：URL で指定されたシーン番号。同じ画面内での移動は self.step() で受け取る
@@ -84,9 +87,8 @@ const sceneAnimations = {
       .from(q('.me'), { y: '30%', autoAlpha: 0, duration: 1.2, ease: 'power2.out' }, '+=0.2')
       // 帯は壁が上がりきったらすぐに表示（人物と重ねて出す）
       .from(q('.wall-text, .wall-text-strong'), { autoAlpha: 0, duration: 1.4, ease: 'sine.inOut' }, 1.8)
-      // 左右の縦文字はテンポよく：帯と重ねて出し始め、右 → 左を少しずらして続ける
-      .from(q('.tategaki-right'), { autoAlpha: 0, duration: 0.7 }, '-=0.4')
-      .from(q('.tategaki-left'), { autoAlpha: 0, duration: 0.7 }, '-=0.35')
+      // 左右の縦文字（超えられない／高い壁）：帯と重ねて出し始め、2行を同時に出す
+      .from(q('.tategaki-right, .tategaki-left'), { autoAlpha: 0, duration: 0.7 }, '-=0.4')
       // 強調を消す → 帯が流れ始める（流れる動きは wallFlow） → スケーター登場
       .to(q('.wall-text-strong'), { autoAlpha: 0, duration: 0.8 }, '+=0.3')
       .call(() => wallFlow.play())
@@ -118,8 +120,9 @@ const sceneAnimations = {
     let hamonLoop = null;
     const startHamon = () => {
       stopHamon(0);
-      playSound('hamon');
-      hamonLoop = setInterval(() => playSound('hamon'), 3600);
+      // 素材が小さめなので 1.6 倍
+      playSound('hamon', 1.6);
+      hamonLoop = setInterval(() => playSound('hamon', 1.6), 3600);
     };
     const stopHamon = (fade = 0.5) => {
       clearInterval(hamonLoop);
@@ -141,7 +144,7 @@ const sceneAnimations = {
       // 色を戻す（カラー版を重ねてフェードイン）
       .to(q('.skater-color'), { opacity: 1, duration: 1.5 }, 's2+=0.5')
       // ズームと色が戻ったあとにボタンを表示
-      .fromTo(q('.btn-are'), { autoAlpha: 0, y: 20 * u }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out', immediateRender: false }, '+=0.2')
+      .fromTo(q('.btn-are'), { autoAlpha: 0, y: 20 * u }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out', immediateRender: false, clearProps: 'transform,translate,rotate,scale' }, '+=0.2')
       .addLabel('s3')
       // クリエイティブパーソン（4）：ボタンを消し、さらに少し寄る
       .to(q('.btn-are'), { autoAlpha: 0, duration: 0.3 })
@@ -225,7 +228,7 @@ const sceneAnimations = {
 
     // 「いーな」の吹き出しが1つ出るたびに音を鳴らす（前の音を止めずに重ねる）
     q('.iina-bubble').forEach((b, i) => {
-      steps.call(() => playSound('iina', 1, true), null, `iina+=${i * 0.25}`);
+      steps.call(() => playSound('iina', 1.8, true), null, `iina+=${i * 0.25}`);
     });
     // 3つのコマが出ているあいだ（上がり始めてから、矢印を押して上へ抜け始めるまで）、時計のちくたくを鳴らす
     // （「はい」で s6in から再生し直したときにも鳴るよう、s6in の少しあと）
@@ -332,13 +335,13 @@ const sceneAnimations = {
       if (n === '3' && steps.time() < steps.labels.s3) playSound('zoom');
       // タイムラインのラベルの位置（＋ずらす秒数）で音を鳴らす。前の予約は取り消す
       if (soundCall) soundCall.kill();
-      const cue = (name, label, offset = 0) => {
-        soundCall = gsap.delayedCall(steps.labels[label] - steps.time() + offset, () => playSound(name));
+      const cue = (name, label, offset = 0, volume = 1) => {
+        soundCall = gsap.delayedCall(steps.labels[label] - steps.time() + offset, () => playSound(name, volume));
       };
       // 3 から 4 へ進むとき：クリエイティブパーソンのタイトルの1文字目が出る 0.1 秒前にドラム
       if (n === '4' && steps.time() <= steps.labels.s3) cue('drum', 's4title', -0.1);
       // 4 から 5 へ進むとき：目が出るのと同時に eye-open
-      if (n === '5' && steps.time() <= steps.labels.s4) cue('eye-open', 's5eye');
+      if (n === '5' && steps.time() <= steps.labels.s4) cue('eye-open', 's5eye', 0, 1.8);
       // 6 へ進むときは、3コマが出たところで止めて「下へ」の矢印を待つ
       if (n === '6' && steps.time() < steps.labels.s6wait) {
         move = steps.tweenTo('s6wait', { onComplete: () => self.waitKoma() });
@@ -457,7 +460,7 @@ const sceneAnimations = {
       // 2つを重ねると上限を超えて音割れするので、それぞれ 0.85 倍にする
       .call(() => {
         playSound('snap', 0.85, false, 0.12, 0.8);
-        playSound('popper', 0.85, false, 0, 0.8);
+        playSound('popper', 1.2, false, 0, 0.8);
       }, null, 'snap')
       .set(q('.s7-eye-closed, .s7-giveup'), { autoAlpha: 0 }, 'snap')
       .fromTo(q('.s7-burst'), { autoAlpha: 1, scale: 0 }, { scale: 1.15, duration: 0.12, ease: 'power2.out', immediateRender: false }, 'snap')
@@ -615,7 +618,7 @@ const sceneAnimations = {
     // てっぺんに着いたあと：「登る」を消し、「さあ！」→ BACK
     const finish = () => gsap.timeline()
       .to(climb, { autoAlpha: 0, duration: 0.3 })
-      .fromTo(q('.s10-go'), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)' }, '+=0.2')
+      .fromTo(q('.s10-go'), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)', clearProps: 'transform,translate,rotate,scale' }, '+=0.2')
       .to(q('.back'), { autoAlpha: 1, duration: 0.6 }, '+=0.4');
 
     // 「登る」：1目盛り塗り、壁とハシゴをまとめて下へ（ぐっと沈んでから少し戻る）
@@ -717,7 +720,7 @@ const sceneAnimations = {
     self.add('closeModal', () => gsap.to(modal, { autoAlpha: 0, duration: 0.2 }));
     modal.addEventListener('click', closeModal);
 
-    // 私のスイッチを ON：目が開き、口が笑い、背景がシアンに。BACK と NEXT を出す
+    // 私のスイッチを ON：目が開き、口が笑い、背景がシアンに。3秒後に自動で次のシーンへ
     let meOn = false;
     self.add('turnOn', () => {
       meOn = true;
@@ -751,7 +754,8 @@ const sceneAnimations = {
         .to(q('.me-grin'), { opacity: 1, duration: 0.3 }, 'open+=0.15')
         // 右のバロメーターは、左と同じ位置（進み具合）から動かして揃える
         .add(() => blueFever.progress(redFever.progress()).play(), 0.6)
-        .to(q('.back, .s11-next'), { autoAlpha: 1, duration: 0.6 }, '+=0.8');
+        // ON にしてから3秒たったら、NEXT を押さずに自動で次のシーンへ
+        .call(() => { location.hash = '12'; }, null, 3);
       return on;
     });
 
@@ -771,8 +775,9 @@ const sceneAnimations = {
     // BACK で戻ってきたときは、私のスイッチが ON になった状態から表示する
     if (isBack) {
       tl.progress(1);
-      // ON の状態から表示する（Angel は鳴らさない）
+      // ON の状態から表示する（Angel は鳴らさず、自動でも進まない）。自分で進めるよう NEXT と BACK を出しておく
       self.turnOn().progress(1, true);
+      gsap.set(q('.back, .s11-next'), { autoAlpha: 1 });
       blueFever.progress(redFever.progress()).play();
     }
 
@@ -807,7 +812,7 @@ const sceneAnimations = {
       // 左からゆっくり流れてきて、自然に減速して止まる
       .from(board, { x: -(innerWidth + board.getBoundingClientRect().width), duration: 2.6, ease: 'power2.out' }, 0.3)
       // 「乗る」→ BACK
-      .fromTo(q('.s12-ride'), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)' }, '-=0.1')
+      .fromTo(q('.s12-ride'), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)', clearProps: 'transform,translate,rotate,scale' }, '-=0.1')
       .to(q('.back'), { autoAlpha: 1, duration: 0.6 }, '+=0.4');
 
     // BACK で戻ってきたときは、最後の状態から表示する（途中の音は鳴らさない）
@@ -895,14 +900,14 @@ const sceneAnimations = {
       .to(q('.s14-title'), { autoAlpha: 1, duration: 1.2, ease: 'sine.inOut' }, 1.2)
       .from(q('.s14-skater'), rise, '+=0.3')
       // キャラが上がってくるときに、シーン5で目が出るときと同じ音（2人とも）
-      .call(() => playSound('eye-open', 1, true), null, '<')
+      .call(() => playSound('eye-open', 1.8, true), null, '<')
       .set(q('.s14-bubble-l'), { autoAlpha: 1 })
       .from(q('.s14-bubble-l'), pop)
       .from(q('.s14-me'), rise, '+=0.3')
-      .call(() => playSound('eye-open', 1, true), null, '<')
+      .call(() => playSound('eye-open', 1.8, true), null, '<')
       .set(q('.s14-bubble-r'), { autoAlpha: 1 })
       .from(q('.s14-bubble-r'), pop)
-      .fromTo(q('.s14-yes'), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)' }, '+=0.4')
+      .fromTo(q('.s14-yes'), { autoAlpha: 0, scale: 0.6 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)', clearProps: 'transform,translate,rotate,scale' }, '+=0.4')
       .to(q('.back'), { autoAlpha: 1, duration: 0.6 }, '+=0.4');
 
     // BACK で戻ってきたときは、最後の状態から表示する（途中の音は鳴らさない）
